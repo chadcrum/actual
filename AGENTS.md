@@ -583,3 +583,13 @@ The codebase is actively being migrated:
 - **React.\* → Named Imports**: Legacy React.\* patterns being removed
 
 When working with older code, follow the newer patterns described in this guide.
+
+## Further Reading
+
+For deeper understanding of Actual's systems, see:
+
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)**: Deep dive into CRDT sync, AQL queries, client-server communication, and platform abstraction
+- **[DATA-FLOW.md](./DATA-FLOW.md)**: Redux patterns, undo/redo system, reactivity, and query dependencies
+- **[DOMAIN-LOGIC.md](./DOMAIN-LOGIC.md)**: Transactions, split transactions, envelope budgeting, and budget calculations
+
+These documents provide detailed explanations of core systems that are essential when working on sync, queries, state management, or budget logic.
