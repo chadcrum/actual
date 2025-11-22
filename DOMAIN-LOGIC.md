@@ -120,6 +120,7 @@ Child transactions immediately follow their parent in the database, making it ef
 ### Split Transaction Rules
 
 Child transactions inherit certain properties from the parent:
+
 - They must have the same account
 - They should share the same payee (if parent has one)
 - The cleared flag should match the parent
@@ -196,6 +197,7 @@ export function createCategory(cat, sheetName, prevSheetName) {
 ```
 
 The leftover calculation depends on:
+
 - `budget-${cat.id}`: The budgeted amount for this month
 - `sum-amount-${cat.id}`: The sum of all transactions in this category (negative for expenses)
 - Previous month's leftover and carryover settings
@@ -344,6 +346,7 @@ export function createSummary(groups, categories, prevSheetName, sheetName) {
 ```
 
 The "to budget" amount is calculated as:
+
 - Available funds (income + from last month)
 - Plus last month's overspent (negative amounts from categories without carryover)
 - Plus total budgeted (negated, so subtracting)
@@ -406,6 +409,7 @@ This allows the system to track which account money is transferred to/from while
 ### How Transfers Work
 
 When you create a transfer transaction:
+
 1. A category is created (or exists) that represents the transfer
 2. The `category_mapping` table links that category to the target account
 3. The transaction uses that category
@@ -425,10 +429,9 @@ When creating a transfer:
 
 ```47:93:packages/loot-core/src/server/transactions/transfer.ts
 export async function addTransfer(transaction, transferredAccount) {
-  
+
 ```
 
 The system creates or finds a category mapped to the target account, then links the transaction to that category.
 
 See also: [ARCHITECTURE.md](./ARCHITECTURE.md), [DATA-FLOW.md](./DATA-FLOW.md), [AGENTS.md](./AGENTS.md)
-

@@ -74,7 +74,7 @@ function IncomeCategoryName({ category, onEdit }: IncomeCategoryNameProps) {
               ...styles.lineClamp(2),
               width: sidebarColumnWidth,
               textAlign: 'left',
-              ...styles.smallText,
+              fontSize: 16,
             }}
             data-testid="category-name"
           >

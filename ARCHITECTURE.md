@@ -330,6 +330,7 @@ async function _fullSync(
 ### Why CRDTs?
 
 CRDTs enable:
+
 - **Offline-first**: Changes work offline and sync later
 - **No conflicts**: Timestamps ensure deterministic ordering
 - **Eventual consistency**: All devices converge to the same state
@@ -779,4 +780,3 @@ CREATE TABLE __migrations__ (id INT PRIMARY KEY NOT NULL);
 Migrations are timestamped SQL files in `packages/loot-core/migrations/` that are automatically applied on startup. Each migration file is named with a timestamp prefix to ensure they run in order.
 
 See also: [DATA-FLOW.md](./DATA-FLOW.md), [DOMAIN-LOGIC.md](./DOMAIN-LOGIC.md), [AGENTS.md](./AGENTS.md)
-

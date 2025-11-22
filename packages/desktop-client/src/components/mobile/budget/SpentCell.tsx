@@ -72,14 +72,14 @@ export function SpentCell({
               <AutoTextSize
                 key={value}
                 as={Text}
-                minFontSizePx={6}
-                maxFontSizePx={12}
+                minFontSizePx={8}
+                maxFontSizePx={15}
                 mode="oneline"
                 style={{
                   ...makeAmountGrey(value),
                   maxWidth: columnWidth,
                   textAlign: 'right',
-                  fontSize: 12,
+                  fontSize: 15,
                 }}
               >
                 {format(value, type)}

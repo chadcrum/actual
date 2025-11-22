@@ -96,15 +96,15 @@ export function BalanceCell({
             <AutoTextSize
               key={value}
               as={Text}
-              minFontSizePx={6}
-              maxFontSizePx={12}
+              minFontSizePx={8}
+              maxFontSizePx={15}
               mode="oneline"
               className={cx(
                 defaultClassName,
                 css({
                   maxWidth: columnWidth,
                   textAlign: 'right',
-                  fontSize: 12,
+                  fontSize: 15,
                 }),
               )}
             >
