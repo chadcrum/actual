@@ -85,7 +85,7 @@ function ExpenseCategoryName({
               ...styles.lineClamp(2),
               width: sidebarColumnWidth,
               textAlign: 'left',
-              ...styles.smallText,
+              fontSize: 16,
             }}
             data-testid="category-name"
           >

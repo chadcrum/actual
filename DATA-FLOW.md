@@ -33,6 +33,7 @@ const rootReducer = combineReducers({
 ### Slice Pattern
 
 Each slice follows a consistent pattern with:
+
 - Initial state
 - Reducers (sync state updates)
 - Actions (async operations via thunks)
@@ -75,7 +76,7 @@ export const actions = {
   ...prefsSlice.actions,
   loadPrefs,
   savePrefs,
-  
+
 ```
 
 ### Error Handling
@@ -166,6 +167,7 @@ export const snapshot = () => {
 ```
 
 The snapshot captures:
+
 - Current URL
 - Modal state
 - Other UI state that should be restored on undo
@@ -340,6 +342,7 @@ When undo/redo happens, the client receives an event and updates the UI:
 ```
 
 The undo event includes:
+
 - `tables`: Which tables were affected
 - `undoTag`: The snapshot ID to restore UI state
 
@@ -351,7 +354,7 @@ All mutations are automatically tracked. The system uses `withMutation` to mark 
 function withMutation<Params extends Array<unknown>, ReturnType>(
   handler: (...args: Params) => Promise<ReturnType>,
 ) {
-  
+
 ```
 
 This ensures all data changes are captured for undo/redo.
@@ -424,6 +427,7 @@ export function triggerBudgetChanges(oldValues, newValues) {
 ```
 
 When data changes:
+
 1. `triggerBudgetChanges` is called with old and new values
 2. The spreadsheet identifies which calculations need to update
 3. Dependent cells are recalculated
@@ -452,7 +456,7 @@ export async function compileAndRunAqlQuery(
   queryState: QueryState,
   options: RunCompiledAqlQueryOptions,
 ) {
-  
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = await runCompiledAqlQuery(
     queryState,
@@ -478,4 +482,3 @@ Components can subscribe to data changes:
 This enables efficient updates without polling or manually tracking dependencies.
 
 See also: [ARCHITECTURE.md](./ARCHITECTURE.md), [DOMAIN-LOGIC.md](./DOMAIN-LOGIC.md), [AGENTS.md](./AGENTS.md)
-

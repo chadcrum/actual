@@ -88,8 +88,8 @@ function ToBudget({ toBudget, onPress, show3Columns }: ToBudgetProps) {
           <View>
             <AutoTextSize
               as={Label}
-              minFontSizePx={6}
-              maxFontSizePx={12}
+              minFontSizePx={8}
+              maxFontSizePx={14}
               mode="oneline"
               title={amount < 0 ? t('Overbudgeted') : t('To Budget')}
               style={{
@@ -107,11 +107,11 @@ function ToBudget({ toBudget, onPress, show3Columns }: ToBudgetProps) {
                   <AutoTextSize
                     key={value}
                     as={Text}
-                    minFontSizePx={6}
-                    maxFontSizePx={12}
+                    minFontSizePx={8}
+                    maxFontSizePx={15}
                     mode="oneline"
                     style={{
-                      fontSize: 12,
+                      fontSize: 15,
                       fontWeight: '700',
                       color:
                         amount < 0
@@ -174,14 +174,14 @@ function Saved({ projected, onPress, show3Columns }: SavedProps) {
             <View>
               <AutoTextSize
                 as={Label}
-                minFontSizePx={6}
-                maxFontSizePx={12}
+                minFontSizePx={8}
+                maxFontSizePx={14}
                 mode="oneline"
                 title={t('Projected savings')}
                 style={{
                   color: theme.formInputText,
                   textAlign: 'left',
-                  fontSize: 12,
+                  fontSize: 14,
                 }}
               />
             </View>
@@ -191,6 +191,7 @@ function Saved({ projected, onPress, show3Columns }: SavedProps) {
               style={{
                 color: theme.formInputText,
                 textAlign: 'left',
+                fontSize: 14,
               }}
             />
           )}
@@ -205,12 +206,12 @@ function Saved({ projected, onPress, show3Columns }: SavedProps) {
                   <AutoTextSize
                     key={value}
                     as={Text}
-                    minFontSizePx={6}
-                    maxFontSizePx={12}
+                    minFontSizePx={8}
+                    maxFontSizePx={15}
                     mode="oneline"
                     style={{
                       textAlign: 'left',
-                      fontSize: 12,
+                      fontSize: 15,
                       fontWeight: '700',
                       color: projected
                         ? theme.warningText
@@ -432,7 +433,7 @@ function BudgetTableHeader({
   const amountStyle: CSSProperties = {
     color: theme.formInputText,
     textAlign: 'right',
-    fontSize: 12,
+    fontSize: 15,
     fontWeight: '500',
   };
 
@@ -517,8 +518,8 @@ function BudgetTableHeader({
                     <View>
                       <AutoTextSize
                         as={Label}
-                        minFontSizePx={8}
-                        maxFontSizePx={12}
+                        minFontSizePx={10}
+                        maxFontSizePx={14}
                         mode="multiline"
                         title={t('Budgeted')}
                         style={{ color: theme.formInputText, paddingRight: 4 }}
@@ -530,8 +531,8 @@ function BudgetTableHeader({
                       <AutoTextSize
                         key={value}
                         as={Text}
-                        minFontSizePx={6}
-                        maxFontSizePx={12}
+                        minFontSizePx={8}
+                        maxFontSizePx={15}
                         mode="oneline"
                         style={{
                           ...amountStyle,
@@ -585,8 +586,8 @@ function BudgetTableHeader({
                     <View>
                       <AutoTextSize
                         as={Label}
-                        minFontSizePx={6}
-                        maxFontSizePx={12}
+                        minFontSizePx={8}
+                        maxFontSizePx={14}
                         mode="oneline"
                         title={t('Spent')}
                         style={{ color: theme.formInputText, paddingRight: 4 }}
@@ -598,8 +599,8 @@ function BudgetTableHeader({
                       <AutoTextSize
                         key={value}
                         as={Text}
-                        minFontSizePx={6}
-                        maxFontSizePx={12}
+                        minFontSizePx={8}
+                        maxFontSizePx={15}
                         mode="oneline"
                         style={{
                           ...amountStyle,
@@ -629,8 +630,8 @@ function BudgetTableHeader({
                 <View>
                   <AutoTextSize
                     as={Label}
-                    minFontSizePx={6}
-                    maxFontSizePx={12}
+                    minFontSizePx={8}
+                    maxFontSizePx={14}
                     mode="oneline"
                     title={t('Balance')}
                     style={{ color: theme.formInputText }}
@@ -641,8 +642,8 @@ function BudgetTableHeader({
                     <AutoTextSize
                       key={value}
                       as={Text}
-                      minFontSizePx={6}
-                      maxFontSizePx={12}
+                      minFontSizePx={8}
+                      maxFontSizePx={15}
                       mode="oneline"
                       style={amountStyle}
                     >
