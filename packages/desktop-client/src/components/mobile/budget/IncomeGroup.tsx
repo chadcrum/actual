@@ -219,7 +219,7 @@ function IncomeGroupName({
               ...styles.lineClamp(2),
               width: sidebarColumnWidth,
               textAlign: 'left',
-              ...styles.smallText,
+              fontSize: 16,
             }}
             data-testid="category-group-name"
           >
@@ -274,8 +274,8 @@ function IncomeGroupCells({ group }: IncomeGroupCellsProps) {
                 <AutoTextSize
                   key={value}
                   as={Text}
-                  minFontSizePx={6}
-                  maxFontSizePx={12}
+                  minFontSizePx={8}
+                  maxFontSizePx={15}
                   mode="oneline"
                   style={{
                     width: columnWidth,
@@ -283,7 +283,7 @@ function IncomeGroupCells({ group }: IncomeGroupCellsProps) {
                     alignItems: 'flex-end',
                     paddingLeft: 5,
                     textAlign: 'right',
-                    fontSize: 12,
+                    fontSize: 15,
                     fontWeight: '500',
                   }}
                 >

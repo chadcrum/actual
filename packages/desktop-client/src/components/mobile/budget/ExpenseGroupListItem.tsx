@@ -251,7 +251,7 @@ function ExpenseGroupName({
               ...styles.lineClamp(2),
               width: sidebarColumnWidth,
               textAlign: 'left',
-              ...styles.smallText,
+              fontSize: 16,
               fontWeight: '500',
             }}
             data-testid="category-group-name"
@@ -287,7 +287,7 @@ function ExpenseGroupCells({
 
   const amountStyle: CSSProperties = {
     width: columnWidth,
-    fontSize: 12,
+    fontSize: 15,
     fontWeight: '500',
     paddingLeft: 5,
     textAlign: 'right',
@@ -332,8 +332,8 @@ function ExpenseGroupCells({
                 <AutoTextSize
                   key={value}
                   as={Text}
-                  minFontSizePx={6}
-                  maxFontSizePx={12}
+                  minFontSizePx={8}
+                  maxFontSizePx={15}
                   mode="oneline"
                   style={amountStyle}
                 >
@@ -359,8 +359,8 @@ function ExpenseGroupCells({
                 <AutoTextSize
                   key={value}
                   as={Text}
-                  minFontSizePx={6}
-                  maxFontSizePx={12}
+                  minFontSizePx={8}
+                  maxFontSizePx={15}
                   mode="oneline"
                   style={amountStyle}
                 >
