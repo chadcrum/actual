@@ -204,6 +204,7 @@ export function TransactionListItem({
                   <TextOneLine
                     style={{
                       ...textStyle,
+                      fontSize: 15,
                       fontWeight: isAdded ? '600' : '400',
                       ...(!displayPayee && !isPreview
                         ? {
@@ -261,7 +262,7 @@ export function TransactionListItem({
                     )}
                     <TextOneLine
                       style={{
-                        fontSize: 14,
+                        fontSize: 12,
                         marginTop: 1,
                         fontWeight: '400',
                         color: prettyCategory
@@ -281,7 +282,7 @@ export function TransactionListItem({
                 {notes && (
                   <TextOneLine
                     style={{
-                      fontSize: 14,
+                      fontSize: 12,
                       marginTop: 4,
                       fontWeight: '400',
                       color: theme.tableText,
