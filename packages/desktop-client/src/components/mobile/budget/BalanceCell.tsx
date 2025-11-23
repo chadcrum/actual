@@ -94,11 +94,29 @@ export function BalanceCell({
           goalValue,
           longGoalValue === 1 ? value : budgetedValue,
         );
-        // If no color is returned (positive value without goal), use noticeText (green)
-        // Otherwise use the returned color, or grey for zero/null
-        const valueColor =
+        // Map text colors to their lighter background equivalents
+        const textColor =
           valueColorStyle?.color ||
           (value > 0 ? theme.noticeText : theme.tableTextSubdued);
+
+        // Convert text color to lighter background color
+        let backgroundColor: string;
+        let textColorForPill: string;
+
+        if (textColor === theme.errorText) {
+          backgroundColor = theme.errorBackground;
+          textColorForPill = 'black';
+        } else if (textColor === theme.warningText) {
+          backgroundColor = theme.warningBackground;
+          textColorForPill = 'black';
+        } else if (textColor === theme.noticeText) {
+          backgroundColor = theme.noticeBackground;
+          textColorForPill = 'black';
+        } else {
+          // Grey case (tableTextSubdued) - use a grey background with white text
+          backgroundColor = theme.tableTextSubdued;
+          textColorForPill = 'white';
+        }
 
         return (
           <Button
@@ -106,8 +124,8 @@ export function BalanceCell({
             style={{
               ...PILL_STYLE,
               maxWidth: columnWidth,
-              backgroundColor: valueColor,
-              color: 'white',
+              backgroundColor,
+              color: textColorForPill,
             }}
             onPress={onPress}
             aria-label={ariaLabel}
@@ -124,7 +142,7 @@ export function BalanceCell({
                     maxWidth: columnWidth,
                     textAlign: 'right',
                     fontSize: 15,
-                    color: 'white',
+                    color: textColorForPill,
                   }),
                 )}
               >
@@ -138,6 +156,26 @@ export function BalanceCell({
   );
 }
 function MobileCarryoverIndicator({ style }: { style?: CSSProperties }) {
+  // Map the original text color to its lighter background equivalent
+  const originalColor = style?.color ?? theme.pillText;
+  let backgroundColor: string;
+  let iconColor: string;
+
+  if (originalColor === theme.errorText) {
+    backgroundColor = theme.errorBackground;
+    iconColor = 'black';
+  } else if (originalColor === theme.warningText) {
+    backgroundColor = theme.warningBackground;
+    iconColor = 'black';
+  } else if (originalColor === theme.noticeText) {
+    backgroundColor = theme.noticeBackground;
+    iconColor = 'black';
+  } else {
+    // Grey case
+    backgroundColor = theme.tableTextSubdued;
+    iconColor = 'white';
+  }
+
   return (
     <View
       style={{
@@ -145,13 +183,13 @@ function MobileCarryoverIndicator({ style }: { style?: CSSProperties }) {
         right: '-3px',
         top: '-5px',
         borderRadius: '50%',
-        backgroundColor: style?.color ?? theme.pillText,
+        backgroundColor,
       }}
     >
       <SvgArrowThickRight
         width={11}
         height={11}
-        style={{ color: 'white' }}
+        style={{ color: iconColor }}
       />
     </View>
   );
