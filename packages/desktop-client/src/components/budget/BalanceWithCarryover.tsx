@@ -193,7 +193,6 @@ export function BalanceWithCarryover({
         borderRadius: 16,
         padding: '2px 8px',
         fontSize: 16,
-        fontWeight: 'bold' as const,
         textAlign: 'right' as const,
         display: 'inline-block',
         ...(!isDisabled && {
