@@ -4,6 +4,9 @@ set -e
 echo "Stopping containers..."
 podman-compose down
 
+echo "Installing dependencies..."
+yarn install
+
 echo "Building server artifacts..."
 yarn build:server
 
