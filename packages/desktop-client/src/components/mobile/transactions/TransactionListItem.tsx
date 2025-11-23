@@ -58,7 +58,7 @@ const getTextStyle = ({
   isPreview: boolean;
 }): CSSProperties => ({
   ...styles.text,
-  fontSize: 16,
+  fontSize: 18,
   ...(isPreview
     ? {
         fontStyle: 'italic',
@@ -261,7 +261,7 @@ export function TransactionListItem({
                     )}
                     <TextOneLine
                       style={{
-                        fontSize: 13,
+                        fontSize: 15,
                         marginTop: 1,
                         fontWeight: '400',
                         color: prettyCategory
@@ -281,7 +281,7 @@ export function TransactionListItem({
                 {notes && (
                   <TextOneLine
                     style={{
-                      fontSize: 13,
+                      fontSize: 15,
                       marginTop: 4,
                       fontWeight: '400',
                       color: theme.tableText,
@@ -307,7 +307,7 @@ export function TransactionListItem({
                 {showRunningBalance && runningBalance !== undefined && (
                   <Text
                     style={{
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: '400',
                       ...makeBalanceAmountStyle(runningBalance),
                     }}
