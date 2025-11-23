@@ -55,7 +55,7 @@ export function ToBudgetAmount({
 
   // Determine background and text colors based on value
   const backgroundColor = isPositive
-    ? theme.noticeBackground
+    ? '#389952'
     : isNegative
       ? theme.errorBackground
       : theme.tableBackground;
