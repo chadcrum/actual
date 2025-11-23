@@ -14,8 +14,10 @@ import { type CategoryEntity } from 'loot-core/types/models';
 import { getColumnWidth, PILL_STYLE } from './BudgetTable';
 
 import { BalanceWithCarryover } from '@desktop-client/components/budget/BalanceWithCarryover';
+import { makeBalanceAmountStyle } from '@desktop-client/components/budget/util';
 import { PrivacyFilter } from '@desktop-client/components/PrivacyFilter';
 import { useFormat } from '@desktop-client/hooks/useFormat';
+import { useSheetValue } from '@desktop-client/hooks/useSheetValue';
 import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 import { type Binding } from '@desktop-client/spreadsheet';
 import {
@@ -68,6 +70,9 @@ export function BalanceCell({
       : envelopeBudget.catCarryover(category.id);
 
   const format = useFormat();
+  const goalValue = useSheetValue(goal);
+  const budgetedValue = useSheetValue(budgeted);
+  const longGoalValue = useSheetValue(longGoal);
 
   return (
     <BalanceWithCarryover
@@ -82,37 +87,53 @@ export function BalanceCell({
       longGoal={longGoal}
       CarryoverIndicator={MobileCarryoverIndicator}
     >
-      {({ type, value, className: defaultClassName }) => (
-        <Button
-          variant="bare"
-          style={{
-            ...PILL_STYLE,
-            maxWidth: columnWidth,
-          }}
-          onPress={onPress}
-          aria-label={ariaLabel}
-        >
-          <PrivacyFilter>
-            <AutoTextSize
-              key={value}
-              as={Text}
-              minFontSizePx={8}
-              maxFontSizePx={15}
-              mode="oneline"
-              className={cx(
-                defaultClassName,
-                css({
-                  maxWidth: columnWidth,
-                  textAlign: 'right',
-                  fontSize: 15,
-                }),
-              )}
-            >
-              {format(value, type)}
-            </AutoTextSize>
-          </PrivacyFilter>
-        </Button>
-      )}
+      {({ type, value, className: defaultClassName }) => {
+        // Get the color for this specific value
+        const valueColorStyle = makeBalanceAmountStyle(
+          value,
+          goalValue,
+          longGoalValue === 1 ? value : budgetedValue,
+        );
+        // If no color is returned (positive value without goal), use noticeText (green)
+        // Otherwise use the returned color, or grey for zero/null
+        const valueColor =
+          valueColorStyle?.color ||
+          (value > 0 ? theme.noticeText : theme.tableTextSubdued);
+
+        return (
+          <Button
+            variant="bare"
+            style={{
+              ...PILL_STYLE,
+              maxWidth: columnWidth,
+              backgroundColor: valueColor,
+              color: 'white',
+            }}
+            onPress={onPress}
+            aria-label={ariaLabel}
+          >
+            <PrivacyFilter>
+              <AutoTextSize
+                key={value}
+                as={Text}
+                minFontSizePx={8}
+                maxFontSizePx={15}
+                mode="oneline"
+                className={cx(
+                  css({
+                    maxWidth: columnWidth,
+                    textAlign: 'right',
+                    fontSize: 15,
+                    color: 'white',
+                  }),
+                )}
+              >
+                {format(value, type)}
+              </AutoTextSize>
+            </PrivacyFilter>
+          </Button>
+        );
+      }}
     </BalanceWithCarryover>
   );
 }
@@ -130,7 +151,7 @@ function MobileCarryoverIndicator({ style }: { style?: CSSProperties }) {
       <SvgArrowThickRight
         width={11}
         height={11}
-        style={{ color: theme.pillBackgroundLight }}
+        style={{ color: 'white' }}
       />
     </View>
   );
