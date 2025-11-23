@@ -105,7 +105,7 @@ export function BalanceCell({
 
         if (textColor === theme.errorText) {
           backgroundColor = theme.errorBackground;
-          textColorForPill = 'black';
+          textColorForPill = 'white';
         } else if (textColor === theme.warningText) {
           backgroundColor = theme.warningBackground;
           textColorForPill = 'black';
@@ -163,7 +163,7 @@ function MobileCarryoverIndicator({ style }: { style?: CSSProperties }) {
 
   if (originalColor === theme.errorText) {
     backgroundColor = theme.errorBackground;
-    iconColor = 'black';
+    iconColor = 'white';
   } else if (originalColor === theme.warningText) {
     backgroundColor = theme.warningBackground;
     iconColor = 'black';
