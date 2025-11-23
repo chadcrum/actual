@@ -107,10 +107,10 @@ export function BalanceCell({
           backgroundColor = theme.errorBackground;
           textColorForPill = 'white';
         } else if (textColor === theme.warningText) {
-          backgroundColor = '#FFF9C4'; // Light banana yellow
+          backgroundColor = '#ffff33'; // Bright yellow
           textColorForPill = 'black';
         } else if (textColor === theme.noticeText) {
-          backgroundColor = theme.noticeBackground;
+          backgroundColor = '#00ff00'; // Bright green
           textColorForPill = 'black';
         } else {
           // Grey case (tableTextSubdued) - use a grey background with white text
@@ -143,6 +143,7 @@ export function BalanceCell({
                     textAlign: 'right',
                     fontSize: 15,
                     color: textColorForPill,
+                    fontWeight: 'bold',
                   }),
                 )}
               >
@@ -165,10 +166,10 @@ function MobileCarryoverIndicator({ style }: { style?: CSSProperties }) {
     backgroundColor = theme.errorBackground;
     iconColor = 'white';
   } else if (originalColor === theme.warningText) {
-    backgroundColor = '#FFF9C4'; // Light banana yellow
+    backgroundColor = '#ffff33'; // Bright yellow
     iconColor = 'black';
   } else if (originalColor === theme.noticeText) {
-    backgroundColor = theme.noticeBackground;
+    backgroundColor = '#00ff00'; // Bright green
     iconColor = 'black';
   } else {
     // Grey case
