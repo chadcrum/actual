@@ -192,7 +192,7 @@ export function BalanceWithCarryover({
         color: textColorForPill,
         borderRadius: 16,
         padding: '2px 8px',
-        fontSize: 16,
+        fontSize: 14,
         textAlign: 'right' as const,
         display: 'inline-block',
         ...(!isDisabled && {
@@ -213,6 +213,7 @@ export function BalanceWithCarryover({
       }
       return css({
         ...getBalanceAmountStyle(balanceValue),
+        fontSize: 13,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         textAlign: 'right',
