@@ -13,7 +13,7 @@ import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { Tooltip } from '@actual-app/components/tooltip';
 import { View } from '@actual-app/components/view';
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 
 import { type TransObjectLiteral } from 'loot-core/types/util';
 
@@ -33,23 +33,40 @@ type CarryoverIndicatorProps = {
 };
 
 export function CarryoverIndicator({ style }: CarryoverIndicatorProps) {
+  // Map the original text color to its lighter background equivalent
+  const originalColor = style?.color ?? theme.pillText;
+  let backgroundColor: string;
+  let iconColor: string;
+
+  if (originalColor === theme.errorText) {
+    backgroundColor = theme.errorBackground;
+    iconColor = 'white';
+  } else if (originalColor === theme.warningText) {
+    backgroundColor = '#ffff00'; // Pure yellow
+    iconColor = 'black';
+  } else if (originalColor === theme.noticeText) {
+    backgroundColor = '#00ff00'; // Bright green
+    iconColor = 'black';
+  } else {
+    // Grey case
+    backgroundColor = theme.tableTextSubdued;
+    iconColor = 'white';
+  }
+
   return (
     <View
       style={{
-        marginLeft: 2,
         position: 'absolute',
-        right: '-4px',
-        alignSelf: 'center',
-        justifyContent: 'center',
-        top: 0,
-        bottom: 0,
-        ...style,
+        right: '-3px',
+        top: '-5px',
+        borderRadius: '50%',
+        backgroundColor,
       }}
     >
       <SvgArrowThinRight
-        width={style?.width || 7}
-        height={style?.height || 7}
-        style={style}
+        width={style?.width || 11}
+        height={style?.height || 11}
+        style={{ color: iconColor }}
       />
     </View>
   );
@@ -99,6 +116,7 @@ type BalanceWithCarryoverProps = Omit<
   shouldInlineGoalStatus?: boolean;
   CarryoverIndicator?: ComponentType<CarryoverIndicatorProps>;
   tooltipDisabled?: boolean;
+  usePillStyle?: boolean;
 };
 
 export function BalanceWithCarryover({
@@ -111,6 +129,7 @@ export function BalanceWithCarryover({
   shouldInlineGoalStatus,
   CarryoverIndicator: CarryoverIndicatorComponent = CarryoverIndicator,
   tooltipDisabled,
+  usePillStyle = false,
   children,
   ...props
 }: BalanceWithCarryoverProps) {
@@ -140,9 +159,60 @@ export function BalanceWithCarryover({
     [budgetedValue, goalValue, longGoalValue],
   );
 
+  const getPillStyle = useCallback(
+    (balanceValue: number) => {
+      // Get the color for this specific value
+      const valueColorStyle = getBalanceAmountStyle(balanceValue);
+      // Map text colors to their lighter background equivalents
+      const textColor =
+        valueColorStyle?.color ||
+        (balanceValue > 0 ? theme.noticeText : theme.tableTextSubdued);
+
+      // Convert text color to lighter background color
+      let backgroundColor: string;
+      let textColorForPill: string;
+
+      if (textColor === theme.errorText) {
+        backgroundColor = theme.errorBackground;
+        textColorForPill = 'white';
+      } else if (textColor === theme.warningText) {
+        backgroundColor = '#ffff00'; // Pure yellow
+        textColorForPill = 'black';
+      } else if (textColor === theme.noticeText) {
+        backgroundColor = '#00ff00'; // Bright green
+        textColorForPill = 'black';
+      } else {
+        // Grey case (tableTextSubdued) - use a grey background with white text
+        backgroundColor = theme.tableTextSubdued;
+        textColorForPill = 'white';
+      }
+
+      return {
+        backgroundColor,
+        color: textColorForPill,
+        borderRadius: 16,
+        padding: '2px 8px',
+        fontSize: 16,
+        fontWeight: 'bold' as const,
+        textAlign: 'right' as const,
+        ...(!isDisabled && {
+          cursor: 'pointer',
+        }),
+      };
+    },
+    [getBalanceAmountStyle, isDisabled],
+  );
+
   const getDefaultClassName = useCallback(
-    (balanceValue: number) =>
-      css({
+    (balanceValue: number) => {
+      if (usePillStyle) {
+        return css({
+          ...getPillStyle(balanceValue),
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        });
+      }
+      return css({
         ...getBalanceAmountStyle(balanceValue),
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -151,8 +221,9 @@ export function BalanceWithCarryover({
           cursor: 'pointer',
         }),
         ':hover': { textDecoration: 'underline' },
-      }),
-    [getBalanceAmountStyle, isDisabled],
+      });
+    },
+    [getBalanceAmountStyle, getPillStyle, isDisabled, usePillStyle],
   );
   const GoalStatusDisplay = useCallback(
     (balanceValue, type) => {
@@ -286,7 +357,11 @@ export function BalanceWithCarryover({
 
           {carryoverValue && (
             <CarryoverIndicatorComponent
-              style={getBalanceAmountStyle(balanceValue)}
+              style={
+                usePillStyle
+                  ? getBalanceAmountStyle(balanceValue)
+                  : getBalanceAmountStyle(balanceValue)
+              }
             />
           )}
           {shouldInlineGoalStatus &&
