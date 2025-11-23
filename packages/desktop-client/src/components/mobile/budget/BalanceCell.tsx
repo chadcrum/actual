@@ -107,7 +107,7 @@ export function BalanceCell({
           backgroundColor = theme.errorBackground;
           textColorForPill = 'white';
         } else if (textColor === theme.warningText) {
-          backgroundColor = '#ffff33'; // Bright yellow
+          backgroundColor = '#ffff00'; // Pure yellow
           textColorForPill = 'black';
         } else if (textColor === theme.noticeText) {
           backgroundColor = '#00ff00'; // Bright green
@@ -135,15 +135,14 @@ export function BalanceCell({
                 key={value}
                 as={Text}
                 minFontSizePx={8}
-                maxFontSizePx={15}
+                maxFontSizePx={16}
                 mode="oneline"
                 className={cx(
                   css({
                     maxWidth: columnWidth,
                     textAlign: 'right',
-                    fontSize: 15,
+                    fontSize: 16,
                     color: textColorForPill,
-                    fontWeight: 'bold',
                   }),
                 )}
               >
@@ -166,7 +165,7 @@ function MobileCarryoverIndicator({ style }: { style?: CSSProperties }) {
     backgroundColor = theme.errorBackground;
     iconColor = 'white';
   } else if (originalColor === theme.warningText) {
-    backgroundColor = '#ffff33'; // Bright yellow
+    backgroundColor = '#ffff00'; // Pure yellow
     iconColor = 'black';
   } else if (originalColor === theme.noticeText) {
     backgroundColor = '#00ff00'; // Bright green
