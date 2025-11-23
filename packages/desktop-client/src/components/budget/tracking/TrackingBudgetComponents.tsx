@@ -451,6 +451,7 @@ export const CategoryMonth = memo(function CategoryMonth({
               goal={trackingBudget.catGoal(category.id)}
               budgeted={trackingBudget.catBudgeted(category.id)}
               longGoal={trackingBudget.catLongGoal(category.id)}
+              usePillStyle={true}
             />
           </span>
 
