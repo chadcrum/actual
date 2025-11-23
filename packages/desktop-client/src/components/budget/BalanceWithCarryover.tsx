@@ -195,6 +195,7 @@ export function BalanceWithCarryover({
         fontSize: 16,
         fontWeight: 'bold' as const,
         textAlign: 'right' as const,
+        display: 'inline-block',
         ...(!isDisabled && {
           cursor: 'pointer',
         }),
@@ -208,8 +209,7 @@ export function BalanceWithCarryover({
       if (usePillStyle) {
         return css({
           ...getPillStyle(balanceValue),
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         });
       }
       return css({
@@ -345,6 +345,15 @@ export function BalanceWithCarryover({
                 value: balanceValue,
                 className: getDefaultClassName(balanceValue),
               })
+            ) : usePillStyle ? (
+              <span className={getDefaultClassName(balanceValue)}>
+                <CellValueText
+                  type={type}
+                  name={name}
+                  value={balanceValue}
+                  style={{ display: 'inline' }}
+                />
+              </span>
             ) : (
               <CellValueText
                 type={type}
