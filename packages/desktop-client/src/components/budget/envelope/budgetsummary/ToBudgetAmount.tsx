@@ -57,7 +57,7 @@ export function ToBudgetAmount({
   const backgroundColor = isPositive
     ? '#389952'
     : isNegative
-      ? theme.errorBackground
+      ? '#E93544'
       : theme.tableBackground;
   const textColor = isZero ? theme.tableText : '#ffffff'; // White text for positive and negative
 
