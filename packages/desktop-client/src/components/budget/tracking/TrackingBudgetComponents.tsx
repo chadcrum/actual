@@ -438,7 +438,14 @@ export const CategoryMonth = memo(function CategoryMonth({
         <Field
           name="balance"
           width="flex"
+          truncate={false}
           style={{ paddingRight: styles.monthRightPadding, textAlign: 'right' }}
+          contentStyle={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}
         >
           <span
             ref={triggerBalanceMenuRef}

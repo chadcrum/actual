@@ -461,7 +461,14 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
         ref={balanceMenuTriggerRef}
         name="balance"
         width="flex"
+        truncate={false}
         style={{ paddingRight: styles.monthRightPadding, textAlign: 'right' }}
+        contentStyle={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+        }}
       >
         <span
           onClick={() => {
