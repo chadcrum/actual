@@ -50,6 +50,16 @@ export function ToBudgetAmount({
   }
   const num = availableValue ?? 0;
   const isNegative = num < 0;
+  const isZero = num === 0;
+  const isPositive = num > 0;
+
+  // Determine background and text colors based on value
+  const backgroundColor = isPositive
+    ? theme.noticeBackground
+    : isNegative
+      ? theme.errorBackground
+      : theme.tableBackground;
+  const textColor = isZero ? theme.tableText : '#ffffff'; // White text for positive and negative
 
   return (
     <View style={{ alignItems: 'center', ...style }}>
@@ -83,14 +93,12 @@ export function ToBudgetAmount({
                   fontWeight: 400,
                   userSelect: 'none',
                   cursor: 'pointer',
-                  color: isNegative ? theme.errorText : theme.pageTextPositive,
-                  marginBottom: -1,
-                  borderBottom: '1px solid transparent',
-                  ':hover': {
-                    borderColor: isNegative
-                      ? theme.errorBorder
-                      : theme.pageTextPositive,
-                  },
+                  backgroundColor,
+                  color: textColor,
+                  padding: '8px 16px',
+                  borderRadius: 6,
+                  display: 'inline-block',
+                  marginTop: 4,
                 },
                 amountStyle,
               ])}
