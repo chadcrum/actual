@@ -107,7 +107,7 @@ export function BalanceCell({
           backgroundColor = theme.errorBackground;
           textColorForPill = 'white';
         } else if (textColor === theme.warningText) {
-          backgroundColor = theme.warningBackground;
+          backgroundColor = '#FFF9C4'; // Light banana yellow
           textColorForPill = 'black';
         } else if (textColor === theme.noticeText) {
           backgroundColor = theme.noticeBackground;
@@ -165,7 +165,7 @@ function MobileCarryoverIndicator({ style }: { style?: CSSProperties }) {
     backgroundColor = theme.errorBackground;
     iconColor = 'white';
   } else if (originalColor === theme.warningText) {
-    backgroundColor = theme.warningBackground;
+    backgroundColor = '#FFF9C4'; // Light banana yellow
     iconColor = 'black';
   } else if (originalColor === theme.noticeText) {
     backgroundColor = theme.noticeBackground;
