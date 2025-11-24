@@ -433,7 +433,7 @@ function BudgetTableHeader({
   const amountStyle: CSSProperties = {
     color: theme.formInputText,
     textAlign: 'right',
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '500',
   };
 
@@ -643,7 +643,7 @@ function BudgetTableHeader({
                       key={value}
                       as={Text}
                       minFontSizePx={8}
-                      maxFontSizePx={15}
+                      maxFontSizePx={13}
                       mode="oneline"
                       style={amountStyle}
                     >

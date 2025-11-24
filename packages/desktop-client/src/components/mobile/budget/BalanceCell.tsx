@@ -135,15 +135,14 @@ export function BalanceCell({
                 key={value}
                 as={Text}
                 minFontSizePx={8}
-                maxFontSizePx={16}
+                maxFontSizePx={14}
                 mode="oneline"
                 className={cx(
                   css({
                     maxWidth: columnWidth,
                     textAlign: 'right',
-                    fontSize: 16,
+                    fontSize: 14,
                     color: textColorForPill,
-                    fontWeight: 'bold',
                   }),
                 )}
               >

@@ -273,7 +273,7 @@ function Balance({ balance }: BalanceProps) {
           <CellValueText
             {...props}
             style={{
-              fontSize: 18,
+              fontSize: 16,
               textAlign: 'center',
               fontWeight: '500',
               color:
