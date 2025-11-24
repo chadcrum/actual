@@ -1667,7 +1667,7 @@ const Transaction = memo(function Transaction({
           }
           valueStyle={{
             color: runningBalance < 0 ? theme.errorText : theme.noticeTextLight,
-            fontSize: 12,
+            fontSize: 11,
           }}
           style={{ ...styles.tnum, ...amountStyle }}
           width={103}
