@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+echo "Pulling latest changes..."
+git pull
+
 echo "Stopping containers..."
 podman-compose down
 
