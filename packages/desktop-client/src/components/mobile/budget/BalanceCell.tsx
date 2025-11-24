@@ -143,6 +143,7 @@ export function BalanceCell({
                     textAlign: 'right',
                     fontSize: 14,
                     color: textColorForPill,
+                    fontWeight: 'bold',
                   }),
                 )}
               >
