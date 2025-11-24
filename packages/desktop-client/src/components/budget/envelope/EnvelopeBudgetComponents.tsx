@@ -191,7 +191,7 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
         width="flex"
         textAlign="right"
         style={{
-          fontSize: 13,
+          fontSize: 11,
           paddingRight: styles.monthRightPadding,
           ...styles.tnum,
         }}

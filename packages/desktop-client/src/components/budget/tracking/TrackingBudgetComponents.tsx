@@ -189,7 +189,7 @@ export const GroupMonth = memo(function GroupMonth({
           width="flex"
           textAlign="right"
           style={{
-            fontSize: 13,
+            fontSize: 11,
             paddingRight: styles.monthRightPadding,
             ...styles.tnum,
           }}
