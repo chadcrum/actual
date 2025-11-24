@@ -491,10 +491,6 @@ function SelectedTransactionsFloatingActionBar({
         : t('Link schedule'),
     },
     {
-      name: 'create-rule',
-      text: t('Create rule'),
-    },
-    {
       name: 'delete',
       text: t('Delete'),
     },
@@ -578,6 +574,12 @@ function SelectedTransactionsFloatingActionBar({
               getItemStyle={getMenuItemStyle}
               style={{ backgroundColor: theme.floatingActionBarBackground }}
               onMenuSelect={name => {
+                if (name === 'create-rule') {
+                  onCreateRule(selectedTransactionsArray);
+                  setIsEditMenuOpen(false);
+                  return;
+                }
+
                 onBatchEdit?.({
                   name,
                   ids: selectedTransactionsArray,
@@ -664,6 +666,10 @@ function SelectedTransactionsFloatingActionBar({
                 {
                   name: 'cleared',
                   text: t('Cleared'),
+                },
+                {
+                  name: 'create-rule',
+                  text: t('Create rule'),
                 },
               ]}
             />
@@ -763,8 +769,6 @@ function SelectedTransactionsFloatingActionBar({
                       message: t('Successfully merged transactions'),
                     }),
                   );
-                } else if (type === 'create-rule') {
-                  onCreateRule(selectedTransactionsArray);
                 }
                 setIsMoreOptionsMenuOpen(false);
               }}
