@@ -32,14 +32,23 @@ import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
 import * as monthUtils from 'loot-core/shared/months';
-import { isPreviewId } from 'loot-core/shared/transactions';
+import { q } from 'loot-core/shared/query';
+import {
+  isPreviewId,
+  ungroupTransactions,
+} from 'loot-core/shared/transactions';
 import { validForTransfer } from 'loot-core/shared/transfer';
 import {
   groupById,
   type IntegerAmount,
   integerToCurrency,
 } from 'loot-core/shared/util';
-import { type TransactionEntity } from 'loot-core/types/models';
+import {
+  type NewRuleEntity,
+  type RuleActionEntity,
+  type RuleConditionEntity,
+  type TransactionEntity,
+} from 'loot-core/types/models';
 
 import { ROW_HEIGHT, TransactionListItem } from './TransactionListItem';
 
@@ -57,6 +66,8 @@ import {
 import { useTransactionBatchActions } from '@desktop-client/hooks/useTransactionBatchActions';
 import { useUndo } from '@desktop-client/hooks/useUndo';
 import { setNotificationInset } from '@desktop-client/notifications/notificationsSlice';
+import { pushModal } from '@desktop-client/modals/modalsSlice';
+import { aqlQuery } from '@desktop-client/queries/aqlQuery';
 import { useDispatch } from '@desktop-client/redux';
 
 const NOTIFICATION_BOTTOM_INSET = 75;
@@ -382,9 +393,91 @@ function SelectedTransactionsFloatingActionBar({
   const canMerge = useMemo(() => {
     return Boolean(
       twoTransactions &&
-        twoTransactions[0].amount === twoTransactions[1].amount,
+      twoTransactions[0].amount === twoTransactions[1].amount,
     );
   }, [twoTransactions]);
+
+  const onCreateRule = useCallback(
+    async (ids: string[]) => {
+      const { data } = await aqlQuery(
+        q('transactions')
+          .filter({ id: { $oneof: ids } })
+          .select('*')
+          .options({ splits: 'grouped' }),
+      );
+
+      const ungroupedTransactions = ungroupTransactions(data);
+      const ruleTransaction = ungroupedTransactions[0];
+      const childTransactions = ungroupedTransactions.filter(
+        t => t.parent_id === ruleTransaction.id,
+      );
+
+      const payeeCondition = ruleTransaction.imported_payee
+        ? ({
+            field: 'imported_payee',
+            op: 'is',
+            value: ruleTransaction.imported_payee,
+            type: 'string',
+          } satisfies RuleConditionEntity)
+        : ({
+            field: 'payee',
+            op: 'is',
+            value: ruleTransaction.payee!,
+            type: 'id',
+          } satisfies RuleConditionEntity);
+      const amountCondition = {
+        field: 'amount',
+        op: 'isapprox',
+        value: ruleTransaction.amount,
+        type: 'number',
+      } satisfies RuleConditionEntity;
+
+      const rule = {
+        stage: null,
+        conditionsOp: 'and',
+        conditions: [payeeCondition, amountCondition],
+        actions: [
+          ...(childTransactions.length === 0
+            ? [
+                {
+                  op: 'set',
+                  field: 'category',
+                  value: ruleTransaction.category,
+                  type: 'id',
+                  options: {
+                    splitIndex: 0,
+                  },
+                } satisfies RuleActionEntity,
+              ]
+            : []),
+          ...childTransactions.flatMap((sub, index) => [
+            {
+              op: 'set-split-amount',
+              value: sub.amount,
+              options: {
+                splitIndex: index + 1,
+                method: 'fixed-amount',
+              },
+            } satisfies RuleActionEntity,
+            {
+              op: 'set',
+              field: 'category',
+              value: sub.category,
+              type: 'id',
+              options: {
+                splitIndex: index + 1,
+              },
+            } satisfies RuleActionEntity,
+          ]),
+        ],
+      } satisfies NewRuleEntity;
+
+      dispatch(
+        pushModal({ modal: { name: 'edit-rule', options: { rule } } }),
+      );
+    },
+    [dispatch],
+  );
 
   const moreOptionsMenuItems: MenuItem<string>[] = [
     {
@@ -396,6 +489,10 @@ function SelectedTransactionsFloatingActionBar({
       text: allTransactionsAreLinked
         ? t('Unlink schedule')
         : t('Link schedule'),
+    },
+    {
+      name: 'create-rule',
+      text: t('Create rule'),
     },
     {
       name: 'delete',
@@ -666,6 +763,8 @@ function SelectedTransactionsFloatingActionBar({
                       message: t('Successfully merged transactions'),
                     }),
                   );
+                } else if (type === 'create-rule') {
+                  onCreateRule(selectedTransactionsArray);
                 }
                 setIsMoreOptionsMenuOpen(false);
               }}
