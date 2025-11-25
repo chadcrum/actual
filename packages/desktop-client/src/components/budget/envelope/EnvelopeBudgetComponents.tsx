@@ -3,6 +3,8 @@ import React, {
   type CSSProperties,
   memo,
   useRef,
+  useState,
+  useMemo,
 } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 
@@ -35,7 +37,9 @@ import {
   CellValue,
   CellValueText,
 } from '@desktop-client/components/spreadsheet/CellValue';
+import { useTargetAmounts } from '@desktop-client/components/budget/TargetAmountsContext';
 import {
+  Cell,
   Row,
   Field,
   SheetCell,
@@ -71,9 +75,30 @@ export const EnvelopeCellValue = <
 };
 
 const EnvelopeSheetCell = <FieldName extends SheetFields<'envelope-budget'>>(
-  props: SheetCellProps<'envelope-budget', FieldName>,
+  props: SheetCellProps<'envelope-budget', FieldName> & {
+    targetValue?: number;
+  },
 ) => {
-  return <SheetCell {...props} />;
+  const { targetValue, ...sheetCellProps } = props;
+
+  if (targetValue !== undefined) {
+    return (
+      <Cell
+        {...sheetCellProps}
+        value={String(targetValue)}
+        formatter={value =>
+          integerToCurrency(Number(value)) || '0.00'
+        }
+        valueStyle={{
+          ...sheetCellProps.valueStyle,
+          color: theme.pageTextLight,
+          fontStyle: 'italic',
+        }}
+      />
+    );
+  }
+
+  return <SheetCell {...sheetCellProps} />;
 };
 
 const headerLabelStyle: CSSProperties = {
@@ -88,6 +113,14 @@ const cellStyle: CSSProperties = {
 };
 
 export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
+  const { showTargetAmounts, targetAmounts } = useTargetAmounts();
+
+  // Calculate total of all template amounts
+  const templateTotal = useMemo(() => {
+    if (!showTargetAmounts) return 0;
+    return Object.values(targetAmounts).reduce((sum, amount) => sum + amount, 0);
+  }, [showTargetAmounts, targetAmounts]);
+
   return (
     <View
       style={{
@@ -100,16 +133,26 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
     >
       <View style={headerLabelStyle}>
         <Text style={{ color: theme.tableHeaderText }}>
-          <Trans>Budgeted</Trans>
-        </Text>
-        <EnvelopeCellValue
-          binding={envelopeBudget.totalBudgeted}
-          type="financial"
-        >
-          {props => (
-            <CellValueText {...props} value={-props.value} style={cellStyle} />
+          {showTargetAmounts ? (
+            <Trans>Templates</Trans>
+          ) : (
+            <Trans>Budgeted</Trans>
           )}
-        </EnvelopeCellValue>
+        </Text>
+        {showTargetAmounts ? (
+          <Text style={cellStyle}>
+            {integerToCurrency(templateTotal)}
+          </Text>
+        ) : (
+          <EnvelopeCellValue
+            binding={envelopeBudget.totalBudgeted}
+            type="financial"
+          >
+            {props => (
+              <CellValueText {...props} style={cellStyle} />
+            )}
+          </EnvelopeCellValue>
+        )}
       </View>
       <View style={headerLabelStyle}>
         <Text style={{ color: theme.tableHeaderText }}>
@@ -150,11 +193,23 @@ export function IncomeHeaderMonth() {
   );
 }
 
+
 export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
   month,
   group,
 }: CategoryGroupMonthProps) {
   const { id } = group;
+  const { showTargetAmounts, targetAmounts } = useTargetAmounts();
+
+  // Calculate sum of template amounts for this group's categories
+  const groupTemplateSum = useMemo(() => {
+    if (!showTargetAmounts || !group.categories) {
+      return undefined;
+    }
+    return group.categories.reduce((sum, cat) => {
+      return sum + (targetAmounts[cat.id] || 0);
+    }, 0);
+  }, [showTargetAmounts, targetAmounts, group.categories]);
 
   return (
     <View
@@ -171,6 +226,7 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
         width="flex"
         textAlign="right"
         style={{ fontWeight: 600, ...styles.tnum }}
+        targetValue={groupTemplateSum}
         valueProps={{
           binding: envelopeBudget.groupBudgeted(id),
           type: 'financial',
@@ -247,6 +303,12 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
     });
 
   const showScheduleIndicator = schedule && scheduleStatus;
+
+  const { showTargetAmounts, targetAmounts } = useTargetAmounts();
+  const targetValue =
+    showTargetAmounts && targetAmounts[category.id]
+      ? targetAmounts[category.id]
+      : undefined;
 
   return (
     <View
@@ -361,11 +423,12 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
           exposed={editing}
           focused={editing}
           width="flex"
-          onExpose={() => onEdit(category.id, month)}
+          onExpose={targetValue !== undefined ? undefined : () => onEdit(category.id, month)}
           style={{ ...(editing && { zIndex: 100 }), ...styles.tnum }}
           textAlign="right"
+          targetValue={targetValue}
           valueStyle={{
-            cursor: 'default',
+            cursor: targetValue !== undefined ? 'default' : 'default',
             margin: 1,
             padding: '0 4px',
             borderRadius: 4,

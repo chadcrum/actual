@@ -112,6 +112,88 @@ export function runCheckTemplates() {
   return checkTemplateNotes();
 }
 
+export async function getBudgetTemplates({
+  month,
+}: {
+  month: string;
+}) {
+  await storeNoteTemplates();
+  const categoryTemplates = await getTemplates();
+  const categories = await getCategories();
+
+  const templateContexts: CategoryTemplateContext[] = [];
+  let availBudget = await getSheetValue(
+    monthUtils.sheetForMonth(month),
+    `to-budget`,
+  );
+  const prioritiesSet = new Set<number>();
+  const errors: string[] = [];
+
+  for (const category of categories) {
+    const { id } = category;
+    const sheetName = monthUtils.sheetForMonth(month);
+    const templates = categoryTemplates[id];
+    // Use 0 for budgeted to show "fresh month" template targets
+    const budgeted = 0;
+
+    if (templates) {
+      try {
+        const templateContext = await CategoryTemplateContext.init(
+          templates,
+          category,
+          month,
+          budgeted,
+        );
+        // don't use the funds that are not from templates
+        if (!templateContext.isGoalOnly()) {
+          availBudget += budgeted;
+        }
+        availBudget += templateContext.getLimitExcess();
+        templateContext.getPriorities().forEach(p => prioritiesSet.add(p));
+        templateContexts.push(templateContext);
+      } catch (e) {
+        errors.push(`${category.name}: ${e.message}`);
+      }
+    }
+  }
+
+  const priorities = new Int32Array([...prioritiesSet]).sort();
+  // run each priority level
+  for (const priority of priorities) {
+    const availStart = availBudget;
+    for (const templateContext of templateContexts) {
+      const budget = await templateContext.runTemplatesForPriority(
+        priority,
+        availBudget,
+        availStart,
+      );
+      availBudget -= budget;
+    }
+  }
+
+  // run remainder
+  let remainderContexts = templateContexts.filter(c => c.hasRemainder());
+  while (availBudget > 0 && remainderContexts.length > 0) {
+    let remainderWeight = 0;
+    remainderContexts.forEach(
+      context => (remainderWeight += context.getRemainderWeight()),
+    );
+    const perWeight = availBudget / remainderWeight;
+    remainderContexts.forEach(context => {
+      availBudget -= context.runRemainder(availBudget, perWeight);
+    });
+    remainderContexts = templateContexts.filter(c => c.hasRemainder());
+  }
+
+  const budgetValues: Record<string, number> = {};
+  templateContexts.forEach(context => {
+    const values = context.getValues();
+    budgetValues[context.category.id] = values.budgeted;
+  });
+
+  return budgetValues;
+}
+
 async function getCategories(): Promise<CategoryEntity[]> {
   const { data: categoryGroups }: { data: CategoryGroupEntity[] } =
     await aqlQuery(q('category_groups').filter({ hidden: false }).select('*'));

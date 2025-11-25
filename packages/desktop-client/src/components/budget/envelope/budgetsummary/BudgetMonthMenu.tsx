@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Menu } from '@actual-app/components/menu';
 
+import { useTargetAmounts } from '@desktop-client/components/budget/TargetAmountsContext';
 import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 
 type BudgetMonthMenuProps = Omit<
@@ -30,6 +31,8 @@ export function BudgetMonthMenu({
   const { t } = useTranslation();
 
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
+  const { showTargetAmounts, toggleTargetAmounts } = useTargetAmounts();
+
   return (
     <Menu
       {...props}
@@ -62,10 +65,13 @@ export function BudgetMonthMenu({
           case 'cleanup-goal-template':
             onEndOfMonthCleanup();
             break;
+          case 'toggle-target-amounts':
+            toggleTargetAmounts();
+            break;
         }
       }}
       items={[
-        { name: 'copy-last', text: t('Copy last month’s budget') },
+        { name: 'copy-last', text: t("Copy last month's budget") },
         { name: 'set-zero', text: t('Set budgets to zero') },
         {
           name: 'set-3-avg',
@@ -81,24 +87,31 @@ export function BudgetMonthMenu({
         },
         ...(isGoalTemplatesEnabled
           ? [
-              {
-                name: 'check-templates',
-                text: t('Check templates'),
-              },
-              {
-                name: 'apply-goal-template',
-                text: t('Apply budget template'),
-              },
-              {
-                name: 'overwrite-goal-template',
-                text: t('Overwrite with budget template'),
-              },
-              {
-                name: 'cleanup-goal-template',
-                text: t('End of month cleanup'),
-              },
-            ]
+            {
+              name: 'check-templates',
+              text: t('Check templates'),
+            },
+            {
+              name: 'apply-goal-template',
+              text: t('Apply budget template'),
+            },
+            {
+              name: 'overwrite-goal-template',
+              text: t('Overwrite with budget template'),
+            },
+            {
+              name: 'cleanup-goal-template',
+              text: t('End of month cleanup'),
+            },
+          ]
           : []),
+        Menu.line,
+        {
+          name: 'toggle-target-amounts',
+          text: showTargetAmounts
+            ? t('Hide budget templates')
+            : t('Show budget templates'),
+        },
       ]}
     />
   );

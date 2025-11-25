@@ -16,6 +16,7 @@ import * as envelopeBudget from './envelope/EnvelopeBudgetComponents';
 import { EnvelopeBudgetProvider } from './envelope/EnvelopeBudgetContext';
 import * as trackingBudget from './tracking/TrackingBudgetComponents';
 import { TrackingBudgetProvider } from './tracking/TrackingBudgetContext';
+import { TargetAmountsProvider } from './TargetAmountsContext';
 import { prewarmAllMonths, prewarmMonth } from './util';
 
 import {
@@ -173,29 +174,31 @@ export function Budget() {
     );
   } else {
     table = (
-      <EnvelopeBudgetProvider
-        summaryCollapsed={summaryCollapsed}
-        onBudgetAction={onBudgetAction}
-        onToggleSummaryCollapse={onToggleCollapse}
-      >
-        <AutoSizingBudgetTable
-          type={budgetType}
-          prewarmStartMonth={startMonth}
-          startMonth={startMonth}
-          monthBounds={bounds}
-          maxMonths={maxMonths}
-          onMonthSelect={onMonthSelect}
-          onDeleteCategory={onDeleteCategory}
-          onDeleteGroup={onDeleteGroup}
-          onSaveCategory={onSaveCategory}
-          onSaveGroup={onSaveGroup}
+      <TargetAmountsProvider month={startMonth}>
+        <EnvelopeBudgetProvider
+          summaryCollapsed={summaryCollapsed}
           onBudgetAction={onBudgetAction}
-          onShowActivity={onShowActivity}
-          onReorderCategory={onReorderCategory}
-          onReorderGroup={onReorderGroup}
-          onApplyBudgetTemplatesInGroup={onApplyBudgetTemplatesInGroup}
-        />
-      </EnvelopeBudgetProvider>
+          onToggleSummaryCollapse={onToggleCollapse}
+        >
+          <AutoSizingBudgetTable
+            type={budgetType}
+            prewarmStartMonth={startMonth}
+            startMonth={startMonth}
+            monthBounds={bounds}
+            maxMonths={maxMonths}
+            onMonthSelect={onMonthSelect}
+            onDeleteCategory={onDeleteCategory}
+            onDeleteGroup={onDeleteGroup}
+            onSaveCategory={onSaveCategory}
+            onSaveGroup={onSaveGroup}
+            onBudgetAction={onBudgetAction}
+            onShowActivity={onShowActivity}
+            onReorderCategory={onReorderCategory}
+            onReorderGroup={onReorderGroup}
+            onApplyBudgetTemplatesInGroup={onApplyBudgetTemplatesInGroup}
+          />
+        </EnvelopeBudgetProvider>
+      </TargetAmountsProvider>
     );
   }
 

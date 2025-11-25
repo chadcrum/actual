@@ -59,6 +59,7 @@ export interface BudgetHandlers {
   'budget/set-category-automations': typeof goalActions.storeTemplates;
   'budget/store-note-templates': typeof goalNoteActions.storeNoteTemplates;
   'budget/render-note-templates': typeof goalNoteActions.unparse;
+  'budget/get-budget-templates': typeof goalActions.getBudgetTemplates;
 }
 
 export const app = createApp<BudgetHandlers>();
@@ -158,6 +159,7 @@ app.method(
   mutator(goalNoteActions.storeNoteTemplates),
 );
 app.method('budget/render-note-templates', goalNoteActions.unparse);
+app.method('budget/get-budget-templates', goalActions.getBudgetTemplates);
 
 // Server must return AQL entities not the raw DB data
 async function getCategories() {
