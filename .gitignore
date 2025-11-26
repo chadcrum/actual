@@ -65,3 +65,6 @@ build/
 
 # Lage cache
 .lage/
+
+# Environment variables
+.env
