@@ -30,10 +30,11 @@ echo "Logging into GHCR..."
 USERNAME="${GITHUB_ACTOR:-github}"  # fallback for local use
 echo "$GITHUB_TOKEN" | podman login ghcr.io -u "$USERNAME" --password-stdin
 
-# Build the podman image using the Dockerfile
+# Build the podman image using the sync-server Dockerfile
 echo "Building podman image $IMAGE_LATEST..."
-# Context is repository root, dockerfile is Dockerfile
-podman build -f Dockerfile -t "$IMAGE_LATEST" .
+# Context is repository root, dockerfile is packages/sync-server/docker/ubuntu.Dockerfile
+# This Dockerfile expects pre-built artifacts from yarn build:server
+podman build -f packages/sync-server/docker/ubuntu.Dockerfile -t "$IMAGE_LATEST" .
 
 # Tag with commit hash
 echo "Tagging image as $IMAGE_COMMIT..."
