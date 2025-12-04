@@ -3,7 +3,6 @@ import React, {
   type CSSProperties,
   memo,
   useRef,
-  useState,
   useMemo,
 } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
@@ -133,27 +132,27 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
     >
       <View style={headerLabelStyle}>
         <Text style={{ color: theme.tableHeaderText }}>
-          {showTargetAmounts ? (
-            <Trans>Templates</Trans>
-          ) : (
-            <Trans>Budgeted</Trans>
-          )}
+          <Trans>Budgeted</Trans>
         </Text>
-        {showTargetAmounts ? (
+        <EnvelopeCellValue
+          binding={envelopeBudget.totalBudgeted}
+          type="financial"
+        >
+          {props => (
+            <CellValueText {...props} style={cellStyle} />
+          )}
+        </EnvelopeCellValue>
+      </View>
+      {showTargetAmounts && (
+        <View style={headerLabelStyle}>
+          <Text style={{ color: theme.tableHeaderText }}>
+            <Trans>Templates</Trans>
+          </Text>
           <Text style={cellStyle}>
             {integerToCurrency(templateTotal)}
           </Text>
-        ) : (
-          <EnvelopeCellValue
-            binding={envelopeBudget.totalBudgeted}
-            type="financial"
-          >
-            {props => (
-              <CellValueText {...props} style={cellStyle} />
-            )}
-          </EnvelopeCellValue>
-        )}
-      </View>
+        </View>
+      )}
       <View style={headerLabelStyle}>
         <Text style={{ color: theme.tableHeaderText }}>
           <Trans>Spent</Trans>
@@ -226,12 +225,24 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
         width="flex"
         textAlign="right"
         style={{ fontWeight: 600, ...styles.tnum }}
-        targetValue={groupTemplateSum}
         valueProps={{
           binding: envelopeBudget.groupBudgeted(id),
           type: 'financial',
         }}
       />
+      {showTargetAmounts && (
+        <EnvelopeSheetCell
+          name="templates"
+          width="flex"
+          textAlign="right"
+          style={{ fontWeight: 600, ...styles.tnum }}
+          targetValue={groupTemplateSum}
+          valueProps={{
+            binding: envelopeBudget.groupBudgeted(id),
+            type: 'financial',
+          }}
+        />
+      )}
       <EnvelopeSheetCell
         name="spent"
         width="flex"
@@ -423,12 +434,11 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
           exposed={editing}
           focused={editing}
           width="flex"
-          onExpose={targetValue !== undefined ? undefined : () => onEdit(category.id, month)}
+          onExpose={() => onEdit(category.id, month)}
           style={{ ...(editing && { zIndex: 100 }), ...styles.tnum }}
           textAlign="right"
-          targetValue={targetValue}
           valueStyle={{
-            cursor: targetValue !== undefined ? 'default' : 'default',
+            cursor: 'default',
             margin: 1,
             padding: '0 4px',
             borderRadius: 4,
@@ -464,6 +474,29 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
           }}
         />
       </View>
+      {showTargetAmounts && targetValue !== undefined && (
+        <Field name="templates" width="flex" style={{ textAlign: 'right' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              fontStyle: 'italic',
+              color: theme.pageTextLight,
+              ...styles.tnum,
+            }}
+          >
+            <Text
+              style={{
+                margin: 1,
+                padding: '0 4px',
+              }}
+            >
+              {integerToCurrency(targetValue)}
+            </Text>
+          </View>
+        </Field>
+      )}
       <Field name="spent" width="flex" style={{ textAlign: 'right' }}>
         <View
           data-testid="category-month-spent"
