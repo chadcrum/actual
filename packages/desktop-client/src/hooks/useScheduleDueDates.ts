@@ -61,7 +61,7 @@ export async function fetchScheduleDueDates(
       q('schedules')
         .filter({
           name: { $oneof: Array.from(scheduleNames) },
-          tombstone: 0
+          tombstone: false
         })
         .select(['id', 'name', 'next_date'])
     );
