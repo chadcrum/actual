@@ -120,6 +120,16 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
     return Object.values(targetAmounts).reduce((sum, amount) => sum + amount, 0);
   }, [showTargetAmounts, targetAmounts]);
 
+  // Get total budgeted for the month
+  const totalBudgetedValue = useEnvelopeSheetValue(
+    envelopeBudget.totalBudgeted
+  ) ?? 0;
+
+  // Calculate target remainder for the month
+  const targetRemainder = useMemo(() => {
+    return templateTotal - totalBudgetedValue;
+  }, [templateTotal, totalBudgetedValue]);
+
   return (
     <View
       style={{
@@ -146,10 +156,10 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
       {showTargetAmounts && (
         <View style={headerLabelStyle}>
           <Text style={{ color: theme.tableHeaderText }}>
-            <Trans>Templates</Trans>
+            <Trans>Targets</Trans>
           </Text>
           <Text style={cellStyle}>
-            {integerToCurrency(templateTotal)}
+            {integerToCurrency(targetRemainder)}
           </Text>
         </View>
       )}
@@ -210,6 +220,17 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
     }, 0);
   }, [showTargetAmounts, targetAmounts, group.categories]);
 
+  // Get budgeted amount for this group
+  const groupBudgetedValue = useEnvelopeSheetValue(
+    envelopeBudget.groupBudgeted(id)
+  ) ?? 0;
+
+  // Calculate group target remainder
+  const groupTargetRemainder = useMemo(() => {
+    if (groupTemplateSum === undefined) return undefined;
+    return groupTemplateSum - groupBudgetedValue;
+  }, [groupTemplateSum, groupBudgetedValue]);
+
   return (
     <View
       style={{
@@ -232,11 +253,11 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
       />
       {showTargetAmounts && (
         <EnvelopeSheetCell
-          name="templates"
+          name="targets"
           width="flex"
           textAlign="right"
           style={{ fontWeight: 600, ...styles.tnum }}
-          targetValue={groupTemplateSum}
+          targetValue={groupTargetRemainder}
           valueProps={{
             binding: envelopeBudget.groupBudgeted(id),
             type: 'financial',
@@ -316,9 +337,16 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
   const showScheduleIndicator = schedule && scheduleStatus;
 
   const { showTargetAmounts, targetAmounts } = useTargetAmounts();
+
+  // Get budgeted amount for this category
+  const budgetedValue = useEnvelopeSheetValue(
+    envelopeBudget.catBudgeted(category.id)
+  ) ?? 0;
+
+  // Calculate target remainder: template - budgeted
   const targetValue =
     showTargetAmounts && targetAmounts[category.id]
-      ? targetAmounts[category.id]
+      ? targetAmounts[category.id] - budgetedValue
       : undefined;
 
   return (
@@ -475,7 +503,7 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
         />
       </View>
       {showTargetAmounts && targetValue !== undefined && (
-        <Field name="templates" width="flex" style={{ textAlign: 'right' }}>
+        <Field name="targets" width="flex" style={{ textAlign: 'right' }}>
           <View
             style={{
               flexDirection: 'row',

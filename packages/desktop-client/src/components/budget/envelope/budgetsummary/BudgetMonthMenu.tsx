@@ -87,30 +87,30 @@ export function BudgetMonthMenu({
         },
         ...(isGoalTemplatesEnabled
           ? [
-            {
-              name: 'check-templates',
-              text: t('Check templates'),
-            },
-            {
-              name: 'apply-goal-template',
-              text: t('Apply budget template'),
-            },
-            {
-              name: 'overwrite-goal-template',
-              text: t('Overwrite with budget template'),
-            },
-            {
-              name: 'cleanup-goal-template',
-              text: t('End of month cleanup'),
-            },
-          ]
+              {
+                name: 'check-templates',
+                text: t('Check templates'),
+              },
+              {
+                name: 'apply-goal-template',
+                text: t('Apply budget template'),
+              },
+              {
+                name: 'overwrite-goal-template',
+                text: t('Overwrite with budget template'),
+              },
+              {
+                name: 'cleanup-goal-template',
+                text: t('End of month cleanup'),
+              },
+            ]
           : []),
         Menu.line,
         {
           name: 'toggle-target-amounts',
           text: showTargetAmounts
-            ? t('Hide budget templates')
-            : t('Show budget templates'),
+            ? t('Hide budget targets')
+            : t('Show budget targets'),
         },
       ]}
     />
