@@ -173,6 +173,19 @@ Custom ESLint rules specific to Actual.
 - `typography`: Typography rules
 - `prefer-if-statement`: Prefers explicit if statements
 
+#### 10. **docs** (`packages/docs/`)
+
+Documentation site built with Docusaurus.
+
+- User-facing documentation and guides
+- Built and hosted separately
+
+#### 11. **ci-actions** (`packages/ci-actions/`)
+
+Private package for CI/CD utilities and GitHub Actions.
+
+- Internal use only for continuous integration workflows
+
 ## Development Workflow
 
 ### 1. Making Changes
@@ -373,7 +386,7 @@ describe('ComponentName', () => {
 - `/lage.config.js` - Lage task runner configuration
 - `/eslint.config.mjs` - ESLint configuration (flat config format)
 - `/tsconfig.json` - Root TypeScript configuration
-- `/.cursorignore`, `/.gitignore` - Ignored files
+- `/.gitignore` - Ignored files
 - `/yarn.lock` - Dependency lockfile (Yarn 4)
 
 ### Documentation
@@ -394,7 +407,7 @@ describe('ComponentName', () => {
 
 ### Key Source Directories
 
-- `packages/loot-core/src/client/` - Client-side core logic
+- `packages/loot-core/src/platform/client/` - Client-side core logic
 - `packages/loot-core/src/server/` - Server-side core logic
 - `packages/loot-core/src/shared/` - Shared utilities
 - `packages/loot-core/src/types/` - Type definitions
@@ -453,6 +466,20 @@ yarn workspace @actual-app/web run playwright test --headed --debug accounts.tes
 
 Icons in `packages/component-library/src/icons/` are auto-generated. Don't manually edit them.
 
+## Additional Helper Scripts
+
+Beyond the essential commands documented in the Quick Start section, the following helper scripts are available:
+
+- `start:docs` - Start the documentation server
+- `start:service-plugins` - Start the plugins service watcher
+- `build:plugins-service` - Build the plugins service
+- `build:docs` - Build documentation
+- `generate:release-notes` - Generate release notes
+- `start:server` - Direct server start without dev environment
+- `rebuild-electron`, `rebuild-node` - Rebuild native modules
+
+For a complete list of available scripts, run `yarn run` or check the `scripts` section in [package.json](./package.json).
+
 ## Troubleshooting
 
 ### Type Errors
@@ -492,7 +519,7 @@ Icons in `packages/component-library/src/icons/` are auto-generated. Don't manua
 
 1. Clean build artifacts: `rm -rf packages/*/dist packages/*/lib-dist packages/*/build`
 2. Reinstall dependencies: `yarn install`
-3. Check Node.js version (requires >=20)
+3. Check Node.js version (requires >=22)
 4. Check Yarn version (requires ^4.9.1)
 
 ## Testing Patterns
@@ -570,8 +597,8 @@ yarn install:server
 
 ## Environment Requirements
 
-- **Node.js**: >=20
-- **Yarn**: ^4.9.1 (managed by packageManager field)
+- **Node.js**: >=22
+- **Yarn**: ^4.9.1 (managed by packageManager field, currently using 4.10.3)
 - **Browser Targets**: Electron >= 35.0, modern browsers (see browserslist)
 
 ## Migration Notes
