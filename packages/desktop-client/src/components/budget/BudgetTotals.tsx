@@ -20,6 +20,7 @@ import { getScrollbarWidth } from './util';
 import { useBudgetComponents } from '.';
 
 import { useGlobalPref } from '@desktop-client/hooks/useGlobalPref';
+import { useLocalPref } from '@desktop-client/hooks/useLocalPref';
 
 type BudgetTotalsProps = {
   toggleHiddenCategories: () => void;
@@ -36,6 +37,8 @@ export const BudgetTotals = memo(function BudgetTotals({
   const [categoryExpandedStatePref, setCategoryExpandedStatePref] =
     useGlobalPref('categoryExpandedState');
   const categoryExpandedState = categoryExpandedStatePref ?? 0;
+  const [sortByScheduleDueDate, setSortByScheduleDueDatePref] =
+    useLocalPref('budget.sortByScheduleDueDate');
   const [menuOpen, setMenuOpen] = useState(false);
   const triggerRef = useRef(null);
 
@@ -159,6 +162,8 @@ export const BudgetTotals = memo(function BudgetTotals({
                 expandAllCategories();
               } else if (type === 'collapseAllCategories') {
                 collapseAllCategories();
+              } else if (type === 'sortBySchedule') {
+                setSortByScheduleDueDatePref(!sortByScheduleDueDate);
               }
               setMenuOpen(false);
             }}
@@ -174,6 +179,12 @@ export const BudgetTotals = memo(function BudgetTotals({
               {
                 name: 'collapseAllCategories',
                 text: t('Collapse all'),
+              },
+              {
+                name: 'sortBySchedule',
+                text: sortByScheduleDueDate
+                  ? t('Disable schedule sorting')
+                  : t('Sort by schedule due date'),
               },
             ]}
           />

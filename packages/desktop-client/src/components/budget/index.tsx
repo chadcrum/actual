@@ -12,12 +12,14 @@ import {
 } from 'loot-core/types/models';
 
 import { AutoSizingBudgetTable } from './DynamicBudgetTable';
+import { sortCategoriesByScheduleDueDate } from './sortCategories';
 import * as envelopeBudget from './envelope/EnvelopeBudgetComponents';
 import { EnvelopeBudgetProvider } from './envelope/EnvelopeBudgetContext';
 import * as trackingBudget from './tracking/TrackingBudgetComponents';
 import { TrackingBudgetProvider } from './tracking/TrackingBudgetContext';
 import { TargetAmountsProvider } from './TargetAmountsContext';
 import { prewarmAllMonths, prewarmMonth } from './util';
+import { fetchScheduleDueDates } from '@desktop-client/hooks/useScheduleDueDates';
 
 import {
   applyBudgetAction,
@@ -50,6 +52,9 @@ export function Budget() {
   const maxMonths = maxMonthsPref || 1;
   const [initialized, setInitialized] = useState(false);
   const { grouped: categoryGroups } = useCategories();
+  const [sortByScheduleDueDate] = useLocalPref('budget.sortByScheduleDueDate');
+  const [showHiddenCategories] = useLocalPref('budget.showHiddenCategories');
+  const [scheduleDueDates, setScheduleDueDates] = useState<Map<string, string | null>>(new Map());
 
   useEffect(() => {
     async function run() {
@@ -78,6 +83,17 @@ export function Budget() {
       }
     });
   }, []);
+
+  // Fetch schedule due dates when sorting is enabled
+  useEffect(() => {
+    if (sortByScheduleDueDate && categoryGroups) {
+      fetchScheduleDueDates(categoryGroups).then(dates => {
+        setScheduleDueDates(dates);
+      });
+    } else {
+      setScheduleDueDates(new Map());
+    }
+  }, [sortByScheduleDueDate, categoryGroups]);
 
   const onMonthSelect = async (month, numDisplayed) => {
     setStartMonthPref(month);
@@ -141,6 +157,18 @@ export function Budget() {
     onReorderGroup,
   } = useCategoryActions();
 
+  // Apply sorting if enabled
+  const displayCategoryGroups = useMemo(() => {
+    if (sortByScheduleDueDate && scheduleDueDates.size > 0) {
+      return sortCategoriesByScheduleDueDate(
+        categoryGroups,
+        scheduleDueDates,
+        showHiddenCategories ?? false
+      );
+    }
+    return categoryGroups;
+  }, [categoryGroups, sortByScheduleDueDate, scheduleDueDates, showHiddenCategories]);
+
   if (!initialized || !categoryGroups) {
     return null;
   }
@@ -155,6 +183,7 @@ export function Budget() {
       >
         <AutoSizingBudgetTable
           type={budgetType}
+          categoryGroups={displayCategoryGroups}
           prewarmStartMonth={startMonth}
           startMonth={startMonth}
           monthBounds={bounds}
@@ -182,6 +211,7 @@ export function Budget() {
         >
           <AutoSizingBudgetTable
             type={budgetType}
+            categoryGroups={displayCategoryGroups}
             prewarmStartMonth={startMonth}
             startMonth={startMonth}
             monthBounds={bounds}

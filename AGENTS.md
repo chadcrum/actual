@@ -199,6 +199,16 @@ When implementing changes:
 5. Run relevant tests
 6. Fix any linter errors that are introduced
 
+### Plan Organization
+
+All implementation plans created during development should be stored in the `plans/` directory at the project root for future reference. This helps maintain a historical record of architectural decisions and implementation strategies.
+
+**Guidelines:**
+- Store plans with descriptive filenames: `plans/feature-name-YYYY-MM-DD.md` or `plans/task-name.md`
+- Include context, approach, and any relevant architectural decisions
+- Link to related issues or PRs when applicable
+- Plans serve as documentation for why certain implementation choices were made
+
 ### 2. Testing Strategy
 
 **Unit Tests (Vitest)**

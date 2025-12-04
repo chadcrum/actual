@@ -29,6 +29,7 @@ import { useLocalPref } from '@desktop-client/hooks/useLocalPref';
 
 type BudgetTableProps = {
   type: string;
+  categoryGroups?: CategoryGroupEntity[];
   prewarmStartMonth: string;
   startMonth: string;
   numMonths: number;
@@ -56,6 +57,7 @@ type BudgetTableProps = {
 export function BudgetTable(props: BudgetTableProps) {
   const {
     type,
+    categoryGroups: categoryGroupsProp,
     prewarmStartMonth,
     startMonth,
     numMonths,
@@ -71,7 +73,9 @@ export function BudgetTable(props: BudgetTableProps) {
     onBudgetAction,
   } = props;
 
-  const { grouped: categoryGroups = [] } = useCategories();
+  // Use provided categoryGroups or fallback to hook
+  const { grouped: categoryGroupsFromHook = [] } = useCategories();
+  const categoryGroups = categoryGroupsProp ?? categoryGroupsFromHook;
   const [collapsedGroupIds = [], setCollapsedGroupIdsPref] =
     useLocalPref('budget.collapsed');
   const [showHiddenCategories, setShowHiddenCategoriesPef] = useLocalPref(
