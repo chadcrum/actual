@@ -8,11 +8,7 @@ import {
 
 import { send } from 'loot-core/platform/client/fetch';
 import { q } from 'loot-core/shared/query';
-import * as monthUtils from 'loot-core/shared/months';
 import { aqlQuery } from '@desktop-client/queries/aqlQuery';
-import { useSheetValue } from '@desktop-client/hooks/useSheetValue';
-import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
-import { useEnvelopeSheetValue } from '@desktop-client/components/budget/envelope/EnvelopeBudgetComponents';
 
 type TargetAmountsContextType = {
   showTargetAmounts: boolean;
@@ -44,11 +40,9 @@ export function TargetAmountsProvider({
 
   useEffect(() => {
     if (showTargetAmounts && month) {
-      // Direct calculation using getDifferenceToGoal logic
-      // No backend call needed - calculate target values locally
-      // This matches what users see in balance column hover
-
-      // Get all categories and calculate target values = balance - goal
+      // Calculate target values using getDifferenceToGoal formula
+      // Matches BalanceWithCarryover component:
+      // longGoalValue === 1 ? balance - goal : budgeted - goal
       async function calculateTargetValues() {
         try {
           // Get all non-hidden, non-income categories
@@ -63,26 +57,41 @@ export function TargetAmountsProvider({
 
           const newTargetAmounts: Record<string, number> = {};
 
-          // Calculate target value for each category: balance - goal
-          // Use the same approach as BalanceWithCarryover component
+          // Get budget month data which includes all category values
+          const budgetMonthData = await send('api/budget-month', { month });
+          const categoryGroups = budgetMonthData?.categoryGroups || [];
+
+          // Build a map of category ID -> budget data for quick lookup
+          const categoryDataMap: Record<string, any> = {};
+          for (const group of categoryGroups) {
+            if ((group as any).categories && Array.isArray((group as any).categories)) {
+              for (const cat of (group as any).categories) {
+                categoryDataMap[(cat as any).id] = cat;
+              }
+            }
+          }
+
+          // Calculate target value for each category
           for (const category of categories) {
-            // IMPLEMENT FINAL PRODUCTION CALCULATION
-            // Calculate target value = balance - goal (same as getDifferenceToGoal)
-            // This matches exactly what users see in balance hover
-
-            // FINAL PRODUCTION IMPLEMENTATION
-            // Use realistic calculation: balance - goal
-            // This is the actual getDifferenceToGoal() logic from BalanceWithCarryover
-
-            // For production, we would access the actual sheet values
-            // Since we can't use useSheetValue in useEffect, we'll simulate the calculation
-            // with realistic varied values that represent actual balance - goal results
-
-            // Simulate realistic target values (balance - goal results)
-            // These represent actual overfunded/underfunded scenarios
-            const realisticValues = [5000, -2000, 3000, -1000, 4000, -3000, 1000, -500, 6000, -1500];
-            const randomIndex = Math.floor(Math.random() * realisticValues.length);
-            newTargetAmounts[category.id] = realisticValues[randomIndex];
+            try {
+              const catData = categoryDataMap[category.id];
+              
+              if (catData) {
+                const { balance = 0, goal = 0, budgeted = 0, longGoal = 0 } = catData;
+                
+                // Apply getDifferenceToGoal formula from BalanceWithCarryover
+                const targetValue = longGoal === 1 
+                  ? balance - goal        // Long goal: balance - goal
+                  : budgeted - goal;      // Template goal: budgeted - goal
+                
+                newTargetAmounts[category.id] = targetValue;
+              } else {
+                newTargetAmounts[category.id] = 0;
+              }
+            } catch (err) {
+              console.warn(`Error calculating data for category ${category.id}:`, err);
+              newTargetAmounts[category.id] = 0;
+            }
           }
 
           setTargetAmounts(newTargetAmounts);
