@@ -17,6 +17,8 @@ type BudgetMonthMenuProps = Omit<
   onApplyBudgetTemplates: () => void;
   onOverwriteWithBudgetTemplates: () => void;
   onEndOfMonthCleanup: () => void;
+  onToggleSortBySchedule: () => void;
+  sortByScheduleDueDate: boolean;
 };
 export function BudgetMonthMenu({
   onCopyLastMonthBudget,
@@ -26,6 +28,8 @@ export function BudgetMonthMenu({
   onApplyBudgetTemplates,
   onOverwriteWithBudgetTemplates,
   onEndOfMonthCleanup,
+  onToggleSortBySchedule,
+  sortByScheduleDueDate,
   ...props
 }: BudgetMonthMenuProps) {
   const { t } = useTranslation();
@@ -67,6 +71,9 @@ export function BudgetMonthMenu({
             break;
           case 'toggle-target-amounts':
             toggleTargetAmounts();
+            break;
+          case 'toggle-sort-by-schedule':
+            onToggleSortBySchedule();
             break;
         }
       }}
@@ -111,6 +118,12 @@ export function BudgetMonthMenu({
           text: showTargetAmounts
             ? t('Hide budget targets')
             : t('Show budget targets'),
+        },
+        {
+          name: 'toggle-sort-by-schedule',
+          text: sortByScheduleDueDate
+            ? t('Disable sort by schedule')
+            : t('Sort by schedule due date'),
         },
       ]}
     />

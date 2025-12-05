@@ -225,6 +225,10 @@ export function BudgetSummary({ month }: BudgetSummaryProps) {
                       ),
                     });
                   }}
+                  onToggleSortBySchedule={() => {
+                    // Toggle is handled via preference in the modal
+                  }}
+                  sortByScheduleDueDate={false}
                 />
               </Popover>
             </View>

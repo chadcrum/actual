@@ -28,6 +28,8 @@ import { groupById } from 'loot-core/shared/util';
 import { BudgetTable, PILL_STYLE } from './BudgetTable';
 
 import { sync } from '@desktop-client/app/appSlice';
+import { fetchScheduleDueDates } from '@desktop-client/hooks/useScheduleDueDates';
+import { sortCategoriesByScheduleDueDate } from '@desktop-client/components/budget/sortCategories';
 import {
   applyBudgetAction,
   createCategory,
@@ -72,6 +74,7 @@ export function BudgetPage() {
   const currMonth = monthUtils.currentMonth();
   const [startMonth = currMonth, setStartMonthPref] =
     useLocalPref('budget.startMonth');
+  const [sortByScheduleDueDate] = useLocalPref('budget.sortByScheduleDueDate');
   const [monthBounds, setMonthBounds] = useState({
     start: startMonth,
     end: startMonth,
@@ -81,6 +84,9 @@ export function BudgetPage() {
   const [_numberFormat] = useSyncedPref('numberFormat');
   const numberFormat = _numberFormat || 'comma-dot';
   const [hideFraction] = useSyncedPref('hideFraction');
+  const [scheduleDueDates, setScheduleDueDates] = useState<
+    Map<string, string | null>
+  >(new Map());
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -95,6 +101,16 @@ export function BudgetPage() {
 
     init();
   }, [budgetType, startMonth, dispatch, spreadsheet]);
+
+  useEffect(() => {
+    if (sortByScheduleDueDate && categoryGroups) {
+      fetchScheduleDueDates(categoryGroups).then(dates => {
+        setScheduleDueDates(dates);
+      });
+    } else {
+      setScheduleDueDates(new Map());
+    }
+  }, [sortByScheduleDueDate, categoryGroups]);
 
   const onBudgetAction = useCallback(
     async (month, type, args) => {
@@ -554,6 +570,17 @@ export function BudgetPage() {
     );
   }
 
+  const sortedCategoryGroups = useMemo(() => {
+    if (sortByScheduleDueDate && scheduleDueDates.size > 0) {
+      return sortCategoriesByScheduleDueDate(
+        categoryGroups,
+        scheduleDueDates,
+        showHiddenCategories ?? false,
+      );
+    }
+    return categoryGroups;
+  }, [categoryGroups, sortByScheduleDueDate, scheduleDueDates, showHiddenCategories]);
+
   return (
     <Page
       padding={0}
@@ -615,7 +642,7 @@ export function BudgetPage() {
                 // This key forces the whole table rerender when the number
                 // format changes
                 key={`${numberFormat}${hideFraction}`}
-                categoryGroups={categoryGroups}
+                categoryGroups={sortedCategoryGroups}
                 month={startMonth}
                 onShowBudgetSummary={onShowBudgetSummary}
                 onBudgetAction={onBudgetAction}

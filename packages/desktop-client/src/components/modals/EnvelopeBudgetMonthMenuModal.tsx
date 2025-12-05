@@ -24,6 +24,7 @@ import {
 } from '@desktop-client/components/common/Modal';
 import { Notes } from '@desktop-client/components/Notes';
 import { useLocale } from '@desktop-client/hooks/useLocale';
+import { useLocalPref } from '@desktop-client/hooks/useLocalPref';
 import { useNotes } from '@desktop-client/hooks/useNotes';
 import { useUndo } from '@desktop-client/hooks/useUndo';
 import { type Modal as ModalType } from '@desktop-client/modals/modalsSlice';
@@ -41,9 +42,16 @@ export function EnvelopeBudgetMonthMenuModal({
   const locale = useLocale();
   const originalNotes = useNotes(`budget-${month}`);
   const { showUndoNotification } = useUndo();
+  const [sortByScheduleDueDate, setSortByScheduleDueDate] = useLocalPref(
+    'budget.sortByScheduleDueDate',
+  );
 
   const _onEditNotes = () => {
     onEditNotes?.(month);
+  };
+
+  const onToggleSortBySchedule = () => {
+    setSortByScheduleDueDate(!sortByScheduleDueDate);
   };
 
   const defaultMenuItemStyle: CSSProperties = {
@@ -228,6 +236,8 @@ export function EnvelopeBudgetMonthMenuModal({
                       ),
                     });
                   }}
+                  onToggleSortBySchedule={onToggleSortBySchedule}
+                  sortByScheduleDueDate={sortByScheduleDueDate ?? false}
                 />
               </TargetAmountsProvider>
             )}

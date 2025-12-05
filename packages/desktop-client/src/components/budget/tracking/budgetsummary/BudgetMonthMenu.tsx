@@ -15,6 +15,8 @@ type BudgetMonthMenuProps = Omit<
   onCheckTemplates: () => void;
   onApplyBudgetTemplates: () => void;
   onOverwriteWithBudgetTemplates: () => void;
+  onToggleSortBySchedule: () => void;
+  sortByScheduleDueDate: boolean;
 };
 
 export function BudgetMonthMenu({
@@ -24,6 +26,8 @@ export function BudgetMonthMenu({
   onCheckTemplates,
   onApplyBudgetTemplates,
   onOverwriteWithBudgetTemplates,
+  onToggleSortBySchedule,
+  sortByScheduleDueDate,
   ...props
 }: BudgetMonthMenuProps) {
   const { t } = useTranslation();
@@ -56,6 +60,9 @@ export function BudgetMonthMenu({
             break;
           case 'overwrite-goal-template':
             onOverwriteWithBudgetTemplates();
+            break;
+          case 'toggle-sort-by-schedule':
+            onToggleSortBySchedule();
             break;
         }
       }}
@@ -90,6 +97,13 @@ export function BudgetMonthMenu({
               },
             ]
           : []),
+        Menu.line,
+        {
+          name: 'toggle-sort-by-schedule',
+          text: sortByScheduleDueDate
+            ? t('Disable sort by schedule')
+            : t('Sort by schedule due date'),
+        },
       ]}
     />
   );
