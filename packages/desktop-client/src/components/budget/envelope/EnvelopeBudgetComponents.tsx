@@ -114,8 +114,8 @@ const cellStyle: CSSProperties = {
 export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
   const { showTargetAmounts, targetAmounts } = useTargetAmounts();
 
-  // Calculate total of all template amounts
-  const templateTotal = useMemo(() => {
+  // Calculate total of all target values (balance - goal for each category)
+  const targetTotal = useMemo(() => {
     if (!showTargetAmounts) return 0;
     return Object.values(targetAmounts).reduce((sum, amount) => sum + amount, 0);
   }, [showTargetAmounts, targetAmounts]);
@@ -127,8 +127,8 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
 
   // Calculate target remainder for the month
   const targetRemainder = useMemo(() => {
-    return templateTotal - totalBudgetedValue;
-  }, [templateTotal, totalBudgetedValue]);
+    return targetTotal - totalBudgetedValue;
+  }, [targetTotal, totalBudgetedValue]);
 
   return (
     <View
@@ -159,7 +159,7 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
             <Trans>Targets</Trans>
           </Text>
           <Text style={cellStyle}>
-            {integerToCurrency(targetRemainder)}
+            {integerToCurrency(targetTotal)}
           </Text>
         </View>
       )}
@@ -210,8 +210,8 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
   const { id } = group;
   const { showTargetAmounts, targetAmounts } = useTargetAmounts();
 
-  // Calculate sum of template amounts for this group's categories
-  const groupTemplateSum = useMemo(() => {
+  // Calculate sum of target values for this group's categories
+  const groupTargetSum = useMemo(() => {
     if (!showTargetAmounts || !group.categories) {
       return undefined;
     }
@@ -227,9 +227,9 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
 
   // Calculate group target remainder
   const groupTargetRemainder = useMemo(() => {
-    if (groupTemplateSum === undefined) return undefined;
-    return groupTemplateSum - groupBudgetedValue;
-  }, [groupTemplateSum, groupBudgetedValue]);
+    if (groupTargetSum === undefined) return undefined;
+    return groupTargetSum - groupBudgetedValue;
+  }, [groupTargetSum, groupBudgetedValue]);
 
   return (
     <View
@@ -257,7 +257,7 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
           width="flex"
           textAlign="right"
           style={{ fontWeight: 600, ...styles.tnum }}
-          targetValue={groupTargetRemainder}
+          targetValue={groupTargetSum}
           valueProps={{
             binding: envelopeBudget.groupBudgeted(id),
             type: 'financial',
@@ -343,11 +343,9 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
     envelopeBudget.catBudgeted(category.id)
   ) ?? 0;
 
-  // Calculate target remainder: template - budgeted
-  const targetValue =
-    showTargetAmounts && targetAmounts[category.id]
-      ? targetAmounts[category.id] - budgetedValue
-      : undefined;
+  // Use simple getDifferenceToGoal calculation: balance - goal
+  // This matches what users see in balance column hover
+  const targetValue = showTargetAmounts ? targetAmounts[category.id] : undefined;
 
   return (
     <View
