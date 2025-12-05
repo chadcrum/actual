@@ -502,7 +502,7 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
           }}
         />
       </View>
-      {showTargetAmounts && targetValue !== undefined && (
+      {showTargetAmounts && (
         <Field name="targets" width="flex" style={{ textAlign: 'right' }}>
           <View
             style={{
@@ -520,7 +520,7 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
                 padding: '0 4px',
               }}
             >
-              {integerToCurrency(targetValue)}
+              {targetValue !== undefined ? integerToCurrency(targetValue) : 'N/A'}
             </Text>
           </View>
         </Field>
