@@ -112,11 +112,7 @@ export function runCheckTemplates() {
   return checkTemplateNotes();
 }
 
-export async function getBudgetTemplates({
-  month,
-}: {
-  month: string;
-}) {
+export async function getBudgetTemplates({ month }: { month: string }) {
   await storeNoteTemplates();
   const categoryTemplates = await getTemplates();
   const categories = await getCategories();

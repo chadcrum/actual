@@ -12,14 +12,13 @@ import {
 } from 'loot-core/types/models';
 
 import { AutoSizingBudgetTable } from './DynamicBudgetTable';
-import { sortCategoriesByScheduleDueDate } from './sortCategories';
 import * as envelopeBudget from './envelope/EnvelopeBudgetComponents';
 import { EnvelopeBudgetProvider } from './envelope/EnvelopeBudgetContext';
+import { sortCategoriesByScheduleDueDate } from './sortCategories';
+import { TargetAmountsProvider } from './TargetAmountsContext';
 import * as trackingBudget from './tracking/TrackingBudgetComponents';
 import { TrackingBudgetProvider } from './tracking/TrackingBudgetContext';
-import { TargetAmountsProvider } from './TargetAmountsContext';
 import { prewarmAllMonths, prewarmMonth } from './util';
-import { fetchScheduleDueDates } from '@desktop-client/hooks/useScheduleDueDates';
 
 import {
   applyBudgetAction,
@@ -29,6 +28,7 @@ import { useCategories } from '@desktop-client/hooks/useCategories';
 import { useCategoryActions } from '@desktop-client/hooks/useCategoryActions';
 import { useGlobalPref } from '@desktop-client/hooks/useGlobalPref';
 import { useLocalPref } from '@desktop-client/hooks/useLocalPref';
+import { fetchScheduleDueDates } from '@desktop-client/hooks/useScheduleDueDates';
 import { SheetNameProvider } from '@desktop-client/hooks/useSheetName';
 import { useSpreadsheet } from '@desktop-client/hooks/useSpreadsheet';
 import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
@@ -54,7 +54,9 @@ export function Budget() {
   const { grouped: categoryGroups } = useCategories();
   const [sortByScheduleDueDate] = useLocalPref('budget.sortByScheduleDueDate');
   const [showHiddenCategories] = useLocalPref('budget.showHiddenCategories');
-  const [scheduleDueDates, setScheduleDueDates] = useState<Map<string, string | null>>(new Map());
+  const [scheduleDueDates, setScheduleDueDates] = useState<
+    Map<string, string | null>
+  >(new Map());
 
   useEffect(() => {
     async function run() {
@@ -163,11 +165,16 @@ export function Budget() {
       return sortCategoriesByScheduleDueDate(
         categoryGroups,
         scheduleDueDates,
-        showHiddenCategories ?? false
+        showHiddenCategories ?? false,
       );
     }
     return categoryGroups;
-  }, [categoryGroups, sortByScheduleDueDate, scheduleDueDates, showHiddenCategories]);
+  }, [
+    categoryGroups,
+    sortByScheduleDueDate,
+    scheduleDueDates,
+    showHiddenCategories,
+  ]);
 
   if (!initialized || !categoryGroups) {
     return null;

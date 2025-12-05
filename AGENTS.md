@@ -204,6 +204,7 @@ When implementing changes:
 All implementation plans created during development should be stored in the `.plans/` directory at the project root for future reference. This helps maintain a historical record of architectural decisions and implementation strategies.
 
 **Guidelines:**
+
 - Store plans with descriptive filenames: `plans/feature-name-YYYY-MM-DD.md` or `plans/task-name.md`
 - Include context, approach, and any relevant architectural decisions
 - Link to related issues or PRs when applicable

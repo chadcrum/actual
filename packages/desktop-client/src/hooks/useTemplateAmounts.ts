@@ -19,10 +19,7 @@ export function useTemplateAmounts(
   const [amounts, setAmounts] = useState<TemplateAmounts | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const categoryIds = useMemo(
-    () => categories.map(c => c.id),
-    [categories],
-  );
+  const categoryIds = useMemo(() => categories.map(c => c.id), [categories]);
 
   const cacheKey = `${month}-all`;
 

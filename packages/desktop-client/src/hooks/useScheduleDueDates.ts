@@ -1,20 +1,31 @@
 import { q } from 'loot-core/shared/query';
-import { type CategoryEntity, type CategoryGroupEntity } from 'loot-core/types/models';
-import { type Template, type ScheduleTemplate } from 'loot-core/types/models/templates';
+import {
+  type CategoryEntity,
+  type CategoryGroupEntity,
+} from 'loot-core/types/models';
+import {
+  type Template,
+  type ScheduleTemplate,
+} from 'loot-core/types/models/templates';
+
 import { aqlQuery } from '@desktop-client/queries/aqlQuery';
 
 /**
  * Extracts schedule templates from a category's goal_def JSON field
  */
-function extractScheduleTemplatesFromCategory(category: CategoryEntity): ScheduleTemplate[] {
+function extractScheduleTemplatesFromCategory(
+  category: CategoryEntity,
+): ScheduleTemplate[] {
   if (!category.goal_def) return [];
 
   try {
     const templates: Template[] = JSON.parse(category.goal_def);
-    return templates
-      .filter((t): t is ScheduleTemplate => t.type === 'schedule')
-      // Filter out any error templates
-      .filter(t => 'name' in t && t.name);
+    return (
+      templates
+        .filter((t): t is ScheduleTemplate => t.type === 'schedule')
+        // Filter out any error templates
+        .filter(t => 'name' in t && t.name)
+    );
   } catch {
     return [];
   }
@@ -24,7 +35,7 @@ function extractScheduleTemplatesFromCategory(category: CategoryEntity): Schedul
  * Async version of useScheduleDueDates for use with useEffect
  */
 export async function fetchScheduleDueDates(
-  categoryGroups: CategoryGroupEntity[]
+  categoryGroups: CategoryGroupEntity[],
 ): Promise<Map<string, string | null>> {
   try {
     // 1. Flatten all categories and extract schedule templates
@@ -33,7 +44,8 @@ export async function fetchScheduleDueDates(
     for (const group of categoryGroups) {
       if (group.categories) {
         for (const category of group.categories) {
-          const scheduleTemplates = extractScheduleTemplatesFromCategory(category);
+          const scheduleTemplates =
+            extractScheduleTemplatesFromCategory(category);
           if (scheduleTemplates.length > 0) {
             categoryScheduleMap.set(category.id, scheduleTemplates);
           }
@@ -61,9 +73,9 @@ export async function fetchScheduleDueDates(
       q('schedules')
         .filter({
           name: { $oneof: Array.from(scheduleNames) },
-          tombstone: false
+          tombstone: false,
         })
-        .select(['id', 'name', 'next_date'])
+        .select(['id', 'name', 'next_date']),
     );
 
     const schedules = queryResult?.data || [];

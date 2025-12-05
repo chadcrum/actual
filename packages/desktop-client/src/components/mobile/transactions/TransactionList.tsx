@@ -65,8 +65,8 @@ import {
 } from '@desktop-client/hooks/useSelected';
 import { useTransactionBatchActions } from '@desktop-client/hooks/useTransactionBatchActions';
 import { useUndo } from '@desktop-client/hooks/useUndo';
-import { setNotificationInset } from '@desktop-client/notifications/notificationsSlice';
 import { pushModal } from '@desktop-client/modals/modalsSlice';
+import { setNotificationInset } from '@desktop-client/notifications/notificationsSlice';
 import { aqlQuery } from '@desktop-client/queries/aqlQuery';
 import { useDispatch } from '@desktop-client/redux';
 
@@ -393,7 +393,7 @@ function SelectedTransactionsFloatingActionBar({
   const canMerge = useMemo(() => {
     return Boolean(
       twoTransactions &&
-      twoTransactions[0].amount === twoTransactions[1].amount,
+        twoTransactions[0].amount === twoTransactions[1].amount,
     );
   }, [twoTransactions]);
 
@@ -472,9 +472,7 @@ function SelectedTransactionsFloatingActionBar({
         ],
       } satisfies NewRuleEntity;
 
-      dispatch(
-        pushModal({ modal: { name: 'edit-rule', options: { rule } } }),
-      );
+      dispatch(pushModal({ modal: { name: 'edit-rule', options: { rule } } }));
     },
     [dispatch],
   );

@@ -1,4 +1,7 @@
-import { type CategoryEntity, type CategoryGroupEntity } from 'loot-core/types/models';
+import {
+  type CategoryEntity,
+  type CategoryGroupEntity,
+} from 'loot-core/types/models';
 
 /**
  * Sorts categories within each group by schedule due date
@@ -9,7 +12,7 @@ import { type CategoryEntity, type CategoryGroupEntity } from 'loot-core/types/m
 export function sortCategoriesByScheduleDueDate(
   categoryGroups: CategoryGroupEntity[],
   scheduleDueDates: Map<string, string | null>,
-  showHiddenCategories: boolean
+  showHiddenCategories: boolean,
 ): CategoryGroupEntity[] {
   return categoryGroups.map(group => {
     if (!group.categories || group.categories.length === 0) {
@@ -59,7 +62,7 @@ export function sortCategoriesByScheduleDueDate(
     // Return new group with sorted categories
     return {
       ...group,
-      categories: sortedCategories
+      categories: sortedCategories,
     };
   });
 }

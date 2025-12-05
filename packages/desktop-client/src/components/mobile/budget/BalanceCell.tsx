@@ -187,11 +187,7 @@ function MobileCarryoverIndicator({ style }: { style?: CSSProperties }) {
         backgroundColor,
       }}
     >
-      <SvgArrowThickRight
-        width={11}
-        height={11}
-        style={{ color: iconColor }}
-      />
+      <SvgArrowThickRight width={11} height={11} style={{ color: iconColor }} />
     </View>
   );
 }

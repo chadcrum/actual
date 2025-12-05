@@ -37,8 +37,9 @@ export const BudgetTotals = memo(function BudgetTotals({
   const [categoryExpandedStatePref, setCategoryExpandedStatePref] =
     useGlobalPref('categoryExpandedState');
   const categoryExpandedState = categoryExpandedStatePref ?? 0;
-  const [sortByScheduleDueDate, setSortByScheduleDueDatePref] =
-    useLocalPref('budget.sortByScheduleDueDate');
+  const [sortByScheduleDueDate, setSortByScheduleDueDatePref] = useLocalPref(
+    'budget.sortByScheduleDueDate',
+  );
   const [menuOpen, setMenuOpen] = useState(false);
   const triggerRef = useRef(null);
 
