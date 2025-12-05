@@ -510,7 +510,13 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
               alignItems: 'center',
               justifyContent: 'flex-end',
               fontStyle: 'italic',
-              color: theme.pageTextLight,
+              color: targetValue !== undefined
+                ? targetValue === 0
+                  ? theme.noticeText
+                  : targetValue > 0
+                    ? theme.warningText
+                    : theme.errorText
+                : theme.pageTextLight,
               ...styles.tnum,
             }}
           >
