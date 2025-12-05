@@ -16,6 +16,7 @@ import { css } from '@emotion/css';
 import * as monthUtils from 'loot-core/shared/months';
 
 import { BudgetMonthMenu } from '@desktop-client/components/budget/envelope/budgetsummary/BudgetMonthMenu';
+import { TargetAmountsProvider } from '@desktop-client/components/budget/TargetAmountsContext';
 import {
   Modal,
   ModalCloseButton,
@@ -162,71 +163,73 @@ export function EnvelopeBudgetMonthMenuModal({
               </View>
             </View>
             {showMore && (
-              <BudgetMonthMenu
-                style={{ overflowY: 'auto', paddingTop: 10 }}
-                getItemStyle={() => defaultMenuItemStyle}
-                onCopyLastMonthBudget={() => {
-                  onBudgetAction(month, 'copy-last');
-                  close();
-                  showUndoNotification({
-                    message: t(
-                      '{{displayMonth}} budgets have all been set to last month’s budgeted amounts.',
-                      { displayMonth },
-                    ),
-                  });
-                }}
-                onSetBudgetsToZero={() => {
-                  onBudgetAction(month, 'set-zero');
-                  close();
-                  showUndoNotification({
-                    message: t(
-                      '{{displayMonth}} budgets have all been set to zero.',
-                      { displayMonth },
-                    ),
-                  });
-                }}
-                onSetMonthsAverage={numberOfMonths => {
-                  onBudgetAction(month, `set-${numberOfMonths}-avg`);
-                  close();
-                  showUndoNotification({
-                    message: `${displayMonth} budgets have all been set to ${numberOfMonths === 12 ? 'yearly' : `${numberOfMonths} month`} average.`,
-                  });
-                }}
-                onCheckTemplates={() => {
-                  onBudgetAction(month, 'check-templates');
-                  close();
-                }}
-                onApplyBudgetTemplates={() => {
-                  onBudgetAction(month, 'apply-goal-template');
-                  close();
-                  showUndoNotification({
-                    message: t(
-                      '{{displayMonth}} budget templates have been applied.',
-                      { displayMonth },
-                    ),
-                  });
-                }}
-                onOverwriteWithBudgetTemplates={() => {
-                  onBudgetAction(month, 'overwrite-goal-template');
-                  close();
-                  showUndoNotification({
-                    message: t(
-                      '{{displayMonth}} budget templates have been overwritten.',
-                      { displayMonth },
-                    ),
-                  });
-                }}
-                onEndOfMonthCleanup={() => {
-                  onBudgetAction(month, 'cleanup-goal-template');
-                  close();
-                  showUndoNotification({
-                    message: t(
-                      '{{displayMonth}} end-of-month cleanup templates have been applied.',
-                      { displayMonth },
-                    ),
-                  });
-                }}
-              />
+              <TargetAmountsProvider month={month}>
+                <BudgetMonthMenu
+                  style={{ overflowY: 'auto', paddingTop: 10 }}
+                  getItemStyle={() => defaultMenuItemStyle}
+                  onCopyLastMonthBudget={() => {
+                    onBudgetAction(month, 'copy-last');
+                    close();
+                    showUndoNotification({
+                      message: t(
+                        "{{displayMonth}} budgets have all been set to last month's budgeted amounts.",
+                        { displayMonth },
+                      ),
+                    });
+                  }}
+                  onSetBudgetsToZero={() => {
+                    onBudgetAction(month, 'set-zero');
+                    close();
+                    showUndoNotification({
+                      message: t(
+                        '{{displayMonth}} budgets have all been set to zero.',
+                        { displayMonth },
+                      ),
+                    });
+                  }}
+                  onSetMonthsAverage={numberOfMonths => {
+                    onBudgetAction(month, `set-${numberOfMonths}-avg`);
+                    close();
+                    showUndoNotification({
+                      message: `${displayMonth} budgets have all been set to ${numberOfMonths === 12 ? 'yearly' : `${numberOfMonths} month`} average.`,
+                    });
+                  }}
+                  onCheckTemplates={() => {
+                    onBudgetAction(month, 'check-templates');
+                    close();
+                  }}
+                  onApplyBudgetTemplates={() => {
+                    onBudgetAction(month, 'apply-goal-template');
+                    close();
+                    showUndoNotification({
+                      message: t(
+                        '{{displayMonth}} budget templates have been applied.',
+                        { displayMonth },
+                      ),
+                    });
+                  }}
+                  onOverwriteWithBudgetTemplates={() => {
+                    onBudgetAction(month, 'overwrite-goal-template');
+                    close();
+                    showUndoNotification({
+                      message: t(
+                        '{{displayMonth}} budget templates have been overwritten.',
+                        { displayMonth },
+                      ),
+                    });
+                  }}
+                  onEndOfMonthCleanup={() => {
+                    onBudgetAction(month, 'cleanup-goal-template');
+                    close();
+                    showUndoNotification({
+                      message: t(
+                        '{{displayMonth}} end-of-month cleanup templates have been applied.',
+                        { displayMonth },
+                      ),
+                    });
+                  }}
+                />
+              </TargetAmountsProvider>
             )}
           </View>
         </>
