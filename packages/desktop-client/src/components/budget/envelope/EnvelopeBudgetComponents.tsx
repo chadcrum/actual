@@ -117,7 +117,9 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
   // Calculate total of all target values (balance - goal for each category)
   const targetTotal = useMemo(() => {
     if (!showTargetAmounts) return 0;
-    return Object.values(targetAmounts).reduce((sum, amount) => sum + amount, 0);
+    return Object.values(targetAmounts).reduce((sum, amount) => {
+      return sum + (amount ?? 0);
+    }, 0);
   }, [showTargetAmounts, targetAmounts]);
 
   // Get total budgeted for the month
@@ -215,9 +217,16 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
     if (!showTargetAmounts || !group.categories) {
       return undefined;
     }
-    return group.categories.reduce((sum, cat) => {
-      return sum + (targetAmounts[cat.id] || 0);
-    }, 0);
+    let sum = 0;
+    let hasAnyValue = false;
+    for (const cat of group.categories) {
+      const catValue = targetAmounts[cat.id];
+      if (catValue !== undefined) {
+        sum += catValue;
+        hasAnyValue = true;
+      }
+    }
+    return hasAnyValue ? sum : undefined;
   }, [showTargetAmounts, targetAmounts, group.categories]);
 
   // Get budgeted amount for this group

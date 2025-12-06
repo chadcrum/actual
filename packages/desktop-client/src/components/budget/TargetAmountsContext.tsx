@@ -13,7 +13,7 @@ import { aqlQuery } from '@desktop-client/queries/aqlQuery';
 type TargetAmountsContextType = {
   showTargetAmounts: boolean;
   toggleTargetAmounts: () => void;
-  targetAmounts: Record<string, number>;
+  targetAmounts: Record<string, number | undefined>;
 };
 
 const TargetAmountsContext = createContext<TargetAmountsContextType | null>(
@@ -30,7 +30,7 @@ export function TargetAmountsProvider({
   month,
 }: TargetAmountsProviderProps) {
   const [showTargetAmounts, setShowTargetAmounts] = useState(false);
-  const [targetAmounts, setTargetAmounts] = useState<Record<string, number>>(
+  const [targetAmounts, setTargetAmounts] = useState<Record<string, number | undefined>>(
     {},
   );
 
@@ -45,6 +45,9 @@ export function TargetAmountsProvider({
       // longGoalValue === 1 ? balance - goal : budgeted - goal
       async function calculateTargetValues() {
         try {
+          // Parse month to get month number for query (format: YYYY-MM)
+          const monthNum = parseInt(month.replace('-', ''));
+
           // Get all non-hidden, non-income categories
           const { data: categories }: { data: any[] } = await aqlQuery(
             q('categories')
@@ -55,44 +58,72 @@ export function TargetAmountsProvider({
               .select('*')
           );
 
-          const newTargetAmounts: Record<string, number> = {};
+          // Get goal and long_goal values from zero_budgets table for this month
+          const { data: budgets }: { data: any[] } = await aqlQuery(
+            q('zero_budgets')
+              .filter({ month: monthNum })
+              .select('*')
+          );
 
-          // Get budget month data which includes all category values
+          // Get budget month data which includes budget/balance for each category
           const budgetMonthData = await send('api/budget-month', { month });
           const categoryGroups = budgetMonthData?.categoryGroups || [];
 
-          // Build a map of category ID -> budget data for quick lookup
-          const categoryDataMap: Record<string, any> = {};
+          // Build a map of category ID -> budget data (balance, budgeted) for quick lookup
+          const budgetDataMap: Record<string, any> = {};
           for (const group of categoryGroups) {
             if ((group as any).categories && Array.isArray((group as any).categories)) {
               for (const cat of (group as any).categories) {
-                categoryDataMap[(cat as any).id] = cat;
+                budgetDataMap[(cat as any).id] = cat;
               }
             }
           }
+
+          // Build a map of category ID -> goal/longGoal data from budgets table
+          const budgetGoalMap: Record<string, any> = {};
+          for (const budget of budgets) {
+            budgetGoalMap[budget.category] = {
+              goal: budget.goal ?? 0,
+              long_goal: budget.long_goal ?? 0
+            };
+          }
+
+          const newTargetAmounts: Record<string, number | undefined> = {};
 
           // Calculate target value for each category
           for (const category of categories) {
             try {
-              const catData = categoryDataMap[category.id];
-              
-              if (catData) {
-                const { balance = 0, goal = 0, budgeted = 0, longGoal = 0 } = catData;
-                
-                // Apply getDifferenceToGoal formula from BalanceWithCarryover
-                const targetValue = longGoal === 1 
-                  ? balance - goal        // Long goal: balance - goal
-                  : budgeted - goal;      // Template goal: budgeted - goal
-                
-                newTargetAmounts[category.id] = targetValue;
+              const budgetData = budgetDataMap[category.id];
+              const goalData = budgetGoalMap[category.id];
+
+              if (budgetData) {
+                const balance = budgetData.balance ?? 0;
+                const budgeted = budgetData.budgeted ?? 0;
+                const goal = goalData?.goal ?? 0;
+                const longGoal = goalData?.long_goal ?? 0;
+
+                // If no goal is set, show N/A (use undefined)
+                if (goal === null || goal === undefined || goal === 0) {
+                  newTargetAmounts[category.id] = undefined;
+                } else {
+                  // Apply getDifferenceToGoal formula from BalanceWithCarryover
+                  // This matches exactly what the balance hover shows
+                  const targetValue = longGoal === 1
+                    ? balance - goal        // Long goal: balance - goal
+                    : budgeted - goal;      // Template goal: budgeted - goal
+
+                  newTargetAmounts[category.id] = targetValue;
+                }
               } else {
-                newTargetAmounts[category.id] = 0;
+                newTargetAmounts[category.id] = undefined;
               }
             } catch (err) {
               console.warn(`Error calculating data for category ${category.id}:`, err);
-              newTargetAmounts[category.id] = 0;
+              newTargetAmounts[category.id] = undefined;
             }
           }
+
+          console.log('Target amounts calculated:', newTargetAmounts);
 
           setTargetAmounts(newTargetAmounts);
         } catch (error) {
