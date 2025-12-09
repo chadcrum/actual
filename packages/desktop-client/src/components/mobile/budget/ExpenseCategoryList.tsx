@@ -27,6 +27,7 @@ type ExpenseCategoryListProps = {
   showBudgetedColumn: boolean;
   mobileDetailedView: boolean;
   categoryScheduleDates: Map<string, ScheduleDateInfo[]>;
+  categoryTargetAmounts: Record<string, number | undefined>;
 };
 
 export function ExpenseCategoryList({
@@ -40,6 +41,7 @@ export function ExpenseCategoryList({
   shouldHideCategory,
   mobileDetailedView,
   categoryScheduleDates,
+  categoryTargetAmounts,
 }: ExpenseCategoryListProps) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -152,6 +154,7 @@ export function ExpenseCategoryList({
           showBudgetedColumn={showBudgetedColumn}
           mobileDetailedView={mobileDetailedView}
           categoryScheduleDates={categoryScheduleDates}
+          categoryTargetAmounts={categoryTargetAmounts}
         />
       )}
     </GridList>

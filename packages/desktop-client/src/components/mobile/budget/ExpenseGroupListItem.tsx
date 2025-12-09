@@ -46,6 +46,7 @@ type ExpenseGroupListItemProps = ComponentPropsWithoutRef<
   isHidden: boolean;
   mobileDetailedView: boolean;
   categoryScheduleDates: Map<string, ScheduleDateInfo[]>;
+  categoryTargetAmounts: Record<string, number | undefined>;
 };
 
 export function ExpenseGroupListItem({
@@ -61,6 +62,7 @@ export function ExpenseGroupListItem({
   isHidden,
   mobileDetailedView,
   categoryScheduleDates,
+  categoryTargetAmounts,
   ...props
 }: ExpenseGroupListItemProps) {
   const { value: categoryGroup } = props;
@@ -116,6 +118,7 @@ export function ExpenseGroupListItem({
           showBudgetedColumn={showBudgetedColumn}
           mobileDetailedView={mobileDetailedView}
           categoryScheduleDates={categoryScheduleDates}
+          categoryTargetAmounts={categoryTargetAmounts}
         />
       </Card>
     </GridListItem>

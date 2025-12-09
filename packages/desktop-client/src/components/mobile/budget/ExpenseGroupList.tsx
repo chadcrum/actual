@@ -32,6 +32,7 @@ type ExpenseGroupListProps = {
   onToggleCollapse: (id: CategoryGroupEntity['id']) => void;
   mobileDetailedView: boolean;
   categoryScheduleDates: Map<string, ScheduleDateInfo[]>;
+  categoryTargetAmounts: Record<string, number | undefined>;
 };
 
 export function ExpenseGroupList({
@@ -47,6 +48,7 @@ export function ExpenseGroupList({
   onToggleCollapse,
   mobileDetailedView,
   categoryScheduleDates,
+  categoryTargetAmounts,
 }: ExpenseGroupListProps) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -177,6 +179,7 @@ export function ExpenseGroupList({
           isHidden={!!categoryGroup.hidden}
           mobileDetailedView={mobileDetailedView}
           categoryScheduleDates={categoryScheduleDates}
+          categoryTargetAmounts={categoryTargetAmounts}
         />
       )}
     </GridList>

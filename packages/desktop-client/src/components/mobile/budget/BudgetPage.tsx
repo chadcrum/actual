@@ -24,6 +24,9 @@ import { View } from '@actual-app/components/view';
 import { send } from 'loot-core/platform/client/fetch';
 import * as monthUtils from 'loot-core/shared/months';
 import { groupById } from 'loot-core/shared/util';
+import { q } from 'loot-core/shared/query';
+
+import { aqlQuery } from '@desktop-client/queries/aqlQuery';
 
 import { BudgetTable, PILL_STYLE } from './BudgetTable';
 
@@ -95,6 +98,9 @@ export function BudgetPage() {
   const [categoryScheduleDates, setCategoryScheduleDates] = useState<
     Map<string, ScheduleDateInfo[]>
   >(new Map());
+  const [categoryTargetAmounts, setCategoryTargetAmounts] = useState<
+    Record<string, number | undefined>
+  >({});
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -124,6 +130,80 @@ export function BudgetPage() {
       setCategoryScheduleDates(new Map());
     }
   }, [sortByScheduleDueDate, mobileDetailedView, categoryGroups]);
+
+  useEffect(() => {
+    if (!mobileDetailedView) {
+      setCategoryTargetAmounts({});
+      return;
+    }
+
+    async function calculateTargetAmounts() {
+      if (!categoryGroups) {
+        setCategoryTargetAmounts({});
+        return;
+      }
+
+      try {
+        // Get all non-hidden expense categories
+        const { data: categories } = await aqlQuery(
+          q('categories').filter({ hidden: false, is_income: false })
+        );
+
+        // Get goal data from zero_budgets table
+        const monthNum = parseInt(startMonth.replace('-', ''));
+        const { data: goalData } = await aqlQuery(
+          q('zero_budgets').filter({ month: monthNum })
+        );
+
+        // Get budget month data for balances and budgeted amounts
+        const budgetMonth = await send('api/budget-month', {
+          month: startMonth,
+        });
+
+        // Create lookup maps
+        const goalMap = new Map(
+          goalData.map((item: any) => [
+            item.category,
+            { goal: item.goal || 0, longGoal: item.long_goal === 1 },
+          ])
+        );
+
+        const categoryBudgetMap = new Map(
+          budgetMonth.categoryBudgets.map((cat: any) => [
+            cat.id,
+            { balance: cat.balance || 0, budgeted: cat.budgeted || 0 },
+          ])
+        );
+
+        // Calculate target amounts for each category
+        const newTargetAmounts: Record<string, number | undefined> = {};
+
+        for (const category of categories) {
+          const goalInfo = goalMap.get(category.id);
+          const budgetInfo = categoryBudgetMap.get(category.id);
+
+          if (!goalInfo || goalInfo.goal === 0 || !budgetInfo) {
+            newTargetAmounts[category.id] = undefined;
+            continue;
+          }
+
+          // Apply formula: longGoal ? balance - goal : budgeted - goal
+          const targetValue = goalInfo.longGoal
+            ? budgetInfo.balance - goalInfo.goal
+            : budgetInfo.budgeted - goalInfo.goal;
+
+          newTargetAmounts[category.id] = targetValue;
+        }
+
+        setCategoryTargetAmounts(newTargetAmounts);
+      } catch (error) {
+        console.error('Failed to calculate target amounts:', error);
+        setCategoryTargetAmounts({});
+      }
+    }
+
+    calculateTargetAmounts();
+  }, [mobileDetailedView, startMonth, categoryGroups]);
 
   const onBudgetAction = useCallback(
     async (month, type, args) => {
@@ -567,6 +647,20 @@ export function BudgetPage() {
     onToggleHiddenCategories,
   ]);
 
+  const sortedCategoryGroups = useMemo(() => {
+    if (!categoryGroups) {
+      return [];
+    }
+    if (sortByScheduleDueDate && scheduleDueDates.size > 0) {
+      return sortCategoriesByScheduleDueDate(
+        categoryGroups,
+        scheduleDueDates,
+        showHiddenCategories ?? false,
+      );
+    }
+    return categoryGroups;
+  }, [categoryGroups, sortByScheduleDueDate, scheduleDueDates, showHiddenCategories]);
+
   if (!categoryGroups || !initialized) {
     return (
       <View
@@ -582,17 +676,6 @@ export function BudgetPage() {
       </View>
     );
   }
-
-  const sortedCategoryGroups = useMemo(() => {
-    if (sortByScheduleDueDate && scheduleDueDates.size > 0) {
-      return sortCategoriesByScheduleDueDate(
-        categoryGroups,
-        scheduleDueDates,
-        showHiddenCategories ?? false,
-      );
-    }
-    return categoryGroups;
-  }, [categoryGroups, sortByScheduleDueDate, scheduleDueDates, showHiddenCategories]);
 
   return (
     <Page
@@ -664,6 +747,7 @@ export function BudgetPage() {
                 onEditCategory={onOpenCategoryMenuModal}
                 mobileDetailedView={mobileDetailedView ?? false}
                 categoryScheduleDates={categoryScheduleDates}
+                categoryTargetAmounts={categoryTargetAmounts}
               />
             </>
           )}

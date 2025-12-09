@@ -303,6 +303,59 @@ function ScheduleDatesDisplay({
   );
 }
 
+type TargetAmountDisplayProps = {
+  categoryId: string;
+  targetAmounts: Record<string, number | undefined>;
+  show3Columns: boolean;
+};
+
+function TargetAmountDisplay({
+  categoryId,
+  targetAmounts,
+  show3Columns,
+}: TargetAmountDisplayProps) {
+  const targetValue = targetAmounts ? targetAmounts[categoryId] : undefined;
+
+  // Calculate column width to align with Budgeted column
+  const columnWidth = getColumnWidth({
+    show3Columns,
+    isSidebar: false,
+  });
+
+  // Determine color based on target value
+  const color =
+    targetValue === undefined
+      ? theme.pageTextLight
+      : targetValue === 0
+        ? theme.noticeText
+        : targetValue > 0
+          ? theme.warningText
+          : theme.errorText;
+
+  return (
+    <View
+      style={{
+        width: columnWidth,
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        paddingRight: 5,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 12,
+          fontStyle: 'italic',
+          color,
+        }}
+      >
+        {targetValue !== undefined
+          ? integerToCurrency(targetValue)
+          : 'N/A'}
+      </Text>
+    </View>
+  );
+}
+
 type ExpenseCategoryListItemProps = ComponentPropsWithoutRef<
   typeof GridListItem<CategoryEntity>
 > & {
@@ -315,6 +368,7 @@ type ExpenseCategoryListItemProps = ComponentPropsWithoutRef<
   onBudgetAction: (month: string, action: string, args: unknown) => void;
   mobileDetailedView: boolean;
   categoryScheduleDates: Map<string, ScheduleDateInfo[]>;
+  categoryTargetAmounts: Record<string, number | undefined>;
 };
 
 export function ExpenseCategoryListItem({
@@ -326,6 +380,7 @@ export function ExpenseCategoryListItem({
   showBudgetedColumn,
   mobileDetailedView,
   categoryScheduleDates,
+  categoryTargetAmounts,
   ...props
 }: ExpenseCategoryListItemProps) {
   const { value: category } = props;
@@ -558,12 +613,19 @@ export function ExpenseCategoryListItem({
                 ? theme.budgetCurrentMonth
                 : theme.budgetOtherMonth,
               opacity: isHidden ? 0.5 : undefined,
-              justifyContent: 'center',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
             <ScheduleDatesDisplay
               categoryId={category.id}
               scheduleDates={categoryScheduleDates}
+            />
+            <TargetAmountDisplay
+              categoryId={category.id}
+              targetAmounts={categoryTargetAmounts}
+              show3Columns={show3Columns}
             />
           </View>
         )}
