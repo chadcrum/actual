@@ -13,6 +13,7 @@ import {
 import { ExpenseCategoryListItem } from './ExpenseCategoryListItem';
 
 import { moveCategory } from '@desktop-client/budget/budgetSlice';
+import { type ScheduleDateInfo } from '@desktop-client/hooks/useScheduleDueDates';
 import { useDispatch } from '@desktop-client/redux';
 
 type ExpenseCategoryListProps = {
@@ -25,6 +26,7 @@ type ExpenseCategoryListProps = {
   show3Columns: boolean;
   showBudgetedColumn: boolean;
   mobileDetailedView: boolean;
+  categoryScheduleDates: Map<string, ScheduleDateInfo[]>;
 };
 
 export function ExpenseCategoryList({
@@ -37,6 +39,7 @@ export function ExpenseCategoryList({
   showBudgetedColumn,
   shouldHideCategory,
   mobileDetailedView,
+  categoryScheduleDates,
 }: ExpenseCategoryListProps) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -148,6 +151,7 @@ export function ExpenseCategoryList({
           show3Columns={show3Columns}
           showBudgetedColumn={showBudgetedColumn}
           mobileDetailedView={mobileDetailedView}
+          categoryScheduleDates={categoryScheduleDates}
         />
       )}
     </GridList>

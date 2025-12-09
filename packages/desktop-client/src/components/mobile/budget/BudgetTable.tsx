@@ -27,6 +27,9 @@ import { PullToRefresh } from '@desktop-client/components/mobile/PullToRefresh';
 import { PrivacyFilter } from '@desktop-client/components/PrivacyFilter';
 import { CellValue } from '@desktop-client/components/spreadsheet/CellValue';
 import { SchedulesProvider } from '@desktop-client/hooks/useCachedSchedules';
+import {
+  type ScheduleDateInfo,
+} from '@desktop-client/hooks/useScheduleDueDates';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useLocalPref } from '@desktop-client/hooks/useLocalPref';
 import { useSheetValue } from '@desktop-client/hooks/useSheetValue';
@@ -252,6 +255,7 @@ type BudgetGroupsProps = {
   show3Columns: boolean;
   showHiddenCategories: boolean;
   mobileDetailedView: boolean;
+  categoryScheduleDates: Map<string, ScheduleDateInfo[]>;
 };
 
 function BudgetGroups({
@@ -264,6 +268,7 @@ function BudgetGroups({
   show3Columns,
   showHiddenCategories,
   mobileDetailedView,
+  categoryScheduleDates,
 }: BudgetGroupsProps) {
   const { incomeGroup, expenseGroups } = useMemo(() => {
     const categoryGroupsToDisplay = categoryGroups.filter(
@@ -313,6 +318,7 @@ function BudgetGroups({
         isCollapsed={isCollapsed}
         onToggleCollapse={onToggleCollapse}
         mobileDetailedView={mobileDetailedView}
+        categoryScheduleDates={categoryScheduleDates}
       />
 
       {incomeGroup && (
@@ -340,6 +346,7 @@ type BudgetTableProps = {
   onEditCategoryGroup: (id: CategoryGroupEntity['id']) => void;
   onEditCategory: (id: CategoryEntity['id']) => void;
   mobileDetailedView?: boolean;
+  categoryScheduleDates: Map<string, ScheduleDateInfo[]>;
 };
 
 export function BudgetTable({
@@ -351,6 +358,7 @@ export function BudgetTable({
   onEditCategoryGroup,
   onEditCategory,
   mobileDetailedView = false,
+  categoryScheduleDates,
 }: BudgetTableProps) {
   const { width } = useResponsive();
   const show3Columns = width >= 300;
@@ -402,6 +410,7 @@ export function BudgetTable({
               onEditCategory={onEditCategory}
               onBudgetAction={onBudgetAction}
               mobileDetailedView={mobileDetailedView}
+              categoryScheduleDates={categoryScheduleDates}
             />
           </SchedulesProvider>
         </View>

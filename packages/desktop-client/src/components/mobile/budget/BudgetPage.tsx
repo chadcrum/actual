@@ -28,7 +28,11 @@ import { groupById } from 'loot-core/shared/util';
 import { BudgetTable, PILL_STYLE } from './BudgetTable';
 
 import { sync } from '@desktop-client/app/appSlice';
-import { fetchScheduleDueDates } from '@desktop-client/hooks/useScheduleDueDates';
+import {
+  fetchScheduleDueDates,
+  fetchCategoryScheduleDates,
+  type ScheduleDateInfo,
+} from '@desktop-client/hooks/useScheduleDueDates';
 import { sortCategoriesByScheduleDueDate } from '@desktop-client/components/budget/sortCategories';
 import {
   applyBudgetAction,
@@ -88,6 +92,9 @@ export function BudgetPage() {
   const [scheduleDueDates, setScheduleDueDates] = useState<
     Map<string, string | null>
   >(new Map());
+  const [categoryScheduleDates, setCategoryScheduleDates] = useState<
+    Map<string, ScheduleDateInfo[]>
+  >(new Map());
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -105,11 +112,16 @@ export function BudgetPage() {
 
   useEffect(() => {
     if (sortByScheduleDueDate && categoryGroups) {
-      fetchScheduleDueDates(categoryGroups).then(dates => {
-        setScheduleDueDates(dates);
+      Promise.all([
+        fetchScheduleDueDates(categoryGroups),
+        fetchCategoryScheduleDates(categoryGroups),
+      ]).then(([dueDates, scheduleDates]) => {
+        setScheduleDueDates(dueDates);
+        setCategoryScheduleDates(scheduleDates);
       });
     } else {
       setScheduleDueDates(new Map());
+      setCategoryScheduleDates(new Map());
     }
   }, [sortByScheduleDueDate, categoryGroups]);
 
@@ -651,6 +663,7 @@ export function BudgetPage() {
                 onEditCategoryGroup={onOpenCategoryGroupMenuModal}
                 onEditCategory={onOpenCategoryMenuModal}
                 mobileDetailedView={mobileDetailedView ?? false}
+                categoryScheduleDates={categoryScheduleDates}
               />
             </>
           )}

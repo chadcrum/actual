@@ -16,6 +16,7 @@ import {
 } from './ExpenseGroupListItem';
 
 import { moveCategoryGroup } from '@desktop-client/budget/budgetSlice';
+import { type ScheduleDateInfo } from '@desktop-client/hooks/useScheduleDueDates';
 import { useDispatch } from '@desktop-client/redux';
 
 type ExpenseGroupListProps = {
@@ -30,6 +31,7 @@ type ExpenseGroupListProps = {
   isCollapsed: (id: CategoryGroupEntity['id']) => boolean;
   onToggleCollapse: (id: CategoryGroupEntity['id']) => void;
   mobileDetailedView: boolean;
+  categoryScheduleDates: Map<string, ScheduleDateInfo[]>;
 };
 
 export function ExpenseGroupList({
@@ -44,6 +46,7 @@ export function ExpenseGroupList({
   isCollapsed,
   onToggleCollapse,
   mobileDetailedView,
+  categoryScheduleDates,
 }: ExpenseGroupListProps) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -173,6 +176,7 @@ export function ExpenseGroupList({
           onToggleCollapse={onToggleCollapse}
           isHidden={!!categoryGroup.hidden}
           mobileDetailedView={mobileDetailedView}
+          categoryScheduleDates={categoryScheduleDates}
         />
       )}
     </GridList>

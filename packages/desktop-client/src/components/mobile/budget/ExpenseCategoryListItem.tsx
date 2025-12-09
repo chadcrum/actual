@@ -21,6 +21,7 @@ import { SpentCell } from './SpentCell';
 
 import { useCategories } from '@desktop-client/hooks/useCategories';
 import { useNavigate } from '@desktop-client/hooks/useNavigate';
+import { type ScheduleDateInfo } from '@desktop-client/hooks/useScheduleDueDates';
 import { useSheetValue } from '@desktop-client/hooks/useSheetValue';
 import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 import { useUndo } from '@desktop-client/hooks/useUndo';
@@ -204,6 +205,67 @@ function ExpenseCategoryCells({
   );
 }
 
+function formatScheduleDate(dateString: string): string {
+  // Convert YYYY-MM-DD to MM/DD/YY
+  const [year, month, day] = dateString.split('-');
+  const shortYear = year.slice(2); // Get last 2 digits
+  return `${parseInt(month)}/${parseInt(day)}/${shortYear}`;
+}
+
+type ScheduleDatesDisplayProps = {
+  categoryId: string;
+  scheduleDates: Map<string, ScheduleDateInfo[]>;
+};
+
+function ScheduleDatesDisplay({
+  categoryId,
+  scheduleDates,
+}: ScheduleDatesDisplayProps) {
+  const schedules = scheduleDates.get(categoryId) || [];
+
+  if (schedules.length === 0) {
+    return null;
+  }
+
+  const MAX_DISPLAY = 2;
+  const displaySchedules = schedules.slice(0, MAX_DISPLAY);
+  const hasMore = schedules.length > MAX_DISPLAY;
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        paddingTop: 2,
+      }}
+    >
+      {displaySchedules.map((schedule, index) => (
+        <Text
+          key={schedule.scheduleId}
+          style={{
+            fontSize: 12,
+            color: theme.pageTextSubdued,
+          }}
+        >
+          {formatScheduleDate(schedule.nextDate)}
+          {index < displaySchedules.length - 1 ? ',' : ''}
+        </Text>
+      ))}
+      {hasMore && (
+        <Text
+          style={{
+            fontSize: 12,
+            color: theme.pageTextSubdued,
+          }}
+        >
+          ...
+        </Text>
+      )}
+    </View>
+  );
+}
+
 type ExpenseCategoryListItemProps = ComponentPropsWithoutRef<
   typeof GridListItem<CategoryEntity>
 > & {
@@ -215,6 +277,7 @@ type ExpenseCategoryListItemProps = ComponentPropsWithoutRef<
   onEditCategory: (id: CategoryEntity['id']) => void;
   onBudgetAction: (month: string, action: string, args: unknown) => void;
   mobileDetailedView: boolean;
+  categoryScheduleDates: Map<string, ScheduleDateInfo[]>;
 };
 
 export function ExpenseCategoryListItem({
@@ -225,6 +288,7 @@ export function ExpenseCategoryListItem({
   show3Columns,
   showBudgetedColumn,
   mobileDetailedView,
+  categoryScheduleDates,
   ...props
 }: ExpenseCategoryListItemProps) {
   const { value: category } = props;
@@ -457,9 +521,13 @@ export function ExpenseCategoryListItem({
                 ? theme.budgetCurrentMonth
                 : theme.budgetOtherMonth,
               opacity: isHidden ? 0.5 : undefined,
+              justifyContent: 'center',
             }}
           >
-            {/* Expansion area - empty for now */}
+            <ScheduleDatesDisplay
+              categoryId={category.id}
+              scheduleDates={categoryScheduleDates}
+            />
           </View>
         )}
       </View>

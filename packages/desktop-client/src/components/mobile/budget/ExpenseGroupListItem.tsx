@@ -24,6 +24,7 @@ import { ExpenseCategoryList } from './ExpenseCategoryList';
 import { PrivacyFilter } from '@desktop-client/components/PrivacyFilter';
 import { CellValue } from '@desktop-client/components/spreadsheet/CellValue';
 import { useFormat } from '@desktop-client/hooks/useFormat';
+import { type ScheduleDateInfo } from '@desktop-client/hooks/useScheduleDueDates';
 import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 import {
   envelopeBudget,
@@ -44,6 +45,7 @@ type ExpenseGroupListItemProps = ComponentPropsWithoutRef<
   show3Columns: boolean;
   isHidden: boolean;
   mobileDetailedView: boolean;
+  categoryScheduleDates: Map<string, ScheduleDateInfo[]>;
 };
 
 export function ExpenseGroupListItem({
@@ -58,6 +60,7 @@ export function ExpenseGroupListItem({
   onToggleCollapse,
   isHidden,
   mobileDetailedView,
+  categoryScheduleDates,
   ...props
 }: ExpenseGroupListItemProps) {
   const { value: categoryGroup } = props;
@@ -112,6 +115,7 @@ export function ExpenseGroupListItem({
           show3Columns={show3Columns}
           showBudgetedColumn={showBudgetedColumn}
           mobileDetailedView={mobileDetailedView}
+          categoryScheduleDates={categoryScheduleDates}
         />
       </Card>
     </GridListItem>

@@ -10,6 +10,12 @@ import {
 
 import { aqlQuery } from '@desktop-client/queries/aqlQuery';
 
+export type ScheduleDateInfo = {
+  scheduleId: string;
+  scheduleName: string;
+  nextDate: string;
+};
+
 /**
  * Extracts schedule templates from a category's goal_def JSON field
  */
@@ -107,6 +113,90 @@ export async function fetchScheduleDueDates(
     return result;
   } catch (error) {
     console.error('Error fetching schedule due dates:', error);
+    return new Map();
+  }
+}
+
+/**
+ * Fetches all schedule dates for categories (not just earliest)
+ * Returns a map of categoryId -> array of schedule date info, sorted soonest first
+ */
+export async function fetchCategoryScheduleDates(
+  categoryGroups: CategoryGroupEntity[],
+): Promise<Map<string, ScheduleDateInfo[]>> {
+  try {
+    // 1. Extract schedule templates from categories (reuse existing logic)
+    const categoryScheduleMap = new Map<string, ScheduleTemplate[]>();
+    for (const group of categoryGroups) {
+      if (group.categories) {
+        for (const category of group.categories) {
+          const templates = extractScheduleTemplatesFromCategory(category);
+          if (templates.length > 0) {
+            categoryScheduleMap.set(category.id, templates);
+          }
+        }
+      }
+    }
+
+    if (categoryScheduleMap.size === 0) return new Map();
+
+    // 2. Collect unique schedule names
+    const scheduleNames = new Set<string>();
+    for (const templates of categoryScheduleMap.values()) {
+      templates.forEach(t => scheduleNames.add(t.name));
+    }
+
+    if (scheduleNames.size === 0) return new Map();
+
+    // 3. Fetch all schedules (same query as fetchScheduleDueDates)
+    const queryResult = await aqlQuery(
+      q('schedules')
+        .filter({
+          name: { $oneof: Array.from(scheduleNames) },
+          tombstone: false,
+        })
+        .select(['id', 'name', 'next_date']),
+    );
+
+    const schedules = queryResult?.data || [];
+
+    // 4. Build map of schedule name -> schedule info
+    const scheduleMap = new Map<string, ScheduleDateInfo>();
+    for (const schedule of schedules) {
+      if (schedule.name && schedule.next_date) {
+        scheduleMap.set(schedule.name, {
+          scheduleId: schedule.id,
+          scheduleName: schedule.name,
+          nextDate: schedule.next_date,
+        });
+      }
+    }
+
+    // 5. Build final map: categoryId -> sorted ScheduleDateInfo[]
+    const result = new Map<string, ScheduleDateInfo[]>();
+    for (const [categoryId, templates] of categoryScheduleMap.entries()) {
+      const categorySchedules: ScheduleDateInfo[] = [];
+
+      for (const template of templates) {
+        const scheduleInfo = scheduleMap.get(template.name);
+        if (scheduleInfo) {
+          categorySchedules.push(scheduleInfo);
+        }
+      }
+
+      // Sort by next_date (soonest first) - string comparison works for YYYY-MM-DD
+      categorySchedules.sort((a, b) =>
+        a.nextDate < b.nextDate ? -1 : a.nextDate > b.nextDate ? 1 : 0,
+      );
+
+      if (categorySchedules.length > 0) {
+        result.set(categoryId, categorySchedules);
+      }
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching category schedule dates:', error);
     return new Map();
   }
 }
