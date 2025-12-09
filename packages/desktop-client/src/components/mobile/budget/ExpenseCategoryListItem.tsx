@@ -629,11 +629,6 @@ export function ExpenseCategoryListItem({
               flexShrink: 0,
             }}
           />
-          <TargetAmountDisplay
-            categoryId={category.id}
-            targetAmounts={categoryTargetAmounts}
-            show3Columns={show3Columns}
-          />
           <View
             style={{
               flex: 1,
@@ -645,6 +640,11 @@ export function ExpenseCategoryListItem({
                 scheduleDates={categoryScheduleDates}
               />
             </View>
+          <TargetAmountDisplay
+            categoryId={category.id}
+            targetAmounts={categoryTargetAmounts}
+            show3Columns={show3Columns}
+          />
           </View>
         )}
       </View>
