@@ -24,6 +24,7 @@ type ExpenseCategoryListProps = {
   onBudgetAction: (month: string, action: string, args: unknown) => void;
   show3Columns: boolean;
   showBudgetedColumn: boolean;
+  mobileDetailedView: boolean;
 };
 
 export function ExpenseCategoryList({
@@ -35,6 +36,7 @@ export function ExpenseCategoryList({
   show3Columns,
   showBudgetedColumn,
   shouldHideCategory,
+  mobileDetailedView,
 }: ExpenseCategoryListProps) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -132,6 +134,7 @@ export function ExpenseCategoryList({
         shouldHideCategory,
         show3Columns,
         showBudgetedColumn,
+        mobileDetailedView,
       ]}
     >
       {category => (
@@ -144,6 +147,7 @@ export function ExpenseCategoryList({
           isHidden={shouldHideCategory(category)}
           show3Columns={show3Columns}
           showBudgetedColumn={showBudgetedColumn}
+          mobileDetailedView={mobileDetailedView}
         />
       )}
     </GridList>

@@ -251,6 +251,7 @@ type BudgetGroupsProps = {
   showBudgetedColumn: boolean;
   show3Columns: boolean;
   showHiddenCategories: boolean;
+  mobileDetailedView: boolean;
 };
 
 function BudgetGroups({
@@ -262,6 +263,7 @@ function BudgetGroups({
   showBudgetedColumn,
   show3Columns,
   showHiddenCategories,
+  mobileDetailedView,
 }: BudgetGroupsProps) {
   const { incomeGroup, expenseGroups } = useMemo(() => {
     const categoryGroupsToDisplay = categoryGroups.filter(
@@ -310,6 +312,7 @@ function BudgetGroups({
         showHiddenCategories={showHiddenCategories}
         isCollapsed={isCollapsed}
         onToggleCollapse={onToggleCollapse}
+        mobileDetailedView={mobileDetailedView}
       />
 
       {incomeGroup && (
@@ -336,6 +339,7 @@ type BudgetTableProps = {
   onRefresh: () => Promise<void>;
   onEditCategoryGroup: (id: CategoryGroupEntity['id']) => void;
   onEditCategory: (id: CategoryEntity['id']) => void;
+  mobileDetailedView?: boolean;
 };
 
 export function BudgetTable({
@@ -346,6 +350,7 @@ export function BudgetTable({
   onRefresh,
   onEditCategoryGroup,
   onEditCategory,
+  mobileDetailedView = false,
 }: BudgetTableProps) {
   const { width } = useResponsive();
   const show3Columns = width >= 300;
@@ -396,6 +401,7 @@ export function BudgetTable({
               onEditCategoryGroup={onEditCategoryGroup}
               onEditCategory={onEditCategory}
               onBudgetAction={onBudgetAction}
+              mobileDetailedView={mobileDetailedView}
             />
           </SchedulesProvider>
         </View>

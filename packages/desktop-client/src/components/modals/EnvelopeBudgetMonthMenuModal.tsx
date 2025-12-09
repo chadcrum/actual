@@ -45,6 +45,9 @@ export function EnvelopeBudgetMonthMenuModal({
   const [sortByScheduleDueDate, setSortByScheduleDueDate] = useLocalPref(
     'budget.sortByScheduleDueDate',
   );
+  const [mobileDetailedView, setMobileDetailedView] = useLocalPref(
+    'budget.mobileDetailedView',
+  );
 
   const _onEditNotes = () => {
     onEditNotes?.(month);
@@ -52,6 +55,10 @@ export function EnvelopeBudgetMonthMenuModal({
 
   const onToggleSortBySchedule = () => {
     setSortByScheduleDueDate(!sortByScheduleDueDate);
+  };
+
+  const onToggleMobileDetailedView = () => {
+    setMobileDetailedView(!mobileDetailedView);
   };
 
   const defaultMenuItemStyle: CSSProperties = {
@@ -238,6 +245,8 @@ export function EnvelopeBudgetMonthMenuModal({
                   }}
                   onToggleSortBySchedule={onToggleSortBySchedule}
                   sortByScheduleDueDate={sortByScheduleDueDate ?? false}
+                  onToggleMobileDetailedView={onToggleMobileDetailedView}
+                  mobileDetailedView={mobileDetailedView ?? false}
                 />
               </TargetAmountsProvider>
             )}

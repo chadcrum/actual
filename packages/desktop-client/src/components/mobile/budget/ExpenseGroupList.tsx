@@ -29,6 +29,7 @@ type ExpenseGroupListProps = {
   showHiddenCategories: boolean;
   isCollapsed: (id: CategoryGroupEntity['id']) => boolean;
   onToggleCollapse: (id: CategoryGroupEntity['id']) => void;
+  mobileDetailedView: boolean;
 };
 
 export function ExpenseGroupList({
@@ -42,6 +43,7 @@ export function ExpenseGroupList({
   showHiddenCategories,
   isCollapsed,
   onToggleCollapse,
+  mobileDetailedView,
 }: ExpenseGroupListProps) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -152,6 +154,7 @@ export function ExpenseGroupList({
         showHiddenCategories,
         isCollapsed,
         onToggleCollapse,
+        mobileDetailedView,
       ]}
       dragAndDropHooks={dragAndDropHooks}
     >
@@ -169,6 +172,7 @@ export function ExpenseGroupList({
           isCollapsed={isCollapsed}
           onToggleCollapse={onToggleCollapse}
           isHidden={!!categoryGroup.hidden}
+          mobileDetailedView={mobileDetailedView}
         />
       )}
     </GridList>

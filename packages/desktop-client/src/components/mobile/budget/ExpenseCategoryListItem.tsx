@@ -214,6 +214,7 @@ type ExpenseCategoryListItemProps = ComponentPropsWithoutRef<
   showBudgetedColumn: boolean;
   onEditCategory: (id: CategoryEntity['id']) => void;
   onBudgetAction: (month: string, action: string, args: unknown) => void;
+  mobileDetailedView: boolean;
 };
 
 export function ExpenseCategoryListItem({
@@ -223,6 +224,7 @@ export function ExpenseCategoryListItem({
   onBudgetAction,
   show3Columns,
   showBudgetedColumn,
+  mobileDetailedView,
   ...props
 }: ExpenseCategoryListItemProps) {
   const { value: category } = props;
@@ -402,43 +404,64 @@ export function ExpenseCategoryListItem({
     return null;
   }
 
+  const EXPANSION_HEIGHT = 25;
+
   return (
     <GridListItem
       textValue={category.name}
       data-testid="category-row"
       {...props}
     >
-      <View
-        style={{
-          height: ROW_HEIGHT,
-          borderColor: theme.tableBorder,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingLeft: 5,
-          paddingRight: 5,
-          borderBottomWidth: 1,
-          opacity: isHidden ? 0.5 : undefined,
-          backgroundColor: monthUtils.isCurrentMonth(month)
-            ? theme.budgetCurrentMonth
-            : theme.budgetOtherMonth,
-        }}
-      >
-        <ExpenseCategoryName
-          category={category}
-          onEditCategory={onEditCategory}
-          show3Columns={show3Columns}
-        />
-        <ExpenseCategoryCells
-          key={`${category.id}-${show3Columns}-${showBudgetedColumn}`}
-          category={category}
-          month={month}
-          onBudgetAction={onBudgetAction}
-          show3Columns={show3Columns}
-          showBudgetedColumn={showBudgetedColumn}
-          onOpenBalanceMenu={onOpenBalanceMenu}
-          onShowActivity={onShowActivity}
-        />
+      <View style={{ flexDirection: 'column' }}>
+        <View
+          style={{
+            height: ROW_HEIGHT,
+            borderColor: theme.tableBorder,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingLeft: 5,
+            paddingRight: 5,
+            borderBottomWidth: mobileDetailedView ? 0 : 1,
+            opacity: isHidden ? 0.5 : undefined,
+            backgroundColor: monthUtils.isCurrentMonth(month)
+              ? theme.budgetCurrentMonth
+              : theme.budgetOtherMonth,
+          }}
+        >
+          <ExpenseCategoryName
+            category={category}
+            onEditCategory={onEditCategory}
+            show3Columns={show3Columns}
+          />
+          <ExpenseCategoryCells
+            key={`${category.id}-${show3Columns}-${showBudgetedColumn}`}
+            category={category}
+            month={month}
+            onBudgetAction={onBudgetAction}
+            show3Columns={show3Columns}
+            showBudgetedColumn={showBudgetedColumn}
+            onOpenBalanceMenu={onOpenBalanceMenu}
+            onShowActivity={onShowActivity}
+          />
+        </View>
+        {mobileDetailedView && (
+          <View
+            style={{
+              height: EXPANSION_HEIGHT,
+              borderColor: theme.tableBorder,
+              borderBottomWidth: 1,
+              paddingLeft: 5,
+              paddingRight: 5,
+              backgroundColor: monthUtils.isCurrentMonth(month)
+                ? theme.budgetCurrentMonth
+                : theme.budgetOtherMonth,
+              opacity: isHidden ? 0.5 : undefined,
+            }}
+          >
+            {/* Expansion area - empty for now */}
+          </View>
+        )}
       </View>
     </GridListItem>
   );

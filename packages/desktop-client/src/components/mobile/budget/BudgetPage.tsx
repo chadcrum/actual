@@ -75,6 +75,7 @@ export function BudgetPage() {
   const [startMonth = currMonth, setStartMonthPref] =
     useLocalPref('budget.startMonth');
   const [sortByScheduleDueDate] = useLocalPref('budget.sortByScheduleDueDate');
+  const [mobileDetailedView] = useLocalPref('budget.mobileDetailedView');
   const [monthBounds, setMonthBounds] = useState({
     start: startMonth,
     end: startMonth,
@@ -649,6 +650,7 @@ export function BudgetPage() {
                 onRefresh={onRefresh}
                 onEditCategoryGroup={onOpenCategoryGroupMenuModal}
                 onEditCategory={onOpenCategoryMenuModal}
+                mobileDetailedView={mobileDetailedView ?? false}
               />
             </>
           )}

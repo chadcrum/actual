@@ -43,6 +43,7 @@ type ExpenseGroupListItemProps = ComponentPropsWithoutRef<
   showBudgetedColumn: boolean;
   show3Columns: boolean;
   isHidden: boolean;
+  mobileDetailedView: boolean;
 };
 
 export function ExpenseGroupListItem({
@@ -56,6 +57,7 @@ export function ExpenseGroupListItem({
   isCollapsed,
   onToggleCollapse,
   isHidden,
+  mobileDetailedView,
   ...props
 }: ExpenseGroupListItemProps) {
   const { value: categoryGroup } = props;
@@ -109,6 +111,7 @@ export function ExpenseGroupListItem({
           shouldHideCategory={shouldHideCategory}
           show3Columns={show3Columns}
           showBudgetedColumn={showBudgetedColumn}
+          mobileDetailedView={mobileDetailedView}
         />
       </Card>
     </GridListItem>

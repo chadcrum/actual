@@ -19,6 +19,8 @@ type BudgetMonthMenuProps = Omit<
   onEndOfMonthCleanup: () => void;
   onToggleSortBySchedule: () => void;
   sortByScheduleDueDate: boolean;
+  onToggleMobileDetailedView: () => void;
+  mobileDetailedView: boolean;
 };
 export function BudgetMonthMenu({
   onCopyLastMonthBudget,
@@ -30,6 +32,8 @@ export function BudgetMonthMenu({
   onEndOfMonthCleanup,
   onToggleSortBySchedule,
   sortByScheduleDueDate,
+  onToggleMobileDetailedView,
+  mobileDetailedView,
   ...props
 }: BudgetMonthMenuProps) {
   const { t } = useTranslation();
@@ -74,6 +78,9 @@ export function BudgetMonthMenu({
             break;
           case 'toggle-sort-by-schedule':
             onToggleSortBySchedule();
+            break;
+          case 'toggle-mobile-detailed-view':
+            onToggleMobileDetailedView();
             break;
         }
       }}
@@ -124,6 +131,11 @@ export function BudgetMonthMenu({
           text: sortByScheduleDueDate
             ? t('Disable sort by schedule')
             : t('Sort by schedule due date'),
+        },
+        {
+          name: 'toggle-mobile-detailed-view',
+          text: t('Detailed view'),
+          toggle: mobileDetailedView,
         },
       ]}
     />
