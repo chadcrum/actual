@@ -111,7 +111,7 @@ export function BudgetPage() {
   }, [budgetType, startMonth, dispatch, spreadsheet]);
 
   useEffect(() => {
-    if (sortByScheduleDueDate && categoryGroups) {
+    if ((sortByScheduleDueDate || mobileDetailedView) && categoryGroups) {
       Promise.all([
         fetchScheduleDueDates(categoryGroups),
         fetchCategoryScheduleDates(categoryGroups),
@@ -123,7 +123,7 @@ export function BudgetPage() {
       setScheduleDueDates(new Map());
       setCategoryScheduleDates(new Map());
     }
-  }, [sortByScheduleDueDate, categoryGroups]);
+  }, [sortByScheduleDueDate, mobileDetailedView, categoryGroups]);
 
   const onBudgetAction = useCallback(
     async (month, type, args) => {
