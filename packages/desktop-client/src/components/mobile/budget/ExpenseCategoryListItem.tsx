@@ -570,10 +570,6 @@ export function ExpenseCategoryListItem({
     show3Columns,
     isSidebar: false,
   });
-  const sidebarColumnWidth = getColumnWidth({
-    show3Columns,
-    isSidebar: true,
-  });
 
   return (
     <GridListItem
