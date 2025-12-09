@@ -212,6 +212,48 @@ function formatScheduleDate(dateString: string): string {
   return `${parseInt(month)}/${parseInt(day)}/${shortYear}`;
 }
 
+type ScheduleDateButtonProps = {
+  schedule: ScheduleDateInfo;
+  showComma: boolean;
+};
+
+function ScheduleDateButton({ schedule, showComma }: ScheduleDateButtonProps) {
+  const dispatch = useDispatch();
+
+  const handlePress = () => {
+    dispatch(
+      pushModal({
+        modal: {
+          name: 'schedule-edit',
+          options: { id: schedule.scheduleId },
+        },
+      }),
+    );
+  };
+
+  return (
+    <Button
+      variant="bare"
+      onPress={handlePress}
+      style={{
+        padding: 2,
+        minHeight: 0,
+      }}
+      aria-label={`Edit schedule: ${schedule.scheduleName}, due ${formatScheduleDate(schedule.nextDate)}`}
+    >
+      <Text
+        style={{
+          fontSize: 12,
+          color: theme.pageTextSubdued,
+        }}
+      >
+        {formatScheduleDate(schedule.nextDate)}
+        {showComma ? ',' : ''}
+      </Text>
+    </Button>
+  );
+}
+
 type ScheduleDatesDisplayProps = {
   categoryId: string;
   scheduleDates: Map<string, ScheduleDateInfo[]>;
@@ -241,16 +283,11 @@ function ScheduleDatesDisplay({
       }}
     >
       {displaySchedules.map((schedule, index) => (
-        <Text
+        <ScheduleDateButton
           key={schedule.scheduleId}
-          style={{
-            fontSize: 12,
-            color: theme.pageTextSubdued,
-          }}
-        >
-          {formatScheduleDate(schedule.nextDate)}
-          {index < displaySchedules.length - 1 ? ',' : ''}
-        </Text>
+          schedule={schedule}
+          showComma={index < displaySchedules.length - 1}
+        />
       ))}
       {hasMore && (
         <Text
