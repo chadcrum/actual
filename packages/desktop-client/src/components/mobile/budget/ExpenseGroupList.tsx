@@ -160,6 +160,8 @@ export function ExpenseGroupList({
         isCollapsed,
         onToggleCollapse,
         mobileDetailedView,
+        categoryScheduleDates,
+        categoryTargetAmounts,
       ]}
       dragAndDropHooks={dragAndDropHooks}
     >

@@ -140,6 +140,8 @@ export function ExpenseCategoryList({
         show3Columns,
         showBudgetedColumn,
         mobileDetailedView,
+        categoryScheduleDates,
+        categoryTargetAmounts,
       ]}
     >
       {category => (

@@ -614,14 +614,21 @@ export function ExpenseCategoryListItem({
                 : theme.budgetOtherMonth,
               opacity: isHidden ? 0.5 : undefined,
               flexDirection: 'row',
-              justifyContent: 'space-between',
               alignItems: 'center',
+              gap: 8,
             }}
           >
-            <ScheduleDatesDisplay
-              categoryId={category.id}
-              scheduleDates={categoryScheduleDates}
-            />
+            <View
+              style={{
+                flex: 1,
+                minHeight: 0,
+              }}
+            >
+              <ScheduleDatesDisplay
+                categoryId={category.id}
+                scheduleDates={categoryScheduleDates}
+              />
+            </View>
             <TargetAmountDisplay
               categoryId={category.id}
               targetAmounts={categoryTargetAmounts}
