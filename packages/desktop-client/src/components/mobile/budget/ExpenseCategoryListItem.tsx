@@ -336,6 +336,7 @@ function TargetAmountDisplay({
     <View
       style={{
         width: columnWidth,
+        minWidth: columnWidth,
         justifyContent: 'center',
         alignItems: 'flex-end',
         paddingRight: 5,

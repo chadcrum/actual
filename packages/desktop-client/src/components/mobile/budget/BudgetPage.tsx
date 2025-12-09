@@ -146,13 +146,15 @@ export function BudgetPage() {
       try {
         // Get all non-hidden expense categories
         const { data: categories } = await aqlQuery(
-          q('categories').filter({ hidden: false, is_income: false })
+          q('categories')
+            .filter({ hidden: false, is_income: false })
+            .select('*'),
         );
 
         // Get goal data from zero_budgets table
         const monthNum = parseInt(startMonth.replace('-', ''));
         const { data: goalData } = await aqlQuery(
-          q('zero_budgets').filter({ month: monthNum })
+          q('zero_budgets').filter({ month: monthNum }).select('*'),
         );
 
         // Get budget month data for balances and budgeted amounts
@@ -164,39 +166,66 @@ export function BudgetPage() {
         const goalMap = new Map(
           goalData.map((item: any) => [
             item.category,
-            { goal: item.goal || 0, longGoal: item.long_goal === 1 },
+            { goal: item.goal ?? 0, longGoal: item.long_goal === 1 },
           ])
         );
 
-        const categoryBudgetMap = new Map(
-          budgetMonth.categoryBudgets.map((cat: any) => [
-            cat.id,
-            { balance: cat.balance || 0, budgeted: cat.budgeted || 0 },
-          ])
-        );
+        const categoryBudgetMap = new Map<
+          string,
+          { balance: number; budgeted: number }
+        >();
+
+        for (const group of budgetMonth?.categoryGroups ?? []) {
+          for (const cat of group?.categories ?? []) {
+            categoryBudgetMap.set(cat.id, {
+              balance: cat.balance ?? 0,
+              budgeted: cat.budgeted ?? 0,
+            });
+          }
+        }
 
         // Calculate target amounts for each category
         const newTargetAmounts: Record<string, number | undefined> = {};
 
         for (const category of categories) {
-          const goalInfo = goalMap.get(category.id);
-          const budgetInfo = categoryBudgetMap.get(category.id);
+          try {
+            const goalInfo = goalMap.get(category.id);
+            const budgetInfo = categoryBudgetMap.get(category.id);
 
-          if (!goalInfo || goalInfo.goal === 0 || !budgetInfo) {
+            if (!budgetInfo) {
+              newTargetAmounts[category.id] = undefined;
+              continue;
+            }
+
+            const balance = budgetInfo.balance ?? 0;
+            const budgeted = budgetInfo.budgeted ?? 0;
+            const goal = goalInfo?.goal ?? 0;
+            const longGoal = goalInfo?.longGoal ?? false;
+
+            // If no goal is set, show N/A (use undefined)
+            if (goal === null || goal === undefined || goal === 0) {
+              newTargetAmounts[category.id] = undefined;
+            } else {
+              // Apply formula: longGoal ? balance - goal : budgeted - goal
+              const targetValue = longGoal
+                ? balance - goal
+                : budgeted - goal;
+
+              newTargetAmounts[category.id] = targetValue;
+            }
+          } catch (err) {
+            // eslint-disable-next-line no-console
+            console.warn(
+              `Error calculating target for category ${category.id}:`,
+              err,
+            );
             newTargetAmounts[category.id] = undefined;
-            continue;
           }
-
-          // Apply formula: longGoal ? balance - goal : budgeted - goal
-          const targetValue = goalInfo.longGoal
-            ? budgetInfo.balance - goalInfo.goal
-            : budgetInfo.budgeted - goalInfo.goal;
-
-          newTargetAmounts[category.id] = targetValue;
         }
 
         setCategoryTargetAmounts(newTargetAmounts);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Failed to calculate target amounts:', error);
         setCategoryTargetAmounts({});
       }
