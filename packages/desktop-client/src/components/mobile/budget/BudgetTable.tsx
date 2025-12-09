@@ -416,6 +416,7 @@ export function BudgetTable({
               onBudgetAction={onBudgetAction}
               mobileDetailedView={mobileDetailedView}
               categoryScheduleDates={categoryScheduleDates}
+              categoryTargetAmounts={categoryTargetAmounts}
             />
           </SchedulesProvider>
         </View>
