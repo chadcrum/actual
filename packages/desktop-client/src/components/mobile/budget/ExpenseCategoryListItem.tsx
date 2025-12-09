@@ -562,6 +562,10 @@ export function ExpenseCategoryListItem({
   }
 
   const EXPANSION_HEIGHT = 25;
+  const sidebarColumnWidth = getColumnWidth({
+    show3Columns,
+    isSidebar: true,
+  });
 
   return (
     <GridListItem
@@ -621,8 +625,19 @@ export function ExpenseCategoryListItem({
           >
             <View
               style={{
-                flex: 1,
-                minHeight: 0,
+              width: sidebarColumnWidth,
+              flexShrink: 0,
+            }}
+          />
+          <TargetAmountDisplay
+            categoryId={category.id}
+            targetAmounts={categoryTargetAmounts}
+            show3Columns={show3Columns}
+          />
+          <View
+            style={{
+              flex: 1,
+              minHeight: 0,
               }}
             >
               <ScheduleDatesDisplay
@@ -630,11 +645,6 @@ export function ExpenseCategoryListItem({
                 scheduleDates={categoryScheduleDates}
               />
             </View>
-            <TargetAmountDisplay
-              categoryId={category.id}
-              targetAmounts={categoryTargetAmounts}
-              show3Columns={show3Columns}
-            />
           </View>
         )}
       </View>
