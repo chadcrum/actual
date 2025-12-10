@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { Menu } from '@actual-app/components/menu';
 
-import { useTargetAmounts } from '@desktop-client/components/budget/TargetAmountsContext';
 import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 
 type BudgetMonthMenuProps = Omit<
@@ -39,7 +38,6 @@ export function BudgetMonthMenu({
   const { t } = useTranslation();
 
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
-  const { showTargetAmounts, toggleTargetAmounts } = useTargetAmounts();
 
   return (
     <Menu
@@ -72,9 +70,6 @@ export function BudgetMonthMenu({
             break;
           case 'cleanup-goal-template':
             onEndOfMonthCleanup();
-            break;
-          case 'toggle-target-amounts':
-            toggleTargetAmounts();
             break;
           case 'toggle-sort-by-schedule':
             onToggleSortBySchedule();
@@ -120,12 +115,6 @@ export function BudgetMonthMenu({
             ]
           : []),
         Menu.line,
-        {
-          name: 'toggle-target-amounts',
-          text: showTargetAmounts
-            ? t('Hide budget targets')
-            : t('Show budget targets'),
-        },
         {
           name: 'toggle-sort-by-schedule',
           text: sortByScheduleDueDate
