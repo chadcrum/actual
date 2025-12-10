@@ -365,10 +365,10 @@ function TargetAmountDisplay({
   return (
     <View
       style={{
-        width: columnWidth,
-        minWidth: columnWidth,
+        width: show3Columns ? '40vw' : '50vw',
         justifyContent: 'center',
-        alignItems: 'flex-end',
+        alignItems: 'center',
+        paddingLeft: 5,
         paddingRight: 5,
       }}
     >
@@ -377,6 +377,7 @@ function TargetAmountDisplay({
           fontSize: 12,
           fontStyle: 'italic',
           color,
+          textAlign: 'center',
         }}
       >
         {text}
@@ -594,10 +595,7 @@ export function ExpenseCategoryListItem({
     show3Columns,
     isSidebar: true,
   });
-  const detailColumnWidth = getColumnWidth({
-    show3Columns,
-    isSidebar: false,
-  });
+  const detailColumnWidth = show3Columns ? '40vw' : '50vw';
 
   return (
     <GridListItem
@@ -672,7 +670,7 @@ export function ExpenseCategoryListItem({
               style={{
                 width: detailColumnWidth,
                 justifyContent: 'center',
-                alignItems: 'flex-end',
+                alignItems: 'center',
               }}
             >
               <TargetAmountDisplay
