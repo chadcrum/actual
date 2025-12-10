@@ -314,6 +314,7 @@ function TargetAmountDisplay({
   targetAmounts,
   show3Columns,
 }: TargetAmountDisplayProps) {
+  const { t } = useTranslation();
   const targetValue = targetAmounts ? targetAmounts[categoryId] : undefined;
 
   // Calculate column width to align with Budgeted column
@@ -322,15 +323,44 @@ function TargetAmountDisplay({
     isSidebar: false,
   });
 
-  // Determine color based on target value
-  const color =
-    targetValue === undefined
-      ? theme.pageTextLight
-      : targetValue === 0
-        ? theme.noticeText
-        : targetValue > 0
-          ? theme.warningText
-          : theme.errorText;
+  // Helper function to determine status text and color based on target value
+  const getTargetStatus = (
+    value: number | undefined,
+  ): { text: string; color: string } => {
+    if (value === undefined) {
+      return {
+        text: t('N/A'),
+        color: theme.pageTextLight,
+      };
+    }
+
+    if (value === 0) {
+      return {
+        text: t('Fully Funded'),
+        color: theme.noticeText,
+      };
+    }
+
+    if (value < 0) {
+      // Underfunded - show absolute value
+      return {
+        text: t('Underfunded ({{amount}})', {
+          amount: integerToCurrency(Math.abs(value)),
+        }),
+        color: theme.warningText,
+      };
+    }
+
+    // value > 0 - Overfunded
+    return {
+      text: t('Overfunded ({{amount}})', {
+        amount: integerToCurrency(value),
+      }),
+      color: theme.errorText,
+    };
+  };
+
+  const { text, color } = getTargetStatus(targetValue);
 
   return (
     <View
@@ -349,9 +379,7 @@ function TargetAmountDisplay({
           color,
         }}
       >
-        {targetValue !== undefined
-          ? integerToCurrency(targetValue)
-          : 'N/A'}
+        {text}
       </Text>
     </View>
   );
