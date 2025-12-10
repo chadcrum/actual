@@ -209,6 +209,7 @@ All implementation plans created during development should be stored in the `.pl
 - Include context, approach, and any relevant architectural decisions
 - Link to related issues or PRs when applicable
 - Plans serve as documentation for why certain implementation choices were made
+- When you create a plan, save it under `.plans/` with a clear name, include a TODO list, and keep that TODO list updated as implementation proceeds
 
 ### 2. Testing Strategy
 
