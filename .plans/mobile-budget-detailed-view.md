@@ -1,13 +1,13 @@
 # Detailed View Toggle for Mobile Budget
 
 ## Overview
-Add a "Detailed View" toggle option to the envelope budget month Actions menu that expands expense category rows from 50px to 75px. The toggle state persists across sessions using local preferences.
+Add a "Detailed View" toggle option to the envelope budget month Actions menu that expands expense category rows from 50px to 63px. The toggle state persists across sessions using local preferences.
 
 ## Requirements
 - Add toggle option to month Actions menu (envelope budget only)
 - Persist toggle state across sessions
-- Expand expense category rows from 50px to 75px when enabled
-- Expansion area (25px) initially empty, ready for future content
+- Expand expense category rows from 50px to 63px when enabled
+- Expansion area (13px) initially empty, ready for future content
 - All expense category rows expand/collapse together
 - Only affects expense categories (not income or group headers)
 
@@ -86,7 +86,7 @@ Add to props type, destructure, and pass to child components.
 
 Key changes:
 1. Add `mobileDetailedView` prop
-2. Calculate dynamic height: `const EXPANSION_HEIGHT = 25;`
+2. Calculate dynamic height: `const EXPANSION_HEIGHT = 13;`
 3. Wrap content in column flex container
 4. Conditionally remove border from main row when expanded
 5. Add expansion area below main row:
@@ -115,7 +115,7 @@ Key changes:
 
 ## Visual Design
 - Main row stays at 50px height
-- Expansion area adds 25px below (total 75px)
+- Expansion area adds 13px below (total 63px)
 - Border moves from main row to expansion area when enabled
 - Expansion area inherits background color and opacity from main row
 - Empty expansion area ready for future content
@@ -131,7 +131,7 @@ Key changes:
 ## Testing Checklist
 - [ ] Toggle appears in envelope budget month Actions menu
 - [ ] Toggle state persists across page refreshes
-- [ ] Expense category rows expand to 75px when enabled (50px when disabled)
+- [ ] Expense category rows expand to 63px when enabled (50px when disabled)
 - [ ] Expansion area is empty
 - [ ] Border appears at bottom of expansion area (not main row)
 - [ ] Income categories unaffected

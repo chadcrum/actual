@@ -279,7 +279,7 @@ function ScheduleDatesDisplay({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        paddingTop: 2,
+        paddingTop: 0,
       }}
     >
       {displaySchedules.map((schedule, index) => (
@@ -366,8 +366,8 @@ function TargetAmountDisplay({
     <View
       style={{
         width: show3Columns ? '40vw' : '50vw',
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
         paddingLeft: 5,
         paddingRight: 5,
       }}
@@ -378,6 +378,7 @@ function TargetAmountDisplay({
           fontStyle: 'italic',
           color,
           textAlign: 'center',
+          lineHeight: 1,
         }}
       >
         {text}
@@ -590,7 +591,7 @@ export function ExpenseCategoryListItem({
     return null;
   }
 
-  const EXPANSION_HEIGHT = 25;
+  const EXPANSION_HEIGHT = 17;
   const sidebarColumnWidth = getColumnWidth({
     show3Columns,
     isSidebar: true,
@@ -644,12 +645,15 @@ export function ExpenseCategoryListItem({
               borderBottomWidth: 1,
               paddingLeft: 5,
               paddingRight: 5,
+              paddingTop: 0,
+              paddingBottom: 4,
+              marginTop: -3,
               backgroundColor: monthUtils.isCurrentMonth(month)
                 ? theme.budgetCurrentMonth
                 : theme.budgetOtherMonth,
               opacity: isHidden ? 0.5 : undefined,
               flexDirection: 'row',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               gap: 8,
             }}
           >
@@ -658,7 +662,8 @@ export function ExpenseCategoryListItem({
                 width: sidebarColumnWidth,
                 flexShrink: 0,
                 alignItems: 'flex-start',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
+                marginBottom: 2,
               }}
             >
               <ScheduleDatesDisplay
@@ -671,6 +676,8 @@ export function ExpenseCategoryListItem({
                 width: detailColumnWidth,
                 justifyContent: 'center',
                 alignItems: 'center',
+                alignContent: 'center',
+                marginBottom: 2,
               }}
             >
               <TargetAmountDisplay
