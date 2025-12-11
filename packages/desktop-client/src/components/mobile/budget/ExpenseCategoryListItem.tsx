@@ -591,7 +591,7 @@ export function ExpenseCategoryListItem({
     return null;
   }
 
-  const EXPANSION_HEIGHT = 17;
+  const EXPANSION_HEIGHT = 15;
   const sidebarColumnWidth = getColumnWidth({
     show3Columns,
     isSidebar: true,
@@ -646,15 +646,15 @@ export function ExpenseCategoryListItem({
               paddingLeft: 5,
               paddingRight: 5,
               paddingTop: 0,
-              paddingBottom: 4,
-              marginTop: -3,
+              paddingBottom: 1,
+              marginTop: -5,
               backgroundColor: monthUtils.isCurrentMonth(month)
                 ? theme.budgetCurrentMonth
                 : theme.budgetOtherMonth,
               opacity: isHidden ? 0.5 : undefined,
               flexDirection: 'row',
               alignItems: 'flex-start',
-              gap: 8,
+              gap: 6,
             }}
           >
             <View
