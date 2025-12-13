@@ -111,16 +111,23 @@ const cellStyle: CSSProperties = {
   fontWeight: 600,
 };
 
-export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
+export const BudgetTotalsMonth = memo(function BudgetTotalsMonth({
+  month,
+}: {
+  month: string;
+}) {
   const { showTargetAmounts, targetAmounts } = useTargetAmounts();
 
   // Calculate total of all target values (balance - goal for each category)
   const targetTotal = useMemo(() => {
     if (!showTargetAmounts) return 0;
-    return Object.values(targetAmounts).reduce((sum, amount) => {
+    const monthTargets = targetAmounts[month];
+    if (!monthTargets) return 0;
+
+    return Object.values(monthTargets).reduce((sum, amount) => {
       return sum + (amount ?? 0);
     }, 0);
-  }, [showTargetAmounts, targetAmounts]);
+  }, [showTargetAmounts, targetAmounts, month]);
 
   // Get total budgeted for the month
   const totalBudgetedValue = useEnvelopeSheetValue(
@@ -158,7 +165,7 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
       {showTargetAmounts && (
         <View style={headerLabelStyle}>
           <Text style={{ color: theme.tableHeaderText }}>
-            <Trans>Targets</Trans>
+            <Trans>Goals</Trans>
           </Text>
           <Text style={cellStyle}>
             {integerToCurrency(targetTotal)}
@@ -217,17 +224,20 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
     if (!showTargetAmounts || !group.categories) {
       return undefined;
     }
+    const monthTargets = targetAmounts[month];
+    if (!monthTargets) return undefined;
+
     let sum = 0;
     let hasAnyValue = false;
     for (const cat of group.categories) {
-      const catValue = targetAmounts[cat.id];
+      const catValue = monthTargets[cat.id];
       if (catValue !== undefined) {
         sum += catValue;
         hasAnyValue = true;
       }
     }
     return hasAnyValue ? sum : undefined;
-  }, [showTargetAmounts, targetAmounts, group.categories]);
+  }, [showTargetAmounts, targetAmounts, group.categories, month]);
 
   // Get budgeted amount for this group
   const groupBudgetedValue = useEnvelopeSheetValue(
@@ -354,7 +364,7 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
 
   // Use simple getDifferenceToGoal calculation: balance - goal
   // This matches what users see in balance column hover
-  const targetValue = showTargetAmounts ? targetAmounts[category.id] : undefined;
+  const targetValue = showTargetAmounts ? targetAmounts[month]?.[category.id] : undefined;
 
   return (
     <View

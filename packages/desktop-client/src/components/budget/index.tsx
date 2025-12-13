@@ -181,6 +181,16 @@ export function Budget() {
   }
 
   let table;
+  // Move months calculation to top level (unconditional)
+  const months = useMemo(
+    () =>
+      monthUtils.rangeInclusive(
+        startMonth,
+        monthUtils.addMonths(startMonth, maxMonths - 1),
+      ),
+    [startMonth, maxMonths],
+  );
+
   if (budgetType === 'tracking') {
     table = (
       <TrackingBudgetProvider
@@ -210,7 +220,7 @@ export function Budget() {
     );
   } else {
     table = (
-      <TargetAmountsProvider month={startMonth}>
+      <TargetAmountsProvider months={months}>
         <EnvelopeBudgetProvider
           summaryCollapsed={summaryCollapsed}
           onBudgetAction={onBudgetAction}
@@ -286,7 +296,7 @@ export type BudgetComponents = {
   ExpenseGroupComponent: ComponentType<CategoryGroupMonthProps>;
   IncomeCategoryComponent: ComponentType<CategoryMonthProps>;
   IncomeGroupComponent: ComponentType<CategoryGroupMonthProps>;
-  BudgetTotalsComponent: ComponentType;
+  BudgetTotalsComponent: ComponentType<{ month: string }>;
   IncomeHeaderComponent: ComponentType;
 };
 

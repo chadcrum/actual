@@ -178,7 +178,7 @@ export function EnvelopeBudgetMonthMenuModal({
               </View>
             </View>
             {showMore && (
-              <TargetAmountsProvider month={month}>
+              <TargetAmountsProvider months={[month]}>
                 <BudgetMonthMenu
                   style={{ overflowY: 'auto', paddingTop: 10 }}
                   getItemStyle={() => defaultMenuItemStyle}
@@ -245,8 +245,8 @@ export function EnvelopeBudgetMonthMenuModal({
                   }}
                   onToggleSortBySchedule={onToggleSortBySchedule}
                   sortByScheduleDueDate={sortByScheduleDueDate ?? false}
-                  onToggleMobileDetailedView={onToggleMobileDetailedView}
-                  mobileDetailedView={mobileDetailedView ?? false}
+                  onToggleDetailedView={onToggleMobileDetailedView}
+                  detailedView={mobileDetailedView ?? false}
                 />
               </TargetAmountsProvider>
             )}

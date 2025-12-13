@@ -13,7 +13,7 @@ import { aqlQuery } from '@desktop-client/queries/aqlQuery';
 type TargetAmountsContextType = {
   showTargetAmounts: boolean;
   toggleTargetAmounts: () => void;
-  targetAmounts: Record<string, number | undefined>;
+  targetAmounts: Record<string, Record<string, number | undefined>>;
   totalGoal: number;
   totalUnderfunded: number;
   totalOverfunded: number;
@@ -25,15 +25,15 @@ const TargetAmountsContext = createContext<TargetAmountsContextType | null>(
 
 type TargetAmountsProviderProps = {
   children: ReactNode;
-  month: string;
+  months: string[];
 };
 
 export function TargetAmountsProvider({
   children,
-  month,
+  months,
 }: TargetAmountsProviderProps) {
   const [showTargetAmounts, setShowTargetAmounts] = useState(false);
-  const [targetAmounts, setTargetAmounts] = useState<Record<string, number | undefined>>(
+  const [targetAmounts, setTargetAmounts] = useState<Record<string, Record<string, number | undefined>>>(
     {},
   );
   const [totalGoal, setTotalGoal] = useState<number>(0);
@@ -45,11 +45,43 @@ export function TargetAmountsProvider({
   };
 
   useEffect(() => {
-    if (month) {
-      // Calculate target values using getDifferenceToGoal formula
-      // Matches BalanceWithCarryover component:
-      // longGoalValue === 1 ? balance - goal : budgeted - goal
-      async function calculateTargetValues() {
+    // If no months are provided, reset everything
+    if (!months || months.length === 0) {
+      setTargetAmounts({});
+      setTotalGoal(0);
+      setTotalUnderfunded(0);
+      setTotalOverfunded(0);
+      return;
+    }
+
+    // Only calculate if needed (though we might want to pre-calculate always if this context is always mounted)
+    // For now, let's calculate if we have months, assuming we want the data ready or if showTargetAmounts is true.
+    // However, to save perf, maybe we only calculate if showTargetAmounts is true?
+    // The previous implementation used `if (month)` which suggests it ran whenever month was present.
+    // But let's check if we should gate it on `showTargetAmounts`.
+    // The previous implementation had `[showTargetAmounts, month]` as deps and `if (month)`.
+    // It didn't explicitly check `showTargetAmounts` inside `if (month)`, but `targetTotal` calculation used `showTargetAmounts`.
+    // Actually, `calculateTargetValues` was called inside the effect. 
+    // Wait, the previous implementation did:
+    // useEffect(() => { if (month) { calculateTargetValues() } else { ... } }, [showTargetAmounts, month])
+    // But `calculateTargetValues` didn't check `showTargetAmounts` before fetching data.
+    // EXCEPT, `TargetAmountsProvider` on mobile sits behind a `showMore` check which implies user interaction.
+    // On desktop, we want this to be available when the toggle is ON.
+    if (!showTargetAmounts) {
+      setTargetAmounts({});
+      return;
+    }
+
+    let mounted = true;
+
+    async function calculateAllTargetValues() {
+      const allTargetAmounts: Record<string, Record<string, number | undefined>> = {};
+      let allTotalGoal = 0;
+      let allTotalUnderfunded = 0;
+      let allTotalOverfunded = 0;
+
+      await Promise.all(months.map(async (month) => {
+        if (!mounted) return;
         try {
           // Parse month to get month number for query (format: YYYY-MM)
           const monthNum = parseInt(month.replace('-', ''));
@@ -94,83 +126,68 @@ export function TargetAmountsProvider({
             };
           }
 
-          const newTargetAmounts: Record<string, number | undefined> = {};
+          const monthTargetAmounts: Record<string, number | undefined> = {};
 
           // Calculate target value for each category
           for (const category of categories) {
-            try {
-              const budgetData = budgetDataMap[category.id];
-              const goalData = budgetGoalMap[category.id];
+            const budgetData = budgetDataMap[category.id];
+            const goalData = budgetGoalMap[category.id];
 
-              if (budgetData) {
-                const balance = budgetData.balance ?? 0;
-                const budgeted = budgetData.budgeted ?? 0;
-                const goal = goalData?.goal ?? 0;
-                const longGoal = goalData?.long_goal ?? 0;
+            if (budgetData) {
+              const balance = budgetData.balance ?? 0;
+              const budgeted = budgetData.budgeted ?? 0;
+              const goal = goalData?.goal ?? 0;
+              const longGoal = goalData?.long_goal ?? 0;
 
-                // If no goal is set, show N/A (use undefined)
-                if (goal === null || goal === undefined || goal === 0) {
-                  newTargetAmounts[category.id] = undefined;
-                } else {
-                  // Apply getDifferenceToGoal formula from BalanceWithCarryover
-                  // This matches exactly what the balance hover shows
-                  const targetValue = longGoal === 1
-                    ? balance - goal        // Long goal: balance - goal
-                    : budgeted - goal;      // Template goal: budgeted - goal
-
-                  newTargetAmounts[category.id] = targetValue;
-                }
+              // If no goal is set, show N/A (use undefined)
+              if (goal === null || goal === undefined || goal === 0) {
+                monthTargetAmounts[category.id] = undefined;
               } else {
-                newTargetAmounts[category.id] = undefined;
+                monthTargetAmounts[category.id] = goal;
               }
-            } catch (err) {
-              console.warn(`Error calculating data for category ${category.id}:`, err);
-              newTargetAmounts[category.id] = undefined;
+            } else {
+              monthTargetAmounts[category.id] = undefined;
             }
           }
 
-          console.log('Target amounts calculated:', newTargetAmounts);
+          allTargetAmounts[month] = monthTargetAmounts;
 
-          setTargetAmounts(newTargetAmounts);
-
-          // Calculate total goal: sum of all budget goals for the month for visible categories
-          let totalGoalAmount = 0;
+          // Calculate totals for this month
           for (const category of categories) {
             const goalData = budgetGoalMap[category.id];
-            totalGoalAmount += goalData?.goal ?? 0;
+            allTotalGoal += goalData?.goal ?? 0;
           }
-          setTotalGoal(totalGoalAmount);
 
-
-          // Calculate total underfunded and overfunded
-          let totalUnderfundedAmount = 0;
-          let totalOverfundedAmount = 0;
-          for (const amount of Object.values(newTargetAmounts)) {
+          for (const amount of Object.values(monthTargetAmounts)) {
             if (amount !== undefined) {
               if (amount < 0) {
-                totalUnderfundedAmount += amount;
+                allTotalUnderfunded += amount;
               } else if (amount > 0) {
-                totalOverfundedAmount += amount;
+                allTotalOverfunded += amount;
               }
             }
           }
-          setTotalUnderfunded(totalUnderfundedAmount);
-          setTotalOverfunded(totalOverfundedAmount);
-        } catch (error) {
-          console.error('Error calculating target values:', error);
-          setTargetAmounts({});
-          setTotalGoal(0);
-          setTotalUnderfunded(0);
-          setTotalOverfunded(0);
-        }
-      }
 
-      calculateTargetValues();
-    } else {
-      setTargetAmounts({});
-      setTotalGoal(0);
+        } catch (error) {
+          console.error(`Error calculating target values for ${month}:`, error);
+          allTargetAmounts[month] = {};
+        }
+      }));
+
+      if (mounted) {
+        setTargetAmounts(allTargetAmounts);
+        setTotalGoal(allTotalGoal);
+        setTotalUnderfunded(allTotalUnderfunded);
+        setTotalOverfunded(allTotalOverfunded);
+      }
     }
-  }, [showTargetAmounts, month]);
+
+    calculateAllTargetValues();
+
+    return () => {
+      mounted = false;
+    };
+  }, [showTargetAmounts, months]); // Re-run if months array changes or toggle changes
 
   return (
     <TargetAmountsContext.Provider

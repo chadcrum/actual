@@ -25,6 +25,8 @@ import { useLocale } from '@desktop-client/hooks/useLocale';
 import { SheetNameProvider } from '@desktop-client/hooks/useSheetName';
 import { useUndo } from '@desktop-client/hooks/useUndo';
 
+import { useTargetAmounts } from '../../TargetAmountsContext';
+
 type BudgetSummaryProps = {
   month: string;
 };
@@ -36,6 +38,8 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
     onBudgetAction,
     onToggleSummaryCollapse,
   } = useEnvelopeBudget();
+
+  const { toggleTargetAmounts, showTargetAmounts } = useTargetAmounts();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const triggerRef = useRef(null);
@@ -201,11 +205,11 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
                       message:
                         numberOfMonths === 12
                           ? t(
-                              `${displayMonth} budgets have all been set to yearly average.`,
-                            )
+                            `${displayMonth} budgets have all been set to yearly average.`,
+                          )
                           : t(
-                              `${displayMonth} budgets have all been set to ${numberOfMonths} month average.`,
-                            ),
+                            `${displayMonth} budgets have all been set to ${numberOfMonths} month average.`,
+                          ),
                     });
                   }}
                   onCheckTemplates={() => {
@@ -246,6 +250,8 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
                     // Toggle is handled via preference in the modal
                   }}
                   sortByScheduleDueDate={false}
+                  onToggleDetailedView={toggleTargetAmounts}
+                  detailedView={showTargetAmounts}
                 />
               </Popover>
             </View>

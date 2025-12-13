@@ -18,8 +18,8 @@ type BudgetMonthMenuProps = Omit<
   onEndOfMonthCleanup: () => void;
   onToggleSortBySchedule: () => void;
   sortByScheduleDueDate: boolean;
-  onToggleMobileDetailedView: () => void;
-  mobileDetailedView: boolean;
+  onToggleDetailedView?: () => void;
+  detailedView?: boolean;
 };
 export function BudgetMonthMenu({
   onCopyLastMonthBudget,
@@ -31,8 +31,8 @@ export function BudgetMonthMenu({
   onEndOfMonthCleanup,
   onToggleSortBySchedule,
   sortByScheduleDueDate,
-  onToggleMobileDetailedView,
-  mobileDetailedView,
+  onToggleDetailedView,
+  detailedView,
   ...props
 }: BudgetMonthMenuProps) {
   const { t } = useTranslation();
@@ -74,8 +74,8 @@ export function BudgetMonthMenu({
           case 'toggle-sort-by-schedule':
             onToggleSortBySchedule();
             break;
-          case 'toggle-mobile-detailed-view':
-            onToggleMobileDetailedView();
+          case 'toggle-detailed-view':
+            onToggleDetailedView?.();
             break;
         }
       }}
@@ -96,23 +96,23 @@ export function BudgetMonthMenu({
         },
         ...(isGoalTemplatesEnabled
           ? [
-              {
-                name: 'check-templates',
-                text: t('Check templates'),
-              },
-              {
-                name: 'apply-goal-template',
-                text: t('Apply budget template'),
-              },
-              {
-                name: 'overwrite-goal-template',
-                text: t('Overwrite with budget template'),
-              },
-              {
-                name: 'cleanup-goal-template',
-                text: t('End of month cleanup'),
-              },
-            ]
+            {
+              name: 'check-templates',
+              text: t('Check templates'),
+            },
+            {
+              name: 'apply-goal-template',
+              text: t('Apply budget template'),
+            },
+            {
+              name: 'overwrite-goal-template',
+              text: t('Overwrite with budget template'),
+            },
+            {
+              name: 'cleanup-goal-template',
+              text: t('End of month cleanup'),
+            },
+          ]
           : []),
         Menu.line,
         {
@@ -121,11 +121,15 @@ export function BudgetMonthMenu({
             ? t('Disable sort by schedule')
             : t('Sort by schedule due date'),
         },
-        {
-          name: 'toggle-mobile-detailed-view',
-          text: t('Detailed view'),
-          toggle: mobileDetailedView,
-        },
+        ...(onToggleDetailedView
+          ? [
+            {
+              name: 'toggle-detailed-view',
+              text: t('Detailed view'),
+              toggle: detailedView,
+            },
+          ]
+          : []),
       ]}
     />
   );
