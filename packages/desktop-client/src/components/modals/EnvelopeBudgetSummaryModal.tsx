@@ -9,6 +9,7 @@ import { groupById, integerToCurrency } from 'loot-core/shared/util';
 import { ToBudgetAmount } from '@desktop-client/components/budget/envelope/budgetsummary/ToBudgetAmount';
 import { TotalsList } from '@desktop-client/components/budget/envelope/budgetsummary/TotalsList';
 import { useEnvelopeSheetValue } from '@desktop-client/components/budget/envelope/EnvelopeBudgetComponents';
+import { TargetAmountsProvider } from '@desktop-client/components/budget/TargetAmountsContext';
 import {
   Modal,
   ModalCloseButton,
@@ -158,12 +159,14 @@ export function EnvelopeBudgetSummaryModal({
             rightContent={<ModalCloseButton onPress={close} />}
           />
           <SheetNameProvider name={sheetForMonth(month)}>
-            <TotalsList
-              prevMonthName={prevMonthName}
-              style={{
-                ...styles.mediumText,
-              }}
-            />
+            <TargetAmountsProvider month={month}>
+              <TotalsList
+                prevMonthName={prevMonthName}
+                style={{
+                  ...styles.mediumText,
+                }}
+              />
+            </TargetAmountsProvider>
             <ToBudgetAmount
               prevMonthName={prevMonthName}
               style={{

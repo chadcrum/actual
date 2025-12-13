@@ -11,6 +11,8 @@ import { View } from '@actual-app/components/view';
 import { EnvelopeCellValue } from '@desktop-client/components/budget/envelope/EnvelopeBudgetComponents';
 import { CellValueText } from '@desktop-client/components/spreadsheet/CellValue';
 import { useFormat } from '@desktop-client/hooks/useFormat';
+import { useSheetValue } from '@desktop-client/hooks/useSheetValue';
+import { useTargetAmounts } from '@desktop-client/components/budget/TargetAmountsContext';
 import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
 
 type TotalsListProps = {
@@ -20,24 +22,32 @@ type TotalsListProps = {
 
 export function TotalsList({ prevMonthName, style }: TotalsListProps) {
   const format = useFormat();
+  const { totalGoal, totalUnderfunded, totalOverfunded } = useTargetAmounts();
+  const income = useSheetValue<'envelope-budget', 'total-income'>(
+    envelopeBudget.totalIncome,
+  );
+  const spent = useSheetValue<'envelope-budget', 'total-spent'>(
+    envelopeBudget.totalSpent,
+  );
+
+  const Separator = () => (
+    <View
+      style={{
+        height: 1,
+        backgroundColor: theme.tableBorder,
+        marginTop: 10,
+        marginBottom: 10,
+      }}
+    />
+  );
+
   return (
     <View
       style={{
         ...styles.smallText,
         ...style,
-        flexDirection: 'column',
       }}
     >
-      <View
-        style={{
-          borderBottom: '1px solid ' + theme.tableBorder,
-          marginBottom: 5,
-          alignItems: 'center',
-          paddingBottom: 2,
-        }}
-      >
-        <Block>test</Block>
-      </View>
       <View
         style={{
           flexDirection: 'row',
@@ -52,6 +62,37 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
             minWidth: 50,
           }}
         >
+          {/* Income & Spent */}
+          <Block style={{ fontWeight: 600 }}>
+            {format(income, 'financial')}
+          </Block>
+          <Block style={{ fontWeight: 600 }}>
+            {format(spent, 'financial')}
+          </Block>
+
+          <Separator />
+
+          {/* Goals & Fund Status */}
+          {totalUnderfunded < 0 && (
+            <Block style={{ fontWeight: 600, color: theme.warningText }}>
+              {format(totalUnderfunded, 'financial')}
+            </Block>
+          )}
+          <Block style={{ fontWeight: 600, color: theme.noticeText }}>
+            {format(totalGoal + totalUnderfunded, 'financial')}
+          </Block>
+          {totalOverfunded > 0 && (
+            <Block style={{ fontWeight: 600, color: theme.errorText }}>
+              {format(totalOverfunded, 'financial')}
+            </Block>
+          )}
+          <Block style={{ fontWeight: 600 }}>
+            {format(totalGoal, 'financial')}
+          </Block>
+
+          <Separator />
+
+          {/* Existing Items */}
           <Tooltip
             style={{ ...styles.tooltip, lineHeight: 1.5, padding: '6px 10px' }}
             content={
@@ -82,7 +123,9 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
               binding={envelopeBudget.incomeAvailable}
               type="financial"
             >
-              {props => <CellValueText {...props} style={{ fontWeight: 600 }} />}
+              {props => (
+                <CellValueText {...props} style={{ fontWeight: 600 }} />
+              )}
             </EnvelopeCellValue>
           </Tooltip>
 
@@ -136,6 +179,21 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
         </View>
 
         <View>
+          {/* Income & Spent Labels */}
+          <Block>Income</Block>
+          <Block>Spent</Block>
+
+          <Separator />
+
+          {/* Goals & Fund Status Labels */}
+          {totalUnderfunded < 0 && <Block>Underfunded</Block>}
+          <Block>Funded</Block>
+          {totalOverfunded > 0 && <Block>Overfunded</Block>}
+          <Block>Goals Target</Block>
+
+          <Separator />
+
+          {/* Existing Labels */}
           <Block>
             <Trans>Available funds</Trans>
           </Block>

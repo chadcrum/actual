@@ -14,6 +14,9 @@ type TargetAmountsContextType = {
   showTargetAmounts: boolean;
   toggleTargetAmounts: () => void;
   targetAmounts: Record<string, number | undefined>;
+  totalGoal: number;
+  totalUnderfunded: number;
+  totalOverfunded: number;
 };
 
 const TargetAmountsContext = createContext<TargetAmountsContextType | null>(
@@ -33,13 +36,16 @@ export function TargetAmountsProvider({
   const [targetAmounts, setTargetAmounts] = useState<Record<string, number | undefined>>(
     {},
   );
+  const [totalGoal, setTotalGoal] = useState<number>(0);
+  const [totalUnderfunded, setTotalUnderfunded] = useState<number>(0);
+  const [totalOverfunded, setTotalOverfunded] = useState<number>(0);
 
   const toggleTargetAmounts = () => {
     setShowTargetAmounts(!showTargetAmounts);
   };
 
   useEffect(() => {
-    if (showTargetAmounts && month) {
+    if (month) {
       // Calculate target values using getDifferenceToGoal formula
       // Matches BalanceWithCarryover component:
       // longGoalValue === 1 ? balance - goal : budgeted - goal
@@ -126,21 +132,48 @@ export function TargetAmountsProvider({
           console.log('Target amounts calculated:', newTargetAmounts);
 
           setTargetAmounts(newTargetAmounts);
+
+          // Calculate total goal: sum of all budget goals for the month
+          let totalGoalAmount = 0;
+          for (const goalData of Object.values(budgetGoalMap)) {
+            totalGoalAmount += goalData.goal ?? 0;
+          }
+          setTotalGoal(totalGoalAmount);
+
+
+          // Calculate total underfunded and overfunded
+          let totalUnderfundedAmount = 0;
+          let totalOverfundedAmount = 0;
+          for (const amount of Object.values(newTargetAmounts)) {
+            if (amount !== undefined) {
+              if (amount < 0) {
+                totalUnderfundedAmount += amount;
+              } else if (amount > 0) {
+                totalOverfundedAmount += amount;
+              }
+            }
+          }
+          setTotalUnderfunded(totalUnderfundedAmount);
+          setTotalOverfunded(totalOverfundedAmount);
         } catch (error) {
           console.error('Error calculating target values:', error);
           setTargetAmounts({});
+          setTotalGoal(0);
+          setTotalUnderfunded(0);
+          setTotalOverfunded(0);
         }
       }
 
       calculateTargetValues();
     } else {
       setTargetAmounts({});
+      setTotalGoal(0);
     }
   }, [showTargetAmounts, month]);
 
   return (
     <TargetAmountsContext.Provider
-      value={{ showTargetAmounts, toggleTargetAmounts, targetAmounts }}
+      value={{ showTargetAmounts, toggleTargetAmounts, targetAmounts, totalGoal, totalUnderfunded, totalOverfunded }}
     >
       {children}
     </TargetAmountsContext.Provider>
