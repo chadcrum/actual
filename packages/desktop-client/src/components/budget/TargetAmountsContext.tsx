@@ -133,10 +133,11 @@ export function TargetAmountsProvider({
 
           setTargetAmounts(newTargetAmounts);
 
-          // Calculate total goal: sum of all budget goals for the month
+          // Calculate total goal: sum of all budget goals for the month for visible categories
           let totalGoalAmount = 0;
-          for (const goalData of Object.values(budgetGoalMap)) {
-            totalGoalAmount += goalData.goal ?? 0;
+          for (const category of categories) {
+            const goalData = budgetGoalMap[category.id];
+            totalGoalAmount += goalData?.goal ?? 0;
           }
           setTotalGoal(totalGoalAmount);
 

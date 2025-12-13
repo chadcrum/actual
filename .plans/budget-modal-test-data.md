@@ -82,3 +82,46 @@ None
 4.  **Verify**: Check that "Goals Target" is displayed with the correct sum of goals.
 5.  **Verify Updates**: Change a goal amount and verify the modal updates.
 
+# Feature: Expanded Budget Summary in Modal
+
+This section documents the cumulative changes made to transform the simple "Goals Target" display into a comprehensive budget summary in the modal.
+
+## Implemented Features
+
+### 1. Underfunded, Funded, and Overfunded Summaries
+- **Underfunded**: Sum of all negative amounts required to reach goals. Displayed in **Yellow** (`theme.warningText`).
+- **Overfunded**: Sum of all positive amounts exceeding goals. Displayed in **Red** (`theme.errorText`).
+- **Funded**: Calculated as `Total Goals + Total Underfunded`. Displayed in **Green** (`theme.noticeText`).
+- **Goals Target**: The total of all goals.
+
+### 2. Income and Spent Summary
+- Added **Income** summary (`envelopeBudget.totalIncome`) at the very top.
+- Added **Spent** summary (`envelopeBudget.totalSpent`) below Income.
+
+### 3. Layout and Formatting
+- **Order**:
+    1. Income / Spent
+    2. *Divider Line*
+    3. Underfunded (if any) / Funded / Overfunded (if any) / Goals Target
+    4. *Divider Line*
+    5. Existing Budget Metrics (Available Funds, Overspent, etc.)
+- **Styling**:
+    - Consistent 2-column layout for ALL sections.
+    - **Left Column**: Numbers (Bold, Right Aligned).
+    - **Right Column**: Labels (Regular, Left Aligned).
+    - Vertical alignment is strictly maintained across all sections.
+    - Increased vertical padding around the divider lines for better visual separation.
+
+## Technical Implementation Details
+
+### Context Updates
+#### [MODIFY] [TargetAmountsContext.tsx](file:///home/chid/git/actual/packages/desktop-client/src/components/budget/TargetAmountsContext.tsx)
+-   Calculates `totalUnderfunded` (sum of negative target diffs).
+-   Calculates `totalOverfunded` (sum of positive target diffs).
+-   Exposes these values in the context provider.
+
+### Component Updates
+#### [MODIFY] [TotalsList.tsx](file:///home/chid/git/actual/packages/desktop-client/src/components/budget/envelope/budgetsummary/TotalsList.tsx)
+-   Refactored to use a Flexbox row container layout for perfect alignment.
+-   Uses `useSheetValue` with explicit generics to fetch Income and Spent data.
+-   Implements the conditional rendering for Underfunded/Overfunded rows.
