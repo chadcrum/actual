@@ -30,18 +30,18 @@ if [ "$LOCAL" = "$REMOTE" ]; then
   exit 0
 fi
 
-# Show what commits will be merged
+# Show what commits will be rebased
 echo ""
-echo "📊 Commits to be merged:"
-git log --oneline HEAD..upstream/master | head -10
-if [ "$(git rev-list --count HEAD..upstream/master)" -gt 10 ]; then
-  echo "... and $(($(git rev-list --count HEAD..upstream/master) - 10)) more"
+echo "📊 Your local commits to be rebased:"
+git log --oneline upstream/master..HEAD | head -10
+if [ "$(git rev-list --count upstream/master..HEAD)" -gt 10 ]; then
+  echo "... and $(($(git rev-list --count upstream/master..HEAD) - 10)) more"
 fi
 echo ""
 
-# Merge upstream/master into current branch
-echo "🔀 Merging upstream/master into $CURRENT_BRANCH..."
-git merge upstream/master --no-edit
+# Rebase current branch on top of upstream/master
+echo "🔀 Rebasing $CURRENT_BRANCH on top of upstream/master..."
+git rebase upstream/master
 
 echo ""
 echo "✅ Successfully synced upstream/master changes into $CURRENT_BRANCH"
