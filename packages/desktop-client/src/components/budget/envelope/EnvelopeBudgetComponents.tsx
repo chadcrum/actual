@@ -120,13 +120,17 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth({
 
   // Calculate total of all target values (balance - goal for each category)
   const targetTotal = useMemo(() => {
-    if (!showTargetAmounts) return 0;
+    if (!showTargetAmounts) return { goal: 0, underfunded: 0 };
     const monthTargets = targetAmounts[month];
-    if (!monthTargets) return 0;
+    if (!monthTargets) return { goal: 0, underfunded: 0 };
 
-    return Object.values(monthTargets).reduce((sum, amount) => {
-      return sum + (amount ?? 0);
-    }, 0);
+    return Object.values(monthTargets).reduce((acc, amount) => {
+      acc.goal += amount?.goal ?? 0;
+      if (amount && amount.difference < 0) {
+        acc.underfunded += amount.difference;
+      }
+      return acc;
+    }, { goal: 0, underfunded: 0 });
   }, [showTargetAmounts, targetAmounts, month]);
 
   // Get total budgeted for the month
@@ -136,7 +140,7 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth({
 
   // Calculate target remainder for the month
   const targetRemainder = useMemo(() => {
-    return targetTotal - totalBudgetedValue;
+    return targetTotal.goal - totalBudgetedValue;
   }, [targetTotal, totalBudgetedValue]);
 
   return (
@@ -162,16 +166,28 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth({
           )}
         </EnvelopeCellValue>
       </View>
-      {showTargetAmounts && (
-        <View style={headerLabelStyle}>
-          <Text style={{ color: theme.tableHeaderText }}>
-            <Trans>Goals</Trans>
-          </Text>
-          <Text style={cellStyle}>
-            {integerToCurrency(targetTotal)}
-          </Text>
-        </View>
-      )}
+      <>
+        {showTargetAmounts && (
+          <View style={headerLabelStyle}>
+            <Text style={{ color: theme.tableHeaderText }}>
+              <Trans>Underfunded</Trans>
+            </Text>
+            <Text style={cellStyle}>
+              {integerToCurrency(Math.abs(targetTotal.underfunded))}
+            </Text>
+          </View>
+        )}
+        {showTargetAmounts && (
+          <View style={headerLabelStyle}>
+            <Text style={{ color: theme.tableHeaderText }}>
+              <Trans>Goals</Trans>
+            </Text>
+            <Text style={cellStyle}>
+              {integerToCurrency(targetTotal.goal)}
+            </Text>
+          </View>
+        )}
+      </>
       <View style={headerLabelStyle}>
         <Text style={{ color: theme.tableHeaderText }}>
           <Trans>Spent</Trans>
@@ -227,16 +243,20 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
     const monthTargets = targetAmounts[month];
     if (!monthTargets) return undefined;
 
-    let sum = 0;
+    let goalSum = 0;
+    let underfundedSum = 0;
     let hasAnyValue = false;
     for (const cat of group.categories) {
       const catValue = monthTargets[cat.id];
       if (catValue !== undefined) {
-        sum += catValue;
+        goalSum += catValue.goal;
+        if (catValue.difference < 0) {
+          underfundedSum += catValue.difference;
+        }
         hasAnyValue = true;
       }
     }
-    return hasAnyValue ? sum : undefined;
+    return hasAnyValue ? { goal: goalSum, underfunded: underfundedSum } : undefined;
   }, [showTargetAmounts, targetAmounts, group.categories, month]);
 
   // Get budgeted amount for this group
@@ -247,7 +267,7 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
   // Calculate group target remainder
   const groupTargetRemainder = useMemo(() => {
     if (groupTargetSum === undefined) return undefined;
-    return groupTargetSum - groupBudgetedValue;
+    return groupTargetSum.goal - groupBudgetedValue;
   }, [groupTargetSum, groupBudgetedValue]);
 
   return (
@@ -272,11 +292,24 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
       />
       {showTargetAmounts && (
         <EnvelopeSheetCell
-          name="targets"
+          name="underfunded"
+          width="flex"
+          textAlign="right"
+          style={{ fontWeight: 600, ...styles.tnum, color: theme.warningText }}
+          targetValue={groupTargetSum ? Math.abs(groupTargetSum.underfunded) : undefined}
+          valueProps={{
+            binding: envelopeBudget.groupBudgeted(id),
+            type: 'financial',
+          }}
+        />
+      )}
+      {showTargetAmounts && (
+        <EnvelopeSheetCell
+          name="goals"
           width="flex"
           textAlign="right"
           style={{ fontWeight: 600, ...styles.tnum }}
-          targetValue={groupTargetSum}
+          targetValue={groupTargetSum?.goal}
           valueProps={{
             binding: envelopeBudget.groupBudgeted(id),
             type: 'financial',
@@ -364,7 +397,9 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
 
   // Use simple getDifferenceToGoal calculation: balance - goal
   // This matches what users see in balance column hover
-  const targetValue = showTargetAmounts ? targetAmounts[month]?.[category.id] : undefined;
+  const targetData = showTargetAmounts ? targetAmounts[month]?.[category.id] : undefined;
+  const targetGoal = targetData?.goal;
+  const targetDifference = targetData?.difference;
 
   return (
     <View
@@ -520,20 +555,45 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
         />
       </View>
       {showTargetAmounts && (
-        <Field name="targets" width="flex" style={{ textAlign: 'right' }}>
+        <Field name="underfunded" width="flex" style={{ textAlign: 'right' }}>
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'flex-end',
               fontStyle: 'italic',
-              color: targetValue !== undefined
-                ? targetValue === 0
-                  ? theme.noticeText
-                  : targetValue > 0
+              ...styles.tnum,
+            }}
+          >
+            <Text
+              style={{
+                margin: 1,
+                padding: '0 4px',
+                color: targetDifference !== undefined
+                  ? targetDifference < 0
                     ? theme.warningText
-                    : theme.errorText
-                : theme.pageTextLight,
+                    : theme.noticeText
+                  : theme.pageTextLight,
+              }}
+            >
+              {targetDifference !== undefined
+                ? targetDifference < 0
+                  ? integerToCurrency(Math.abs(targetDifference))
+                  : 'Funded'
+                : 'N/A'}
+            </Text>
+          </View>
+        </Field>
+      )}
+      {showTargetAmounts && (
+        <Field name="goals" width="flex" style={{ textAlign: 'right' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              fontStyle: 'italic',
+              color: theme.pageTextLight,
               ...styles.tnum,
             }}
           >
@@ -543,7 +603,7 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
                 padding: '0 4px',
               }}
             >
-              {targetValue !== undefined ? integerToCurrency(targetValue) : 'N/A'}
+              {targetGoal !== undefined ? integerToCurrency(targetGoal) : 'N/A'}
             </Text>
           </View>
         </Field>

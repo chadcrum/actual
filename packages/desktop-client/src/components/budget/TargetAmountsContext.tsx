@@ -9,11 +9,12 @@ import {
 import { send } from 'loot-core/platform/client/fetch';
 import { q } from 'loot-core/shared/query';
 import { aqlQuery } from '@desktop-client/queries/aqlQuery';
+import { useLocalPref } from '../../hooks/useLocalPref';
 
 type TargetAmountsContextType = {
   showTargetAmounts: boolean;
   toggleTargetAmounts: () => void;
-  targetAmounts: Record<string, Record<string, number | undefined>>;
+  targetAmounts: Record<string, Record<string, { goal: number; difference: number } | undefined>>;
   totalGoal: number;
   totalUnderfunded: number;
   totalOverfunded: number;
@@ -32,8 +33,10 @@ export function TargetAmountsProvider({
   children,
   months,
 }: TargetAmountsProviderProps) {
-  const [showTargetAmounts, setShowTargetAmounts] = useState(false);
-  const [targetAmounts, setTargetAmounts] = useState<Record<string, Record<string, number | undefined>>>(
+  const [showTargetAmountsPref, setShowTargetAmountsPref] = useLocalPref('budget.showTargetAmounts');
+  const showTargetAmounts = (showTargetAmountsPref as boolean) ?? false;
+  const setShowTargetAmounts = setShowTargetAmountsPref;
+  const [targetAmounts, setTargetAmounts] = useState<Record<string, Record<string, { goal: number; difference: number } | undefined>>>(
     {},
   );
   const [totalGoal, setTotalGoal] = useState<number>(0);
@@ -75,7 +78,7 @@ export function TargetAmountsProvider({
     let mounted = true;
 
     async function calculateAllTargetValues() {
-      const allTargetAmounts: Record<string, Record<string, number | undefined>> = {};
+      const allTargetAmounts: Record<string, Record<string, { goal: number; difference: number } | undefined>> = {};
       let allTotalGoal = 0;
       let allTotalUnderfunded = 0;
       let allTotalOverfunded = 0;
@@ -126,7 +129,7 @@ export function TargetAmountsProvider({
             };
           }
 
-          const monthTargetAmounts: Record<string, number | undefined> = {};
+          const monthTargetAmounts: Record<string, { goal: number; difference: number } | undefined> = {};
 
           // Calculate target value for each category
           for (const category of categories) {
@@ -143,7 +146,11 @@ export function TargetAmountsProvider({
               if (goal === null || goal === undefined || goal === 0) {
                 monthTargetAmounts[category.id] = undefined;
               } else {
-                monthTargetAmounts[category.id] = goal;
+                const difference = longGoal === 1
+                  ? balance - goal
+                  : budgeted - goal;
+
+                monthTargetAmounts[category.id] = { goal, difference };
               }
             } else {
               monthTargetAmounts[category.id] = undefined;
@@ -160,10 +167,10 @@ export function TargetAmountsProvider({
 
           for (const amount of Object.values(monthTargetAmounts)) {
             if (amount !== undefined) {
-              if (amount < 0) {
-                allTotalUnderfunded += amount;
-              } else if (amount > 0) {
-                allTotalOverfunded += amount;
+              if (amount.difference < 0) {
+                allTotalUnderfunded += amount.difference;
+              } else if (amount.difference > 0) {
+                allTotalOverfunded += amount.difference; // Still keep overfunded logic if desired, though usually only underfunded is key
               }
             }
           }
