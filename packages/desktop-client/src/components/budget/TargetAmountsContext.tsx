@@ -57,24 +57,6 @@ export function TargetAmountsProvider({
       return;
     }
 
-    // Only calculate if needed (though we might want to pre-calculate always if this context is always mounted)
-    // For now, let's calculate if we have months, assuming we want the data ready or if showTargetAmounts is true.
-    // However, to save perf, maybe we only calculate if showTargetAmounts is true?
-    // The previous implementation used `if (month)` which suggests it ran whenever month was present.
-    // But let's check if we should gate it on `showTargetAmounts`.
-    // The previous implementation had `[showTargetAmounts, month]` as deps and `if (month)`.
-    // It didn't explicitly check `showTargetAmounts` inside `if (month)`, but `targetTotal` calculation used `showTargetAmounts`.
-    // Actually, `calculateTargetValues` was called inside the effect. 
-    // Wait, the previous implementation did:
-    // useEffect(() => { if (month) { calculateTargetValues() } else { ... } }, [showTargetAmounts, month])
-    // But `calculateTargetValues` didn't check `showTargetAmounts` before fetching data.
-    // EXCEPT, `TargetAmountsProvider` on mobile sits behind a `showMore` check which implies user interaction.
-    // On desktop, we want this to be available when the toggle is ON.
-    if (!showTargetAmounts) {
-      setTargetAmounts({});
-      return;
-    }
-
     let mounted = true;
 
     async function calculateAllTargetValues() {
@@ -194,7 +176,7 @@ export function TargetAmountsProvider({
     return () => {
       mounted = false;
     };
-  }, [showTargetAmounts, months]); // Re-run if months array changes or toggle changes
+  }, [months]); // Re-run if months array changes
 
   return (
     <TargetAmountsContext.Provider

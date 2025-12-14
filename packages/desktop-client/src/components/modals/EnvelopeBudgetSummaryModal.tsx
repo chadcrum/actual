@@ -159,7 +159,7 @@ export function EnvelopeBudgetSummaryModal({
             rightContent={<ModalCloseButton onPress={close} />}
           />
           <SheetNameProvider name={sheetForMonth(month)}>
-            <TargetAmountsProvider month={month}>
+            <TargetAmountsProvider months={[month]}>
               <TotalsList
                 prevMonthName={prevMonthName}
                 style={{
