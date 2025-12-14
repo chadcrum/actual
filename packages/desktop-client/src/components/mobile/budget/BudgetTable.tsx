@@ -400,6 +400,7 @@ export function BudgetTable({
           data-testid="budget-table"
           style={{
             backgroundColor: theme.pageBackground,
+            minHeight: '100vh',
             paddingBottom: MOBILE_NAV_HEIGHT,
           }}
         >

@@ -2,12 +2,14 @@
 
 This guide provides comprehensive information for AI agents (like Cursor) working with the Actual Budget codebase.
 
+> **Additional References**: For custom guidelines, helper scripts, and further reading on architecture topics, see [AGENTS-chad.md](./AGENTS-chad.md).
+
 ## Project Overview
 
 **Actual Budget** is a local-first personal finance tool written in TypeScript/JavaScript. It's 100% free and open-source with synchronization capabilities across devices.
 
 - **Repository**: https://github.com/actualbudget/actual
-- **Community Docs**: https://github.com/actualbudget/actual/tree/master/packages/docs or https://actualbudget.org/docs
+- **Community Docs**: Documentation is part of the monorepo at `packages/docs/`. Published at https://actualbudget.org/docs
 - **License**: MIT
 - **Primary Language**: TypeScript (with React)
 - **Build System**: Yarn 4 workspaces (monorepo)
@@ -175,16 +177,16 @@ Custom ESLint rules specific to Actual.
 
 #### 10. **docs** (`packages/docs/`)
 
-Documentation site built with Docusaurus.
+Documentation website built with Docusaurus.
 
-- User-facing documentation and guides
-- Built and hosted separately
-
-#### 11. **ci-actions** (`packages/ci-actions/`)
-
-Private package for CI/CD utilities and GitHub Actions.
-
-- Internal use only for continuous integration workflows
+- Documentation is part of the monorepo
+- Built with Docusaurus 3
+- Commands:
+  ```bash
+  yarn workspace docs start
+  yarn workspace docs build
+  yarn start:docs  # From root
+  ```
 
 ## Development Workflow
 
@@ -198,18 +200,6 @@ When implementing changes:
 4. Run linting: `yarn lint:fix`
 5. Run relevant tests
 6. Fix any linter errors that are introduced
-
-### Plan Organization
-
-All implementation plans created during development should be stored in the `.plans/` directory at the project root for future reference. This helps maintain a historical record of architectural decisions and implementation strategies.
-
-**Guidelines:**
-
-- Store plans with descriptive filenames: `plans/feature-name-YYYY-MM-DD.md` or `plans/task-name.md`
-- Include context, approach, and any relevant architectural decisions
-- Link to related issues or PRs when applicable
-- Plans serve as documentation for why certain implementation choices were made
-- When you create a plan, save it under `.plans/` with a clear name, include a TODO list, and keep that TODO list updated as implementation proceeds
 
 ### 2. Testing Strategy
 
@@ -226,9 +216,6 @@ yarn test:debug
 
 # Run tests for a specific package
 yarn workspace loot-core run test
-
-# Run a specific test file (watch mode)
-yarn workspace loot-core run test path/to/test.test.ts
 ```
 
 **E2E Tests (Playwright)**
@@ -398,7 +385,7 @@ describe('ComponentName', () => {
 - `/lage.config.js` - Lage task runner configuration
 - `/eslint.config.mjs` - ESLint configuration (flat config format)
 - `/tsconfig.json` - Root TypeScript configuration
-- `/.gitignore` - Ignored files
+- `/.cursorignore`, `/.gitignore` - Ignored files
 - `/yarn.lock` - Dependency lockfile (Yarn 4)
 
 ### Documentation
@@ -407,6 +394,7 @@ describe('ComponentName', () => {
 - `/CONTRIBUTING.md` - Points to community docs
 - `/upcoming-release-notes/` - Release notes for next version
 - `/CODEOWNERS` - Code ownership definitions
+- `/packages/docs/` - Documentation website (Docusaurus)
 
 ### Build Artifacts (Don't Edit)
 
@@ -419,7 +407,7 @@ describe('ComponentName', () => {
 
 ### Key Source Directories
 
-- `packages/loot-core/src/platform/client/` - Client-side core logic
+- `packages/loot-core/src/client/` - Client-side core logic
 - `packages/loot-core/src/server/` - Server-side core logic
 - `packages/loot-core/src/shared/` - Shared utilities
 - `packages/loot-core/src/types/` - Type definitions
@@ -428,6 +416,8 @@ describe('ComponentName', () => {
 - `packages/desktop-client/e2e/` - End-to-end tests
 - `packages/component-library/src/` - Reusable components
 - `packages/component-library/src/icons/` - Icon components (auto-generated, don't edit)
+- `packages/docs/docs/` - Documentation source files (Markdown)
+- `packages/docs/docs/contributing/` - Developer documentation
 
 ## Common Development Tasks
 
@@ -436,9 +426,6 @@ describe('ComponentName', () => {
 ```bash
 # Run all tests across all packages (recommended)
 yarn test
-
-# Unit test for a specific file in loot-core (watch mode)
-yarn workspace loot-core run test src/path/to/file.test.ts
 
 # E2E test for a specific file
 yarn workspace @actual-app/web run playwright test accounts.test.ts --browser=chromium
@@ -477,20 +464,6 @@ yarn workspace @actual-app/web run playwright test --headed --debug accounts.tes
 ### Working with Icons
 
 Icons in `packages/component-library/src/icons/` are auto-generated. Don't manually edit them.
-
-## Additional Helper Scripts
-
-Beyond the essential commands documented in the Quick Start section, the following helper scripts are available:
-
-- `start:docs` - Start the documentation server
-- `start:service-plugins` - Start the plugins service watcher
-- `build:plugins-service` - Build the plugins service
-- `build:docs` - Build documentation
-- `generate:release-notes` - Generate release notes
-- `start:server` - Direct server start without dev environment
-- `rebuild-electron`, `rebuild-node` - Rebuild native modules
-
-For a complete list of available scripts, run `yarn run` or check the `scripts` section in [package.json](./package.json).
 
 ## Troubleshooting
 
@@ -531,7 +504,7 @@ For a complete list of available scripts, run `yarn run` or check the `scripts` 
 
 1. Clean build artifacts: `rm -rf packages/*/dist packages/*/lib-dist packages/*/build`
 2. Reinstall dependencies: `yarn install`
-3. Check Node.js version (requires >=22)
+3. Check Node.js version (requires >=20)
 4. Check Yarn version (requires ^4.9.1)
 
 ## Testing Patterns
@@ -609,8 +582,8 @@ yarn install:server
 
 ## Environment Requirements
 
-- **Node.js**: >=22
-- **Yarn**: ^4.9.1 (managed by packageManager field, currently using 4.10.3)
+- **Node.js**: >=20
+- **Yarn**: ^4.9.1 (managed by packageManager field)
 - **Browser Targets**: Electron >= 35.0, modern browsers (see browserslist)
 
 ## Migration Notes
@@ -622,13 +595,3 @@ The codebase is actively being migrated:
 - **React.\* → Named Imports**: Legacy React.\* patterns being removed
 
 When working with older code, follow the newer patterns described in this guide.
-
-## Further Reading
-
-For deeper understanding of Actual's systems, see:
-
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)**: Deep dive into CRDT sync, AQL queries, client-server communication, and platform abstraction
-- **[DATA-FLOW.md](./DATA-FLOW.md)**: Redux patterns, undo/redo system, reactivity, and query dependencies
-- **[DOMAIN-LOGIC.md](./DOMAIN-LOGIC.md)**: Transactions, split transactions, envelope budgeting, and budget calculations
-
-These documents provide detailed explanations of core systems that are essential when working on sync, queries, state management, or budget logic.
