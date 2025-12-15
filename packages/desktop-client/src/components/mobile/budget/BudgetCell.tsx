@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@actual-app/components/button';
 import { Text } from '@actual-app/components/text';
+import { theme } from '@actual-app/components/theme';
 import { AutoTextSize } from 'auto-text-size';
 
 import { type CategoryEntity } from 'loot-core/types/models';
@@ -12,6 +13,7 @@ import { getColumnWidth, PILL_STYLE } from './BudgetTable';
 import { makeAmountGrey } from '@desktop-client/components/budget/util';
 import { PrivacyFilter } from '@desktop-client/components/PrivacyFilter';
 import { CellValue } from '@desktop-client/components/spreadsheet/CellValue';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useNotes } from '@desktop-client/hooks/useNotes';
 import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
@@ -47,6 +49,8 @@ export function BudgetCell<
   const { showUndoNotification } = useUndo();
   const [budgetType = 'envelope'] = useSyncedPref('budgetType');
   const categoryNotes = useNotes(category.id);
+  const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
 
   const onOpenCategoryBudgetMenu = useCallback(() => {
     const modalBudgetType = budgetType === 'envelope' ? 'envelope' : 'tracking';
@@ -146,13 +150,15 @@ export function BudgetCell<
               <AutoTextSize
                 key={value}
                 as={Text}
-                minFontSizePx={6}
-                maxFontSizePx={12}
+                minFontSizePx={increaseFonts ? 8 : 6}
+                maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                 mode="oneline"
                 style={{
                   maxWidth: columnWidth,
                   textAlign: 'right',
-                  fontSize: 12,
+                  fontSize: increaseFonts
+                    ? `${fontSize}px`
+                    : theme.mobileBudgetTableFontSize,
                 }}
               >
                 {format(value, type)}

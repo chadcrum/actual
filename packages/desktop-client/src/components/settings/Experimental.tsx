@@ -1,6 +1,7 @@
 import { type ReactNode, useState } from 'react';
 import { Trans } from 'react-i18next';
 
+import { Select } from '@actual-app/components/select';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
@@ -151,6 +152,10 @@ function ServerFeatureToggle({
 
 export function ExperimentalFeatures() {
   const [expanded, setExpanded] = useState(false);
+  const [fontSize, setFontSize] = useSyncedPref('mobileBudgetTableFontSize');
+  const increaseMobileBudgetTableFontSizeEnabled = useFeatureFlag(
+    'increaseMobileBudgetTableFontSize',
+  );
 
   const goalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
   const goalTemplatesUIEnabled = useFeatureFlag('goalTemplatesUIEnabled');
@@ -205,6 +210,34 @@ export function ExperimentalFeatures() {
             <FeatureToggle flag="forceReload">
               <Trans>Force reload app button</Trans>
             </FeatureToggle>
+            <FeatureToggle flag="increaseMobileBudgetTableFontSize">
+              <Trans>Increase mobile budget table font size</Trans>
+            </FeatureToggle>
+            {increaseMobileBudgetTableFontSizeEnabled && (
+              <View style={{ paddingLeft: 22, marginTop: 8 }}>
+                <View style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Text>
+                    <Trans>Font size:</Trans>
+                  </Text>
+                  <Select
+                    value={fontSize || '14'}
+                    onChange={value => setFontSize(value)}
+                    options={[
+                      ['12', '12px'],
+                      ['13', '13px'],
+                      ['14', '14px'],
+                      ['15', '15px'],
+                      ['16', '16px'],
+                      ['17', '17px'],
+                      ['18', '18px'],
+                      ['19', '19px'],
+                      ['20', '20px'],
+                    ]}
+                    style={{ width: 80 }}
+                  />
+                </View>
+              </View>
+            )}
             {showServerPrefs && (
               <ServerFeatureToggle
                 prefName="flags.plugins"

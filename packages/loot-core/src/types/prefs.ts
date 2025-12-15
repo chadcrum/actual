@@ -5,7 +5,9 @@ export type FeatureFlag =
   | 'formulaMode'
   | 'currency'
   | 'crossoverReport'
-  | 'forceReload';
+  | 'plugins'
+  | 'forceReload'
+  | 'increaseMobileBudgetTableFontSize';
 
 /**
  * Cross-device preferences. These sync across devices when they are changed.
@@ -22,6 +24,8 @@ export type SyncedPrefs = Partial<
     | 'currencySymbolPosition'
     | 'currencySpaceBetweenAmountAndSymbol'
     | 'defaultCurrencyCode'
+    | 'plugins'
+    | 'mobileBudgetTableFontSize'
     | `show-account-${string}-net-worth-chart`
     | `side-nav.show-balance-history-${string}`
     | `show-balances-${string}`
