@@ -76,3 +76,4 @@ build/
 
 # Chad forked integration
 integration-chad/
+.env
