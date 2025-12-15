@@ -20,6 +20,7 @@ import { CellValue } from '@desktop-client/components/spreadsheet/CellValue';
 import { useCategoryScheduleGoalTemplateIndicator } from '@desktop-client/hooks/useCategoryScheduleGoalTemplateIndicator';
 import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
+import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 import { type Binding } from '@desktop-client/spreadsheet';
 
 type SpentCellProps = {
@@ -43,6 +44,7 @@ export function SpentCell({
     show3Columns,
   });
   const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
 
   const { schedule, scheduleStatus, isScheduleRecurring } =
     useCategoryScheduleGoalTemplateIndicator({
@@ -75,14 +77,14 @@ export function SpentCell({
                 key={value}
                 as={Text}
                 minFontSizePx={increaseFonts ? 8 : 6}
-                maxFontSizePx={increaseFonts ? 14 : 12}
+                maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                 mode="oneline"
                 style={{
                   ...makeAmountGrey(value),
                   maxWidth: columnWidth,
                   textAlign: 'right',
                   fontSize: increaseFonts
-                    ? theme.mobileBudgetTableFontSizeLarge
+                    ? `${fontSize}px`
                     : theme.mobileBudgetTableFontSize,
                 }}
               >

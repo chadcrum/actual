@@ -192,6 +192,9 @@ function ExpenseGroupName({
     isSidebar: true,
     offset: -3.5,
   });
+  const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
+
   return (
     <View
       style={{
@@ -253,7 +256,9 @@ function ExpenseGroupName({
               ...styles.lineClamp(2),
               width: sidebarColumnWidth,
               textAlign: 'left',
-              ...styles.smallText,
+              fontSize: increaseFonts
+                ? `${fontSize}px`
+                : styles.smallText.fontSize,
               fontWeight: '500',
             }}
             data-testid="category-group-name"
@@ -285,14 +290,13 @@ function ExpenseGroupCells({
   const [budgetType = 'envelope'] = useSyncedPref('budgetType');
   const format = useFormat();
   const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
 
   const columnWidth = getColumnWidth({ show3Columns });
 
   const amountStyle: CSSProperties = {
     width: columnWidth,
-    fontSize: increaseFonts
-      ? theme.mobileBudgetTableFontSizeLarge
-      : theme.mobileBudgetTableFontSize,
+    fontSize: increaseFonts ? `${fontSize}px` : theme.mobileBudgetTableFontSize,
     fontWeight: '500',
     paddingLeft: 5,
     textAlign: 'right',
@@ -338,7 +342,7 @@ function ExpenseGroupCells({
                   key={value}
                   as={Text}
                   minFontSizePx={increaseFonts ? 8 : 6}
-                  maxFontSizePx={increaseFonts ? 14 : 12}
+                  maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                   mode="oneline"
                   style={amountStyle}
                 >
@@ -365,7 +369,7 @@ function ExpenseGroupCells({
                   key={value}
                   as={Text}
                   minFontSizePx={increaseFonts ? 8 : 6}
-                  maxFontSizePx={increaseFonts ? 14 : 12}
+                  maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                   mode="oneline"
                   style={amountStyle}
                 >
@@ -386,8 +390,8 @@ function ExpenseGroupCells({
               <AutoTextSize
                 key={value}
                 as={Text}
-                minFontSizePx={6}
-                maxFontSizePx={12}
+                minFontSizePx={increaseFonts ? 8 : 6}
+                maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                 mode="oneline"
                 style={amountStyle}
               >

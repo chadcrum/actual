@@ -20,6 +20,7 @@ import { getColumnWidth, ROW_HEIGHT } from './BudgetTable';
 import { SpentCell } from './SpentCell';
 
 import { useCategories } from '@desktop-client/hooks/useCategories';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useNavigate } from '@desktop-client/hooks/useNavigate';
 import { useSheetValue } from '@desktop-client/hooks/useSheetValue';
@@ -47,6 +48,8 @@ function ExpenseCategoryName({
     show3Columns,
     isSidebar: true,
   });
+  const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
 
   return (
     <View
@@ -86,7 +89,9 @@ function ExpenseCategoryName({
               ...styles.lineClamp(2),
               width: sidebarColumnWidth,
               textAlign: 'left',
-              ...styles.smallText,
+              fontSize: increaseFonts
+                ? `${fontSize}px`
+                : styles.smallText.fontSize,
             }}
             data-testid="category-name"
           >

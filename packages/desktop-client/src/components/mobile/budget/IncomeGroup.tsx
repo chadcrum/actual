@@ -246,6 +246,7 @@ function IncomeGroupCells({ group }: IncomeGroupCellsProps) {
   const [budgetType = 'envelope'] = useSyncedPref('budgetType');
   const format = useFormat();
   const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
 
   const budgeted =
     budgetType === 'tracking' ? trackingBudget.groupBudgeted(group.id) : null;
@@ -278,7 +279,7 @@ function IncomeGroupCells({ group }: IncomeGroupCellsProps) {
                   key={value}
                   as={Text}
                   minFontSizePx={increaseFonts ? 8 : 6}
-                  maxFontSizePx={increaseFonts ? 14 : 12}
+                  maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                   mode="oneline"
                   style={{
                     width: columnWidth,
@@ -287,7 +288,7 @@ function IncomeGroupCells({ group }: IncomeGroupCellsProps) {
                     paddingLeft: 5,
                     textAlign: 'right',
                     fontSize: increaseFonts
-                      ? theme.mobileBudgetTableFontSizeLarge
+                      ? `${fontSize}px`
                       : theme.mobileBudgetTableFontSize,
                     fontWeight: '500',
                   }}

@@ -50,6 +50,7 @@ export function BudgetCell<
   const [budgetType = 'envelope'] = useSyncedPref('budgetType');
   const categoryNotes = useNotes(category.id);
   const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
 
   const onOpenCategoryBudgetMenu = useCallback(() => {
     const modalBudgetType = budgetType === 'envelope' ? 'envelope' : 'tracking';
@@ -150,13 +151,13 @@ export function BudgetCell<
                 key={value}
                 as={Text}
                 minFontSizePx={increaseFonts ? 8 : 6}
-                maxFontSizePx={increaseFonts ? 14 : 12}
+                maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                 mode="oneline"
                 style={{
                   maxWidth: columnWidth,
                   textAlign: 'right',
                   fontSize: increaseFonts
-                    ? theme.mobileBudgetTableFontSizeLarge
+                    ? `${fontSize}px`
                     : theme.mobileBudgetTableFontSize,
                 }}
               >

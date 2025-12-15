@@ -75,6 +75,7 @@ function ToBudget({ toBudget, onPress, show3Columns }: ToBudgetProps) {
   const format = useFormat();
   const sidebarColumnWidth = getColumnWidth({ show3Columns, isSidebar: true });
   const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
 
   return (
     <View
@@ -91,7 +92,7 @@ function ToBudget({ toBudget, onPress, show3Columns }: ToBudgetProps) {
             <AutoTextSize
               as={Label}
               minFontSizePx={increaseFonts ? 8 : 6}
-              maxFontSizePx={increaseFonts ? 14 : 12}
+              maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
               mode="oneline"
               title={amount < 0 ? t('Overbudgeted') : t('To Budget')}
               style={{
@@ -110,11 +111,11 @@ function ToBudget({ toBudget, onPress, show3Columns }: ToBudgetProps) {
                     key={value}
                     as={Text}
                     minFontSizePx={increaseFonts ? 8 : 6}
-                    maxFontSizePx={increaseFonts ? 14 : 12}
+                    maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                     mode="oneline"
                     style={{
                       fontSize: increaseFonts
-                        ? theme.mobileBudgetTableFontSizeLarge
+                        ? `${fontSize}px`
                         : theme.mobileBudgetTableFontSize,
                       fontWeight: '700',
                       color:
@@ -125,7 +126,9 @@ function ToBudget({ toBudget, onPress, show3Columns }: ToBudgetProps) {
                             : theme.formInputText,
                     }}
                   >
+                    {/* #region agent log */}
                     {format(value, type)}
+                    {/* #endregion */}
                   </AutoTextSize>
                 </PrivacyFilter>
               </View>
@@ -163,6 +166,7 @@ function Saved({ projected, onPress, show3Columns }: SavedProps) {
   const isNegative = saved < 0;
   const sidebarColumnWidth = getColumnWidth({ show3Columns, isSidebar: true });
   const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
 
   return (
     <View
@@ -180,7 +184,7 @@ function Saved({ projected, onPress, show3Columns }: SavedProps) {
               <AutoTextSize
                 as={Label}
                 minFontSizePx={increaseFonts ? 8 : 6}
-                maxFontSizePx={increaseFonts ? 14 : 12}
+                maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                 mode="oneline"
                 title={t('Projected savings')}
                 style={{
@@ -213,12 +217,12 @@ function Saved({ projected, onPress, show3Columns }: SavedProps) {
                     key={value}
                     as={Text}
                     minFontSizePx={increaseFonts ? 8 : 6}
-                    maxFontSizePx={increaseFonts ? 14 : 12}
+                    maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                     mode="oneline"
                     style={{
                       textAlign: 'left',
                       fontSize: increaseFonts
-                        ? theme.mobileBudgetTableFontSizeLarge
+                        ? `${fontSize}px`
                         : theme.mobileBudgetTableFontSize,
                       fontWeight: '700',
                       color: projected
@@ -228,7 +232,9 @@ function Saved({ projected, onPress, show3Columns }: SavedProps) {
                           : theme.formInputText,
                     }}
                   >
+                    {/* #region agent log */}
                     {format(value, type)}
+                    {/* #endregion */}
                   </AutoTextSize>
                 </PrivacyFilter>
               </View>
@@ -432,6 +438,7 @@ function BudgetTableHeader({
   const format = useFormat();
   const [budgetType = 'envelope'] = useSyncedPref('budgetType');
   const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
   const buttonStyle = {
     padding: 0,
     backgroundColor: 'transparent',
@@ -443,9 +450,7 @@ function BudgetTableHeader({
   const amountStyle: CSSProperties = {
     color: theme.formInputText,
     textAlign: 'right',
-    fontSize: increaseFonts
-      ? theme.mobileBudgetTableFontSizeLarge
-      : theme.mobileBudgetTableFontSize,
+    fontSize: increaseFonts ? `${fontSize}px` : theme.mobileBudgetTableFontSize,
     fontWeight: '500',
   };
 
@@ -531,7 +536,7 @@ function BudgetTableHeader({
                       <AutoTextSize
                         as={Label}
                         minFontSizePx={increaseFonts ? 10 : 8}
-                        maxFontSizePx={increaseFonts ? 14 : 12}
+                        maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                         mode="multiline"
                         title={t('Budgeted')}
                         style={{ color: theme.formInputText, paddingRight: 4 }}
@@ -543,8 +548,8 @@ function BudgetTableHeader({
                       <AutoTextSize
                         key={value}
                         as={Text}
-                        minFontSizePx={6}
-                        maxFontSizePx={12}
+                        minFontSizePx={increaseFonts ? 8 : 6}
+                        maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                         mode="oneline"
                         style={{
                           ...amountStyle,
@@ -599,7 +604,7 @@ function BudgetTableHeader({
                       <AutoTextSize
                         as={Label}
                         minFontSizePx={increaseFonts ? 8 : 6}
-                        maxFontSizePx={increaseFonts ? 14 : 12}
+                        maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                         mode="oneline"
                         title={t('Spent')}
                         style={{ color: theme.formInputText, paddingRight: 4 }}
@@ -612,7 +617,7 @@ function BudgetTableHeader({
                         key={value}
                         as={Text}
                         minFontSizePx={increaseFonts ? 8 : 6}
-                        maxFontSizePx={increaseFonts ? 14 : 12}
+                        maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                         mode="oneline"
                         style={{
                           ...amountStyle,
@@ -643,7 +648,7 @@ function BudgetTableHeader({
                   <AutoTextSize
                     as={Label}
                     minFontSizePx={increaseFonts ? 8 : 6}
-                    maxFontSizePx={increaseFonts ? 14 : 12}
+                    maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                     mode="oneline"
                     title={t('Balance')}
                     style={{ color: theme.formInputText }}
@@ -655,7 +660,7 @@ function BudgetTableHeader({
                       key={value}
                       as={Text}
                       minFontSizePx={increaseFonts ? 8 : 6}
-                      maxFontSizePx={increaseFonts ? 14 : 12}
+                      maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                       mode="oneline"
                       style={amountStyle}
                     >

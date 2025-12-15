@@ -48,6 +48,7 @@ export function BalanceCell({
     show3Columns,
   });
   const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
 
   const goal =
     budgetType === 'tracking'
@@ -99,7 +100,7 @@ export function BalanceCell({
               key={value}
               as={Text}
               minFontSizePx={increaseFonts ? 8 : 6}
-              maxFontSizePx={increaseFonts ? 14 : 12}
+              maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
               mode="oneline"
               className={cx(
                 defaultClassName,
@@ -107,7 +108,7 @@ export function BalanceCell({
                   maxWidth: columnWidth,
                   textAlign: 'right',
                   fontSize: increaseFonts
-                    ? theme.mobileBudgetTableFontSizeLarge
+                    ? `${fontSize}px`
                     : theme.mobileBudgetTableFontSize,
                 }),
               )}
