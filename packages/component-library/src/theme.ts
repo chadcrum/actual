@@ -74,6 +74,8 @@ export const theme = {
   mobileAccountShadow: 'var(--color-mobileAccountShadow)',
   mobileAccountText: 'var(--color-mobileAccountText)',
   mobileTransactionSelected: 'var(--color-mobileTransactionSelected)',
+  mobileBudgetTableFontSize: 'var(--color-mobileBudgetTableFontSize)',
+  mobileBudgetTableFontSizeLarge: 'var(--color-mobileBudgetTableFontSizeLarge)',
   mobileViewTheme: 'var(--color-mobileViewTheme)',
   mobileConfigServerViewTheme: 'var(--color-mobileConfigServerViewTheme)',
   markdownNormal: 'var(--color-markdownNormal)',
