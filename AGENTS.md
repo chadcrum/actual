@@ -594,5 +594,6 @@ The codebase is actively being migrated:
 
 When working with older code, follow the newer patterns described in this guide.
 
-## Chad Forked Integration 
+## Chad Forked Integration
+
 - Include integration-chad/AGENTS-chad-fork.md as an extension of the AGENTS.md file

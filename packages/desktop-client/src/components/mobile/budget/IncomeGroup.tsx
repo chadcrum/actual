@@ -21,6 +21,7 @@ import { IncomeCategoryList } from './IncomeCategoryList';
 
 import { PrivacyFilter } from '@desktop-client/components/PrivacyFilter';
 import { CellValue } from '@desktop-client/components/spreadsheet/CellValue';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 import {
@@ -244,6 +245,7 @@ type IncomeGroupCellsProps = {
 function IncomeGroupCells({ group }: IncomeGroupCellsProps) {
   const [budgetType = 'envelope'] = useSyncedPref('budgetType');
   const format = useFormat();
+  const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
 
   const budgeted =
     budgetType === 'tracking' ? trackingBudget.groupBudgeted(group.id) : null;
@@ -275,8 +277,8 @@ function IncomeGroupCells({ group }: IncomeGroupCellsProps) {
                 <AutoTextSize
                   key={value}
                   as={Text}
-                  minFontSizePx={6}
-                  maxFontSizePx={12}
+                  minFontSizePx={increaseFonts ? 8 : 6}
+                  maxFontSizePx={increaseFonts ? 14 : 12}
                   mode="oneline"
                   style={{
                     width: columnWidth,
@@ -284,7 +286,9 @@ function IncomeGroupCells({ group }: IncomeGroupCellsProps) {
                     alignItems: 'flex-end',
                     paddingLeft: 5,
                     textAlign: 'right',
-                    fontSize: 12,
+                    fontSize: increaseFonts
+                      ? theme.mobileBudgetTableFontSizeLarge
+                      : theme.mobileBudgetTableFontSize,
                     fontWeight: '500',
                   }}
                 >
@@ -305,8 +309,8 @@ function IncomeGroupCells({ group }: IncomeGroupCellsProps) {
               <AutoTextSize
                 key={value}
                 as={Text}
-                minFontSizePx={6}
-                maxFontSizePx={12}
+                minFontSizePx={increaseFonts ? 8 : 6}
+                maxFontSizePx={increaseFonts ? 14 : 12}
                 mode="oneline"
                 style={{
                   width: columnWidth,
@@ -314,7 +318,9 @@ function IncomeGroupCells({ group }: IncomeGroupCellsProps) {
                   alignItems: 'flex-end',
                   paddingLeft: 5,
                   textAlign: 'right',
-                  fontSize: 12,
+                  fontSize: increaseFonts
+                    ? theme.mobileBudgetTableFontSizeLarge
+                    : theme.mobileBudgetTableFontSize,
                   fontWeight: '500',
                 }}
               >

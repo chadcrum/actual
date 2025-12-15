@@ -23,6 +23,7 @@ import { ExpenseCategoryList } from './ExpenseCategoryList';
 
 import { PrivacyFilter } from '@desktop-client/components/PrivacyFilter';
 import { CellValue } from '@desktop-client/components/spreadsheet/CellValue';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 import {
@@ -283,12 +284,15 @@ function ExpenseGroupCells({
 }: ExpenseGroupCellsProps) {
   const [budgetType = 'envelope'] = useSyncedPref('budgetType');
   const format = useFormat();
+  const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
 
   const columnWidth = getColumnWidth({ show3Columns });
 
   const amountStyle: CSSProperties = {
     width: columnWidth,
-    fontSize: 12,
+    fontSize: increaseFonts
+      ? theme.mobileBudgetTableFontSizeLarge
+      : theme.mobileBudgetTableFontSize,
     fontWeight: '500',
     paddingLeft: 5,
     textAlign: 'right',
@@ -333,8 +337,8 @@ function ExpenseGroupCells({
                 <AutoTextSize
                   key={value}
                   as={Text}
-                  minFontSizePx={6}
-                  maxFontSizePx={12}
+                  minFontSizePx={increaseFonts ? 8 : 6}
+                  maxFontSizePx={increaseFonts ? 14 : 12}
                   mode="oneline"
                   style={amountStyle}
                 >
@@ -360,8 +364,8 @@ function ExpenseGroupCells({
                 <AutoTextSize
                   key={value}
                   as={Text}
-                  minFontSizePx={6}
-                  maxFontSizePx={12}
+                  minFontSizePx={increaseFonts ? 8 : 6}
+                  maxFontSizePx={increaseFonts ? 14 : 12}
                   mode="oneline"
                   style={amountStyle}
                 >

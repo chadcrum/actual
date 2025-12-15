@@ -15,6 +15,7 @@ import { getColumnWidth, PILL_STYLE } from './BudgetTable';
 
 import { BalanceWithCarryover } from '@desktop-client/components/budget/BalanceWithCarryover';
 import { PrivacyFilter } from '@desktop-client/components/PrivacyFilter';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 import { type Binding } from '@desktop-client/spreadsheet';
@@ -46,6 +47,7 @@ export function BalanceCell({
   const columnWidth = getColumnWidth({
     show3Columns,
   });
+  const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
 
   const goal =
     budgetType === 'tracking'
@@ -96,15 +98,17 @@ export function BalanceCell({
             <AutoTextSize
               key={value}
               as={Text}
-              minFontSizePx={6}
-              maxFontSizePx={12}
+              minFontSizePx={increaseFonts ? 8 : 6}
+              maxFontSizePx={increaseFonts ? 14 : 12}
               mode="oneline"
               className={cx(
                 defaultClassName,
                 css({
                   maxWidth: columnWidth,
                   textAlign: 'right',
-                  fontSize: 12,
+                  fontSize: increaseFonts
+                    ? theme.mobileBudgetTableFontSizeLarge
+                    : theme.mobileBudgetTableFontSize,
                 }),
               )}
             >
