@@ -593,3 +593,7 @@ The codebase is actively being migrated:
 - **React.\* → Named Imports**: Legacy React.\* patterns being removed
 
 When working with older code, follow the newer patterns described in this guide.
+
+## Chad Forked Integration
+
+- Include integration-chad/AGENTS-chad-fork.md as an extension of the AGENTS.md file
