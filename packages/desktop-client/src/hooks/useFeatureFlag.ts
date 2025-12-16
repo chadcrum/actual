@@ -12,6 +12,7 @@ const DEFAULT_FEATURE_FLAG_STATE: Record<FeatureFlag, boolean> = {
   plugins: false,
   forceReload: false,
   increaseMobileBudgetTableFontSize: false,
+  'budget-tooltip-goals': false,
 };
 
 export function useFeatureFlag(name: FeatureFlag): boolean {

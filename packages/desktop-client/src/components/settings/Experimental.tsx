@@ -179,6 +179,9 @@ export function ExperimentalFeatures() {
             <FeatureToggle flag="forceReload">
               <Trans>Force reload app button</Trans>
             </FeatureToggle>
+            <FeatureToggle flag="budget-tooltip-goals">
+              <Trans>Budget tooltip goals</Trans>
+            </FeatureToggle>
             <FeatureToggle flag="increaseMobileBudgetTableFontSize">
               <Trans>Increase mobile budget table font size</Trans>
             </FeatureToggle>

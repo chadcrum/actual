@@ -7,7 +7,8 @@ export type FeatureFlag =
   | 'crossoverReport'
   | 'plugins'
   | 'forceReload'
-  | 'increaseMobileBudgetTableFontSize';
+  | 'increaseMobileBudgetTableFontSize'
+  | 'budget-tooltip-goals';
 
 /**
  * Cross-device preferences. These sync across devices when they are changed.

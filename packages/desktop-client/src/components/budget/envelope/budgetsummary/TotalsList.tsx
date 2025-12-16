@@ -4,11 +4,13 @@ import { Trans } from 'react-i18next';
 import { AlignedText } from '@actual-app/components/aligned-text';
 import { Block } from '@actual-app/components/block';
 import { styles } from '@actual-app/components/styles';
+import { theme } from '@actual-app/components/theme';
 import { Tooltip } from '@actual-app/components/tooltip';
 import { View } from '@actual-app/components/view';
 
 import { EnvelopeCellValue } from '@desktop-client/components/budget/envelope/EnvelopeBudgetComponents';
 import { CellValueText } from '@desktop-client/components/spreadsheet/CellValue';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
 
@@ -19,6 +21,7 @@ type TotalsListProps = {
 
 export function TotalsList({ prevMonthName, style }: TotalsListProps) {
   const format = useFormat();
+  const isBudgetTooltipGoalsEnabled = useFeatureFlag('budget-tooltip-goals');
   return (
     <View
       style={{
@@ -36,6 +39,18 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
           minWidth: 50,
         }}
       >
+        {isBudgetTooltipGoalsEnabled && (
+          <>
+            <Block style={{ fontWeight: 600 }}>133</Block>
+            <View
+              style={{
+                borderTop: '1px solid ' + theme.tableBorder,
+                marginTop: 4,
+                marginBottom: 4,
+              }}
+            />
+          </>
+        )}
         <Tooltip
           style={{ ...styles.tooltip, lineHeight: 1.5, padding: '6px 10px' }}
           content={
@@ -120,6 +135,18 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
       </View>
 
       <View>
+        {isBudgetTooltipGoalsEnabled && (
+          <>
+            <Block>test</Block>
+            <View
+              style={{
+                borderTop: '1px solid ' + theme.tableBorder,
+                marginTop: 4,
+                marginBottom: 4,
+              }}
+            />
+          </>
+        )}
         <Block>
           <Trans>Available funds</Trans>
         </Block>
