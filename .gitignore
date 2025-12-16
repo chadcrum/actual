@@ -75,5 +75,4 @@ build/
 .lage/
 
 # Chad forked integration
-integration-chad/
 .env

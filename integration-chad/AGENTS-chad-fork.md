@@ -27,29 +27,6 @@ The goal is to:
 5. **Behavior lives in core, presentation lives in web**
    `loot-core` defines behavior and flags; `@actual-app/web` defines UI extensions.
 
-
----
-
-## Directory and Documentation Guidance
-
-### Placement of Plan Documentation
-
-All documentation or notes relating to technical plans, proposal drafts, experiment outlines, or architectural decisions specific to the fork should be placed under:
-
-```
-integration-chad/plans/
-```
-
-**Do not** include such ad-hoc plan, strategy, or brainstorm documents in this `AGENTS-chad-fork.md`. This file should strictly contain rules, conventions, and ongoing required documentation for maintaining the fork. Use the `plans` directory for any project management, planning, or technical proposal artifacts.
-
-### Example
-
-- `integration-chad/plans/plan-custom-toolbar.md` &mdash; Custom toolbar technical approach
-- `integration-chad/plans/experiment-split-budget-view.md` &mdash; Rationale, options, and outcomes for experimental budget view
-- `integration-chad/plans/2024-06-upstream-merge-checklist.md` &mdash; Stepwise notes for an upcoming merge from upstream
-
-This keeps fork maintenance documentation concise and makes planning artifacts discoverable and auditable.
-
 ---
 
 ## Feature Flags
@@ -88,11 +65,19 @@ export function useFeatureFlag(key) {
 
 A **seam** is a deliberate location where custom behavior or UI can be injected without modifying core structure.
 
+### Mandatory Rules for Seams
+
+* **Seams must exist independently of feature flags**
+  Feature flags may enable or disable behavior *inside* a seam, but flags must not create or remove structural UI boundaries.
+
+* **Prefer high-level seams**
+  Introduce seams at layout shells, responsive boundaries, or platform edges. Avoid adding seams deep inside leaf components unless upstream already uses the same pattern.
+
 ### Approved Seam Patterns
 
 * Layout-level extension components
-* Hook-based extensions
-* Context-based render injection
+* Hook-based extensions (at layout/boundary level)
+* Context-based render injection (at layout/boundary level)
 * Responsive boundary components (`NarrowAlternate`, layout shells)
 
 ### Example
@@ -117,6 +102,8 @@ function LayoutExtensions() {
 }
 ```
 
+````
+
 ---
 
 ## Responsive Design Rules
@@ -125,8 +112,8 @@ Actual already branches on responsiveness. Use those boundaries.
 
 ### Rules
 
-* Do **not** duplicate logic in `/mobile` and `/wide` unless necessary
-* Prefer a single extension component that renders responsive variants
+- Do **not** duplicate logic in `/mobile` and `/wide` unless necessary
+- Prefer a single extension component that renders responsive variants
 
 ### Example
 
@@ -135,7 +122,7 @@ function CustomLayoutExtension() {
   const { isNarrowWidth } = useResponsive();
   return isNarrowWidth ? <MobilePanel /> : <DesktopPanel />;
 }
-```
+````
 
 ---
 
@@ -206,10 +193,8 @@ This minimizes surface area affected by upstream refactors.
 Recommended branches:
 
 * `upstream/main` – untouched mirror of upstream
-* `integration` – **main branch** for this fork, receives upstream merges and our feature branch merges
+* `custom/integration` – receives upstream merges
 * `custom/features` – custom work only
-
-**Note:** As we are a forked repo, our "main/master" branch is `integration`. We create feature branches and merge them into the integration branch.
 
 Merge upstream → integration → features.
 
@@ -237,6 +222,7 @@ Re-evaluate approach if:
 * The same files conflict every upstream merge
 * Feature flags stack deeply
 * Core logic is copied instead of extended
+* Removing a feature flag requires large UI refactors
 
 These indicate missing seams.
 
