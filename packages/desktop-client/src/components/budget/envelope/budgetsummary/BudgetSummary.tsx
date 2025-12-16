@@ -269,6 +269,7 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
           <>
             <TotalsList
               prevMonthName={prevMonthName}
+              month={month}
               style={{
                 padding: '5px 0',
                 marginTop: 17,

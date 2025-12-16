@@ -12,14 +12,53 @@ import { EnvelopeCellValue } from '@desktop-client/components/budget/envelope/En
 import { CellValueText } from '@desktop-client/components/spreadsheet/CellValue';
 import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
+import { useGoalTargetSum } from '@desktop-client/hooks/useGoalTargetSum';
 import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
 
 type TotalsListProps = {
   prevMonthName: string;
+  month: string;
   style?: CSSProperties;
 };
 
-export function TotalsList({ prevMonthName, style }: TotalsListProps) {
+function GoalTargetRow({ month }: { month: string }) {
+  const format = useFormat();
+  const goalTargetSum = useGoalTargetSum(month);
+
+  return (
+    <>
+      <Block style={{ fontWeight: 600 }}>
+        {format(goalTargetSum, 'financial')}
+      </Block>
+      <View
+        style={{
+          borderTop: '1px solid ' + theme.tableBorder,
+          marginTop: 4,
+          marginBottom: 4,
+        }}
+      />
+    </>
+  );
+}
+
+function GoalTargetLabel() {
+  return (
+    <>
+      <Block>
+        <Trans>Goal Target</Trans>
+      </Block>
+      <View
+        style={{
+          borderTop: '1px solid ' + theme.tableBorder,
+          marginTop: 4,
+          marginBottom: 4,
+        }}
+      />
+    </>
+  );
+}
+
+export function TotalsList({ prevMonthName, month, style }: TotalsListProps) {
   const format = useFormat();
   const isBudgetTooltipGoalsEnabled = useFeatureFlag('budget-tooltip-goals');
   return (
@@ -39,18 +78,7 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
           minWidth: 50,
         }}
       >
-        {isBudgetTooltipGoalsEnabled && (
-          <>
-            <Block style={{ fontWeight: 600 }}>133</Block>
-            <View
-              style={{
-                borderTop: '1px solid ' + theme.tableBorder,
-                marginTop: 4,
-                marginBottom: 4,
-              }}
-            />
-          </>
-        )}
+        {isBudgetTooltipGoalsEnabled && <GoalTargetRow month={month} />}
         <Tooltip
           style={{ ...styles.tooltip, lineHeight: 1.5, padding: '6px 10px' }}
           content={
@@ -135,18 +163,7 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
       </View>
 
       <View>
-        {isBudgetTooltipGoalsEnabled && (
-          <>
-            <Block>test</Block>
-            <View
-              style={{
-                borderTop: '1px solid ' + theme.tableBorder,
-                marginTop: 4,
-                marginBottom: 4,
-              }}
-            />
-          </>
-        )}
+        {isBudgetTooltipGoalsEnabled && <GoalTargetLabel />}
         <Block>
           <Trans>Available funds</Trans>
         </Block>
