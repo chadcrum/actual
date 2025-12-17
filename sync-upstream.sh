@@ -1,0 +1,1 @@
+integration-chad/scripts/sync-upstream.sh

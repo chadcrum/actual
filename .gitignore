@@ -73,3 +73,6 @@ build/
 
 # Lage cache
 .lage/
+
+# Chad forked integration
+.env

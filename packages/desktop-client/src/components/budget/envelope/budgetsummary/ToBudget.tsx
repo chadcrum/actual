@@ -75,6 +75,7 @@ export function ToBudget({
             setMenuOpen(true);
           }}
           prevMonthName={prevMonthName}
+          month={month}
           style={style}
           amountStyle={amountStyle}
           isTotalsListTooltipDisabled={!isCollapsed || menuOpen}

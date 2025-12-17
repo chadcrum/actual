@@ -16,11 +16,18 @@ import { css } from '@emotion/css';
 import * as monthUtils from 'loot-core/shared/months';
 
 import { BudgetMonthMenu } from './BudgetMonthMenu';
+import { GoalTargetLabel } from './GoalTargetLabel';
+import { GoalTargetRow } from './GoalTargetRow';
+import { OverfundedLabel } from './OverfundedLabel';
+import { OverfundedRow } from './OverfundedRow';
 import { ToBudget } from './ToBudget';
 import { TotalsList } from './TotalsList';
+import { UnderfundedLabel } from './UnderfundedLabel';
+import { UnderfundedRow } from './UnderfundedRow';
 
 import { useEnvelopeBudget } from '@desktop-client/components/budget/envelope/EnvelopeBudgetContext';
 import { NotesButton } from '@desktop-client/components/NotesButton';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useLocale } from '@desktop-client/hooks/useLocale';
 import { SheetNameProvider } from '@desktop-client/hooks/useSheetName';
 import { useUndo } from '@desktop-client/hooks/useUndo';
@@ -40,6 +47,7 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const triggerRef = useRef(null);
   const { showUndoNotification } = useUndo();
+  const isBudgetTooltipGoalsEnabled = useFeatureFlag('budget-tooltip-goals');
 
   function onMenuOpen() {
     setMenuOpen(true);
@@ -269,6 +277,7 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
           <>
             <TotalsList
               prevMonthName={prevMonthName}
+              month={month}
               style={{
                 padding: '5px 0',
                 marginTop: 17,
@@ -277,6 +286,30 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
                 borderBottomWidth: 1,
                 borderColor: theme.tableBorder,
               }}
+              goalTargetRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <GoalTargetRow month={month} />
+                ) : undefined
+              }
+              goalTargetLabel={
+                isBudgetTooltipGoalsEnabled ? <GoalTargetLabel /> : undefined
+              }
+              underfundedRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <UnderfundedRow month={month} />
+                ) : undefined
+              }
+              underfundedLabel={
+                isBudgetTooltipGoalsEnabled ? <UnderfundedLabel /> : undefined
+              }
+              overfundedRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <OverfundedRow month={month} />
+                ) : undefined
+              }
+              overfundedLabel={
+                isBudgetTooltipGoalsEnabled ? <OverfundedLabel /> : undefined
+              }
             />
             <View style={{ margin: '23px 0' }}>
               <ToBudget

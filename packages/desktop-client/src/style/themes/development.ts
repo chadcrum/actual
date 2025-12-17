@@ -217,3 +217,5 @@ export const tooltipBackground = colorPalette.navy50;
 export const tooltipBorder = colorPalette.navy150;
 
 export const calendarCellBackground = colorPalette.navy100;
+export const mobileBudgetTableFontSize = '12px';
+export const mobileBudgetTableFontSizeLarge = '14px';

@@ -1,9 +1,10 @@
-import React, { type CSSProperties } from 'react';
+import React, { type CSSProperties, type ReactNode } from 'react';
 import { Trans } from 'react-i18next';
 
 import { AlignedText } from '@actual-app/components/aligned-text';
 import { Block } from '@actual-app/components/block';
 import { styles } from '@actual-app/components/styles';
+import { theme } from '@actual-app/components/theme';
 import { Tooltip } from '@actual-app/components/tooltip';
 import { View } from '@actual-app/components/view';
 
@@ -14,10 +15,28 @@ import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
 
 type TotalsListProps = {
   prevMonthName: string;
+  month: string;
   style?: CSSProperties;
+  goalTargetRow?: ReactNode;
+  goalTargetLabel?: ReactNode;
+  underfundedRow?: ReactNode;
+  underfundedLabel?: ReactNode;
+  overfundedRow?: ReactNode;
+  overfundedLabel?: ReactNode;
 };
 
-export function TotalsList({ prevMonthName, style }: TotalsListProps) {
+export function TotalsList({
+  prevMonthName,
+
+  month, // Required by interface for child components, but not used directly in this component
+  style,
+  goalTargetRow,
+  goalTargetLabel,
+  underfundedRow,
+  underfundedLabel,
+  overfundedRow,
+  overfundedLabel,
+}: TotalsListProps) {
   const format = useFormat();
   return (
     <View
@@ -36,6 +55,9 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
           minWidth: 50,
         }}
       >
+        {overfundedRow}
+        {underfundedRow}
+        {goalTargetRow}
         <Tooltip
           style={{ ...styles.tooltip, lineHeight: 1.5, padding: '6px 10px' }}
           content={
@@ -120,6 +142,9 @@ export function TotalsList({ prevMonthName, style }: TotalsListProps) {
       </View>
 
       <View>
+        {overfundedLabel}
+        {underfundedLabel}
+        {goalTargetLabel}
         <Block>
           <Trans>Available funds</Trans>
         </Block>

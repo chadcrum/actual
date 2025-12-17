@@ -18,7 +18,9 @@ import { makeAmountGrey } from '@desktop-client/components/budget/util';
 import { PrivacyFilter } from '@desktop-client/components/PrivacyFilter';
 import { CellValue } from '@desktop-client/components/spreadsheet/CellValue';
 import { useCategoryScheduleGoalTemplateIndicator } from '@desktop-client/hooks/useCategoryScheduleGoalTemplateIndicator';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
+import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 import { type Binding } from '@desktop-client/spreadsheet';
 
 type SpentCellProps = {
@@ -41,6 +43,8 @@ export function SpentCell({
   const columnWidth = getColumnWidth({
     show3Columns,
   });
+  const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
 
   const { schedule, scheduleStatus, isScheduleRecurring } =
     useCategoryScheduleGoalTemplateIndicator({
@@ -72,14 +76,16 @@ export function SpentCell({
               <AutoTextSize
                 key={value}
                 as={Text}
-                minFontSizePx={6}
-                maxFontSizePx={12}
+                minFontSizePx={increaseFonts ? 8 : 6}
+                maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
                 mode="oneline"
                 style={{
                   ...makeAmountGrey(value),
                   maxWidth: columnWidth,
                   textAlign: 'right',
-                  fontSize: 12,
+                  fontSize: increaseFonts
+                    ? `${fontSize}px`
+                    : theme.mobileBudgetTableFontSize,
                 }}
               >
                 {format(value, type)}

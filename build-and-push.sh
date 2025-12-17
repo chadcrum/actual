@@ -1,0 +1,1 @@
+integration-chad/scripts/build-and-push.sh
