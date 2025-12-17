@@ -8,13 +8,20 @@ import { Tooltip } from '@actual-app/components/tooltip';
 import { View } from '@actual-app/components/view';
 import { css } from '@emotion/css';
 
+import { GoalTargetLabel } from './GoalTargetLabel';
+import { GoalTargetRow } from './GoalTargetRow';
+import { OverfundedLabel } from './OverfundedLabel';
+import { OverfundedRow } from './OverfundedRow';
 import { TotalsList } from './TotalsList';
+import { UnderfundedLabel } from './UnderfundedLabel';
+import { UnderfundedRow } from './UnderfundedRow';
 
 import {
   useEnvelopeSheetName,
   useEnvelopeSheetValue,
 } from '@desktop-client/components/budget/envelope/EnvelopeBudgetComponents';
 import { PrivacyFilter } from '@desktop-client/components/PrivacyFilter';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
 
@@ -44,6 +51,7 @@ export function ToBudgetAmount({
     value: 0,
   });
   const format = useFormat();
+  const isBudgetTooltipGoalsEnabled = useFeatureFlag('budget-tooltip-goals');
   const availableValue = sheetValue;
   if (typeof availableValue !== 'number' && availableValue !== null) {
     throw new Error(
@@ -65,6 +73,30 @@ export function ToBudgetAmount({
               style={{
                 padding: 7,
               }}
+              goalTargetRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <GoalTargetRow month={month} />
+                ) : undefined
+              }
+              goalTargetLabel={
+                isBudgetTooltipGoalsEnabled ? <GoalTargetLabel /> : undefined
+              }
+              underfundedRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <UnderfundedRow month={month} />
+                ) : undefined
+              }
+              underfundedLabel={
+                isBudgetTooltipGoalsEnabled ? <UnderfundedLabel /> : undefined
+              }
+              overfundedRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <OverfundedRow month={month} />
+                ) : undefined
+              }
+              overfundedLabel={
+                isBudgetTooltipGoalsEnabled ? <OverfundedLabel /> : undefined
+              }
             />
           }
           placement="bottom"

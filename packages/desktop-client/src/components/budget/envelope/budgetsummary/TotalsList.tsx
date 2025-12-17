@@ -1,4 +1,4 @@
-import React, { type CSSProperties } from 'react';
+import React, { type CSSProperties, type ReactNode } from 'react';
 import { Trans } from 'react-i18next';
 
 import { AlignedText } from '@actual-app/components/aligned-text';
@@ -10,57 +10,34 @@ import { View } from '@actual-app/components/view';
 
 import { EnvelopeCellValue } from '@desktop-client/components/budget/envelope/EnvelopeBudgetComponents';
 import { CellValueText } from '@desktop-client/components/spreadsheet/CellValue';
-import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
-import { useGoalTargetSum } from '@desktop-client/hooks/useGoalTargetSum';
 import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
 
 type TotalsListProps = {
   prevMonthName: string;
   month: string;
   style?: CSSProperties;
+  goalTargetRow?: ReactNode;
+  goalTargetLabel?: ReactNode;
+  underfundedRow?: ReactNode;
+  underfundedLabel?: ReactNode;
+  overfundedRow?: ReactNode;
+  overfundedLabel?: ReactNode;
 };
 
-function GoalTargetRow({ month }: { month: string }) {
+export function TotalsList({
+  prevMonthName,
+
+  month, // Required by interface for child components, but not used directly in this component
+  style,
+  goalTargetRow,
+  goalTargetLabel,
+  underfundedRow,
+  underfundedLabel,
+  overfundedRow,
+  overfundedLabel,
+}: TotalsListProps) {
   const format = useFormat();
-  const goalTargetSum = useGoalTargetSum(month);
-
-  return (
-    <>
-      <Block style={{ fontWeight: 600 }}>
-        {format(goalTargetSum, 'financial')}
-      </Block>
-      <View
-        style={{
-          borderTop: '1px solid ' + theme.tableBorder,
-          marginTop: 4,
-          marginBottom: 4,
-        }}
-      />
-    </>
-  );
-}
-
-function GoalTargetLabel() {
-  return (
-    <>
-      <Block>
-        <Trans>Goal Target</Trans>
-      </Block>
-      <View
-        style={{
-          borderTop: '1px solid ' + theme.tableBorder,
-          marginTop: 4,
-          marginBottom: 4,
-        }}
-      />
-    </>
-  );
-}
-
-export function TotalsList({ prevMonthName, month, style }: TotalsListProps) {
-  const format = useFormat();
-  const isBudgetTooltipGoalsEnabled = useFeatureFlag('budget-tooltip-goals');
   return (
     <View
       style={{
@@ -78,7 +55,9 @@ export function TotalsList({ prevMonthName, month, style }: TotalsListProps) {
           minWidth: 50,
         }}
       >
-        {isBudgetTooltipGoalsEnabled && <GoalTargetRow month={month} />}
+        {overfundedRow}
+        {underfundedRow}
+        {goalTargetRow}
         <Tooltip
           style={{ ...styles.tooltip, lineHeight: 1.5, padding: '6px 10px' }}
           content={
@@ -163,7 +142,9 @@ export function TotalsList({ prevMonthName, month, style }: TotalsListProps) {
       </View>
 
       <View>
-        {isBudgetTooltipGoalsEnabled && <GoalTargetLabel />}
+        {overfundedLabel}
+        {underfundedLabel}
+        {goalTargetLabel}
         <Block>
           <Trans>Available funds</Trans>
         </Block>

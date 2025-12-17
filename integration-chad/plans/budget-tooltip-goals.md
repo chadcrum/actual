@@ -1,9 +1,11 @@
 # Implementation Plan: Budget Tooltip Goals Feature
 
 ## Overview
+
 Add an experimental feature flag `budget-tooltip-goals` to enhance the "To Budget" tooltip on the budget page. The enhancement will add a "test" label with value "133" above the existing tooltip content, separated by a horizontal line.
 
 ## Scope
+
 - **Platforms**: Web client (desktop hover, mobile tap/click)
 - **Not included**: Electron version (as specified by user)
 
@@ -19,12 +21,14 @@ Add an experimental feature flag `budget-tooltip-goals` to enhance the "To Budge
 - [x] 6. Test the feature on mobile web (tap/click) - **COMPLETED** (Build succeeded)
 
 ### Commit Information
+
 - **Commit Hash**: `cff5db1ba4db677d0390a6f35924a49f6ae93eab`
 - **Branch**: `integration`
 - **Files Changed**: 4 files
 - **Lines Added**: 33 insertions (+1 deletion)
 
 ### Build Verification
+
 ✅ Browser backend build successful (22.36s)
 ✅ Web frontend build successful (65s)
 ✅ No compilation errors or TypeScript issues
@@ -32,6 +36,7 @@ Add an experimental feature flag `budget-tooltip-goals` to enhance the "To Budge
 ## Files to Modify
 
 ### 1. Add Feature Flag Definition
+
 **File**: `/home/chid/git/actual/packages/loot-core/src/types/prefs.ts`
 
 Add `'budget-tooltip-goals'` to the `FeatureFlag` union type (around line 10).
@@ -51,6 +56,7 @@ export type FeatureFlag =
 ```
 
 ### 2. Add Default Feature Flag State
+
 **File**: `/home/chid/git/actual/packages/desktop-client/src/hooks/useFeatureFlag.ts`
 
 Add `budget-tooltip-goals: false` to the `DEFAULT_FEATURE_FLAG_STATE` object (around line 14).
@@ -71,6 +77,7 @@ const DEFAULT_FEATURE_FLAG_STATE: Record<FeatureFlag, boolean> = {
 ```
 
 ### 3. Add UI Toggle in Settings
+
 **File**: `/home/chid/git/actual/packages/desktop-client/src/components/settings/Experimental.tsx`
 
 Add a new `FeatureToggle` component for the budget tooltip goals feature in the experimental features list (around line 182, before the `increaseMobileBudgetTableFontSize` toggle).
@@ -82,22 +89,26 @@ Add a new `FeatureToggle` component for the budget tooltip goals feature in the 
 ```
 
 ### 4. Enhance Tooltip Content
+
 **File**: `/home/chid/git/actual/packages/desktop-client/src/components/budget/envelope/budgetsummary/TotalsList.tsx`
 
 **Changes needed**:
 
 1. Add imports at the top (after line 7):
+
    ```tsx
    import { theme } from '@actual-app/components/theme';
    import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
    ```
 
 2. Inside the `TotalsList` component function (after line 21), add:
+
    ```tsx
    const isBudgetTooltipGoalsEnabled = useFeatureFlag('budget-tooltip-goals');
    ```
 
 3. In the **left column** (values column, at the beginning around line 38, before the Available funds Tooltip):
+
    ```tsx
    {isBudgetTooltipGoalsEnabled && (
      <>
@@ -130,11 +141,14 @@ Add a new `FeatureToggle` component for the budget tooltip goals feature in the 
 ## Implementation Details
 
 ### Tooltip Structure
+
 The tooltip currently has a two-column layout:
+
 - **Left column**: Values (right-aligned, bold)
 - **Right column**: Labels (left-aligned)
 
 The new structure when the flag is enabled:
+
 ```
 test                133
 ─────────────────────────
@@ -145,6 +159,7 @@ For next month        -0.00
 ```
 
 ### Styling Consistency
+
 - Match existing row spacing (lineHeight: 1.5)
 - Use `fontWeight: 600` for the value "133"
 - Use existing `Block` component for the label "test"
@@ -152,6 +167,7 @@ For next month        -0.00
 - Use `theme.tableBorder` for the separator line color
 
 ### Testing Considerations
+
 - Verify the feature flag toggle works in Settings > Experimental Features
 - Test on desktop (hover behavior)
 - Test on mobile web (tap/click behavior)
@@ -159,6 +175,7 @@ For next month        -0.00
 - Verify the tooltip still works when flag is disabled (no changes to existing behavior)
 
 ## Edge Cases
+
 - When feature flag is disabled, tooltip should show only the existing 4 rows (no changes)
 - The horizontal separator should only appear when the feature flag is enabled
 - Ensure proper spacing between the new row, separator, and existing rows

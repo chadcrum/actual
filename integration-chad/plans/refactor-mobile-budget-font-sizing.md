@@ -21,15 +21,19 @@ The `increaseMobileBudgetTableFontSize` feature (commit 6ae70465c) violates AGEN
 ## Approach
 
 ### Phase 1: Create Custom Hook (Seam)
+
 Create `packages/desktop-client/src/hooks/useMobileBudgetFontSize.ts` that encapsulates:
+
 - Feature flag check
 - Preference reading
 - Computed values for minFontSizePx, maxFontSizePx, fontSize styles
 
 ### Phase 2: Refactor Components
+
 Update the 7 mobile budget components to use the hook instead of inline logic.
 
 ### Phase 3: Clean Up
+
 - Remove agent log comments (`/* #region agent log */`)
 - Verify visual parity with before/after
 - Document changes in FORK_NOTES.md
@@ -82,6 +86,7 @@ export function useMobileBudgetFontSize(): FontSizingConfig {
 **File:** `packages/desktop-client/src/components/mobile/budget/BalanceCell.tsx`
 
 **Changes:**
+
 1. Remove `useFeatureFlag` and `useSyncedPref` imports for font sizing
 2. Add `import { useMobileBudgetFontSize }`
 3. Remove these lines:
@@ -107,6 +112,7 @@ export function useMobileBudgetFontSize(): FontSizingConfig {
    ```
 
 **Location of changes:**
+
 - Line ~50: Remove old hook calls
 - Line ~50: Add new hook call
 - Lines ~100-115: Update AutoTextSize properties in BalanceCell render
@@ -117,11 +123,13 @@ export function useMobileBudgetFontSize(): FontSizingConfig {
 **File:** `packages/desktop-client/src/components/mobile/budget/BudgetCell.tsx`
 
 Follow same pattern as BalanceCell.tsx:
+
 1. Replace useFeatureFlag/useSyncedPref with useMobileBudgetFontSize
 2. Update all AutoTextSize min/maxFontSizePx properties
 3. Update fontSize style property
 
 **Locations:**
+
 - Line ~50: Hook setup
 - Lines ~150-160: First AutoTextSize block
 
@@ -235,6 +243,7 @@ None - all changes are UI/presentation only in `@actual-app/web` (desktop-client
 After all changes:
 
 1. **Build verification:**
+
    ```bash
    npm run build
    ```
@@ -264,10 +273,12 @@ After all changes:
 ## File Checklist
 
 Files to create:
+
 - [ ] `packages/desktop-client/src/hooks/useMobileBudgetFontSize.ts`
 - [ ] `FORK_NOTES.md`
 
 Files to modify:
+
 - [ ] `packages/desktop-client/src/components/mobile/budget/BalanceCell.tsx`
 - [ ] `packages/desktop-client/src/components/mobile/budget/BudgetCell.tsx`
 - [ ] `packages/desktop-client/src/components/mobile/budget/BudgetTable.tsx` (also remove agent log comments)
@@ -277,6 +288,7 @@ Files to modify:
 - [ ] `packages/desktop-client/src/components/mobile/budget/SpentCell.tsx`
 
 Files NOT to modify (no changes needed):
+
 - `loot-core/src/types/prefs.ts` - Flag definition already correct
 - `packages/desktop-client/src/hooks/useFeatureFlag.ts` - Hook already correct
 - `packages/desktop-client/src/components/settings/Experimental.tsx` - UI already correct
@@ -296,6 +308,7 @@ Files NOT to modify (no changes needed):
 ## Rollback Plan
 
 If something breaks:
+
 1. Git diff against current commit to see what was changed
 2. Reset to current commit: `git reset --hard HEAD`
 3. Review this plan for what went wrong
@@ -303,6 +316,7 @@ If something breaks:
 ## Merge Impact
 
 After this refactor:
+
 - **Smaller conflict surface:** Font sizing changes consolidated to 1 hook instead of 7 files
 - **Easier upstream merges:** Only need to update hook if font sizing logic changes
 - **Better AGENTS alignment:** Single intentional seam instead of scattered edits

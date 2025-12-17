@@ -10,8 +10,14 @@ import {
 } from 'loot-core/shared/months';
 import { groupById } from 'loot-core/shared/util';
 
+import { GoalTargetLabel } from '@desktop-client/components/budget/envelope/budgetsummary/GoalTargetLabel';
+import { GoalTargetRow } from '@desktop-client/components/budget/envelope/budgetsummary/GoalTargetRow';
+import { OverfundedLabel } from '@desktop-client/components/budget/envelope/budgetsummary/OverfundedLabel';
+import { OverfundedRow } from '@desktop-client/components/budget/envelope/budgetsummary/OverfundedRow';
 import { ToBudgetAmount } from '@desktop-client/components/budget/envelope/budgetsummary/ToBudgetAmount';
 import { TotalsList } from '@desktop-client/components/budget/envelope/budgetsummary/TotalsList';
+import { UnderfundedLabel } from '@desktop-client/components/budget/envelope/budgetsummary/UnderfundedLabel';
+import { UnderfundedRow } from '@desktop-client/components/budget/envelope/budgetsummary/UnderfundedRow';
 import { useEnvelopeSheetValue } from '@desktop-client/components/budget/envelope/EnvelopeBudgetComponents';
 import {
   Modal,
@@ -19,6 +25,7 @@ import {
   ModalHeader,
 } from '@desktop-client/components/common/Modal';
 import { useCategories } from '@desktop-client/hooks/useCategories';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useLocale } from '@desktop-client/hooks/useLocale';
 import { SheetNameProvider } from '@desktop-client/hooks/useSheetName';
@@ -55,6 +62,7 @@ export function EnvelopeBudgetSummaryModal({
   const { showUndoNotification } = useUndo();
   const { list: categories } = useCategories();
   const categoriesById = groupById(categories);
+  const isBudgetTooltipGoalsEnabled = useFeatureFlag('budget-tooltip-goals');
 
   const openTransferAvailableModal = () => {
     dispatch(
@@ -171,6 +179,30 @@ export function EnvelopeBudgetSummaryModal({
               style={{
                 ...styles.mediumText,
               }}
+              goalTargetRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <GoalTargetRow month={month} />
+                ) : undefined
+              }
+              goalTargetLabel={
+                isBudgetTooltipGoalsEnabled ? <GoalTargetLabel /> : undefined
+              }
+              underfundedRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <UnderfundedRow month={month} />
+                ) : undefined
+              }
+              underfundedLabel={
+                isBudgetTooltipGoalsEnabled ? <UnderfundedLabel /> : undefined
+              }
+              overfundedRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <OverfundedRow month={month} />
+                ) : undefined
+              }
+              overfundedLabel={
+                isBudgetTooltipGoalsEnabled ? <OverfundedLabel /> : undefined
+              }
             />
             <ToBudgetAmount
               prevMonthName={prevMonthName}

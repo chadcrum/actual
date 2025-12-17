@@ -4,9 +4,9 @@ This document defines **rules and conventions for maintaining a private fork of 
 
 The goal is to:
 
-* Minimize merge conflicts
-* Keep upstream behavior as the default
-* Make customizations easy to reason about, remove, or upstream later
+- Minimize merge conflicts
+- Keep upstream behavior as the default
+- Make customizations easy to reason about, remove, or upstream later
 
 ---
 
@@ -33,14 +33,14 @@ The goal is to:
 
 ### Where Flags Live
 
-* **Source of truth:** `loot-core`
-* **UI consumption:** Redux slice + hooks in `@actual-app/web`
+- **Source of truth:** `loot-core`
+- **UI consumption:** Redux slice + hooks in `@actual-app/web`
 
 Flags must:
 
-* Default to `false`
-* Be centralized and documented
-* Sound temporary (e.g. `enableCustomToolbar`, not `toolbarV2`)
+- Default to `false`
+- Be centralized and documented
+- Sound temporary (e.g. `enableCustomToolbar`, not `toolbarV2`)
 
 ### Example
 
@@ -67,18 +67,18 @@ A **seam** is a deliberate location where custom behavior or UI can be injected 
 
 ### Mandatory Rules for Seams
 
-* **Seams must exist independently of feature flags**
-  Feature flags may enable or disable behavior *inside* a seam, but flags must not create or remove structural UI boundaries.
+- **Seams must exist independently of feature flags**
+  Feature flags may enable or disable behavior _inside_ a seam, but flags must not create or remove structural UI boundaries.
 
-* **Prefer high-level seams**
+- **Prefer high-level seams**
   Introduce seams at layout shells, responsive boundaries, or platform edges. Avoid adding seams deep inside leaf components unless upstream already uses the same pattern.
 
 ### Approved Seam Patterns
 
-* Layout-level extension components
-* Hook-based extensions (at layout/boundary level)
-* Context-based render injection (at layout/boundary level)
-* Responsive boundary components (`NarrowAlternate`, layout shells)
+- Layout-level extension components
+- Hook-based extensions (at layout/boundary level)
+- Context-based render injection (at layout/boundary level)
+- Responsive boundary components (`NarrowAlternate`, layout shells)
 
 ### Example
 
@@ -130,9 +130,9 @@ function CustomLayoutExtension() {
 
 Core logic changes must be:
 
-* Minimal
-* Additive
-* Flag-gated
+- Minimal
+- Additive
+- Flag-gated
 
 ### Good
 
@@ -159,8 +159,8 @@ Avoid branching entire systems.
 
 ## Platform-Specific Behavior
 
-* All platform differences must go through `global.Actual`
-* Never branch on Electron vs Browser directly in UI components
+- All platform differences must go through `global.Actual`
+- Never branch on Electron vs Browser directly in UI components
 
 ### Example
 
@@ -176,8 +176,8 @@ if (flag && Actual.platform === 'desktop') {
 
 Custom code must:
 
-* Live in a clearly named directory (e.g. `custom/`)
-* Follow existing lazy-loading patterns
+- Live in a clearly named directory (e.g. `custom/`)
+- Follow existing lazy-loading patterns
 
 ```ts
 const DesktopPanel = React.lazy(() => import('./custom/wide/Panel'));
@@ -192,9 +192,9 @@ This minimizes surface area affected by upstream refactors.
 
 Recommended branches:
 
-* `upstream/main` – untouched mirror of upstream
-* `custom/integration` – receives upstream merges
-* `custom/features` – custom work only
+- `upstream/main` – untouched mirror of upstream
+- `custom/integration` – receives upstream merges
+- `custom/features` – custom work only
 
 Merge upstream → integration → features.
 
@@ -204,12 +204,11 @@ Merge upstream → integration → features.
 
 Every fork must include:
 
-* This `AGENTS.md`
-* A `FORK_NOTES.md` describing:
-
-  * Added seams
-  * Added flags
-  * Rationale for core changes
+- This `AGENTS.md`
+- A `FORK_NOTES.md` describing:
+  - Added seams
+  - Added flags
+  - Rationale for core changes
 
 Document **why**, not just what.
 
@@ -219,10 +218,10 @@ Document **why**, not just what.
 
 Re-evaluate approach if:
 
-* The same files conflict every upstream merge
-* Feature flags stack deeply
-* Core logic is copied instead of extended
-* Removing a feature flag requires large UI refactors
+- The same files conflict every upstream merge
+- Feature flags stack deeply
+- Core logic is copied instead of extended
+- Removing a feature flag requires large UI refactors
 
 These indicate missing seams.
 
