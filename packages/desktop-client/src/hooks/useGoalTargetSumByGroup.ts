@@ -9,32 +9,37 @@ import { useSpreadsheet } from './useSpreadsheet';
 import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
 
 /**
- * Calculates the sum of all goal values for visible expense categories in the current month.
+ * Calculates the sum of all goal values for visible expense categories in a specific group for the current month.
  *
  * @param month The month string (e.g., "2024-01") to calculate goals for
- * @returns The total sum of goal values across all visible expense categories
+ * @param groupId The group ID to filter categories by
+ * @returns The total sum of goal values across all visible expense categories in the specified group
  */
-export function useGoalTargetSum(month: string): number {
+export function useGoalTargetSumByGroup(
+  month: string,
+  groupId: string,
+): number {
   const sheetName = monthUtils.sheetForMonth(month);
 
   const spreadsheet = useSpreadsheet();
   const categories = useCategories();
   const [showHiddenCategories] = useLocalPref('budget.showHiddenCategories');
 
-  // Calculate visible expense category IDs
+  // Calculate visible expense category IDs for the specified group
   const visibleCategoryIds = useMemo(() => {
     return categories.grouped
       .filter(group => !group.is_income) // Only expense groups
       .filter(group => showHiddenCategories || !group.hidden) // Filter hidden groups
+      .filter(group => group.id === groupId) // Filter by specific group ID
       .flatMap(group => group.categories || [])
       .filter(cat => showHiddenCategories || !cat.hidden) // Filter hidden categories
       .map(cat => cat.id);
-  }, [categories.grouped, showHiddenCategories]);
+  }, [categories.grouped, showHiddenCategories, groupId]);
 
-  // Track goal values for each visible category
+  // Track goal values for each visible category in the group
   const [goalValues, setGoalValues] = useState<Record<string, number>>({});
 
-  // Subscribe to goal values for all visible categories
+  // Subscribe to goal values for all visible categories in the group
   useEffect(() => {
     // If no sheet name or visible categories, skip subscriptions
     if (!sheetName || visibleCategoryIds.length === 0) {
@@ -119,7 +124,7 @@ export function useGoalTargetSum(month: string): number {
     return () => unbinds.forEach(unbind => unbind());
   }, [visibleCategoryIds, sheetName, spreadsheet, month]);
 
-  // Calculate total goal sum
+  // Calculate total goal sum for the group
   return useMemo(() => {
     return Object.values(goalValues).reduce((sum, val) => sum + val, 0);
   }, [goalValues]);

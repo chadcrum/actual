@@ -233,11 +233,15 @@ export type CategoryMonthProps = {
   onEdit: (id: CategoryEntity['id'] | null, month?: string) => void;
   onBudgetAction: (month: string, action: string, arg: unknown) => void;
   onShowActivity: (id: CategoryEntity['id'], month: string) => void;
+  goalColumn?: React.ReactNode;
+  underfundedColumn?: React.ReactNode;
 };
 
 export type CategoryGroupMonthProps = {
   month: string;
   group: CategoryGroupEntity;
+  goalColumn?: React.ReactNode;
+  underfundedColumn?: React.ReactNode;
 };
 
 export type BudgetComponents = {
@@ -246,7 +250,11 @@ export type BudgetComponents = {
   ExpenseGroupComponent: ComponentType<CategoryGroupMonthProps>;
   IncomeCategoryComponent: ComponentType<CategoryMonthProps>;
   IncomeGroupComponent: ComponentType<CategoryGroupMonthProps>;
-  BudgetTotalsComponent: ComponentType;
+  BudgetTotalsComponent: ComponentType<{
+    month: string;
+    goalColumn?: React.ReactNode;
+    underfundedColumn?: React.ReactNode;
+  }>;
   IncomeHeaderComponent: ComponentType;
 };
 

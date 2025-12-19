@@ -187,6 +187,9 @@ export function ExperimentalFeatures() {
             <FeatureToggle flag="budget-tooltip-goals">
               <Trans>Budget tooltip goals</Trans>
             </FeatureToggle>
+            <FeatureToggle flag="budget-detailed-view">
+              <Trans>Budget detailed view</Trans>
+            </FeatureToggle>
             <FeatureToggle flag="increaseMobileBudgetTableFontSize">
               <Trans>Increase mobile budget table font size</Trans>
             </FeatureToggle>

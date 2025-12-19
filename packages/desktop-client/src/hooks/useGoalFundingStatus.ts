@@ -232,7 +232,7 @@ export function useGoalFundingStatus(month: string): FundingStatus {
     });
 
     return () => unbinds.forEach(unbind => unbind());
-  }, [visibleCategoryIds, sheetName, spreadsheet]);
+  }, [visibleCategoryIds, sheetName, spreadsheet, month]);
 
   // Calculate underfunded and overfunded sums
   return useMemo(() => {

@@ -9,7 +9,8 @@ export type FeatureFlag =
   | 'forceReload'
   | 'increaseMobileBudgetTableFontSize'
   | 'budget-tooltip-goals'
-  | 'resetBudgetTemplates'; // NEW: Experimental reset template feature
+  | 'resetBudgetTemplates'
+  | 'budget-detailed-view';
 
 /**
  * Cross-device preferences. These sync across devices when they are changed.
@@ -51,7 +52,8 @@ export type SyncedPrefs = Partial<
     | `ofx-fallback-missing-payee-${string}`
     | `flip-amount-${string}-${'csv' | 'qif'}`
     | `flags.${FeatureFlag}`
-    | `learn-categories`,
+    | `learn-categories`
+    | 'budget.detailed-view-enabled',
     string
   >
 >;

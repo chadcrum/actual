@@ -9,6 +9,7 @@ import {
   type CategoryEntity,
 } from 'loot-core/types/models';
 
+import { BudgetMonthColumns } from './envelope/BudgetMonthColumns';
 import { RenderMonths } from './RenderMonths';
 import { SidebarCategory } from './SidebarCategory';
 
@@ -117,6 +118,22 @@ export function ExpenseCategory({
               onEdit={onEditMonth}
               onBudgetAction={onBudgetAction}
               onShowActivity={onShowActivity}
+              underfundedColumn={
+                <BudgetMonthColumns
+                  month={month}
+                  categoryId={cat.id}
+                  type="category"
+                  columnType="underfunded"
+                />
+              }
+              goalColumn={
+                <BudgetMonthColumns
+                  month={month}
+                  categoryId={cat.id}
+                  type="category"
+                  columnType="goal"
+                />
+              }
             />
           )}
         </RenderMonths>

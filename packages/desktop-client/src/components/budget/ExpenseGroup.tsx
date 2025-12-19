@@ -9,6 +9,7 @@ import {
   type CategoryGroupEntity,
 } from 'loot-core/types/models';
 
+import { BudgetMonthColumns } from './envelope/BudgetMonthColumns';
 import { RenderMonths } from './RenderMonths';
 import { SidebarGroup } from './SidebarGroup';
 
@@ -143,7 +144,28 @@ export function ExpenseGroup({
           onShowNewCategory={onShowNewCategory}
         />
         <RenderMonths>
-          {({ month }) => <MonthComponent month={month} group={group} />}
+          {({ month }) => (
+            <MonthComponent
+              month={month}
+              group={group}
+              underfundedColumn={
+                <BudgetMonthColumns
+                  month={month}
+                  groupId={group.id}
+                  type="group"
+                  columnType="underfunded"
+                />
+              }
+              goalColumn={
+                <BudgetMonthColumns
+                  month={month}
+                  groupId={group.id}
+                  type="group"
+                  columnType="goal"
+                />
+              }
+            />
+          )}
         </RenderMonths>
       </View>
     </Row>

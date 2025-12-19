@@ -30,6 +30,7 @@ import { NotesButton } from '@desktop-client/components/NotesButton';
 import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useLocale } from '@desktop-client/hooks/useLocale';
 import { SheetNameProvider } from '@desktop-client/hooks/useSheetName';
+import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 import { useUndo } from '@desktop-client/hooks/useUndo';
 
 type BudgetSummaryProps = {
@@ -48,6 +49,8 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
   const triggerRef = useRef(null);
   const { showUndoNotification } = useUndo();
   const isBudgetTooltipGoalsEnabled = useFeatureFlag('budget-tooltip-goals');
+  const [budgetDetailedViewEnabled, setBudgetDetailedViewEnabled] =
+    useSyncedPref('budget.detailed-view-enabled');
 
   function onMenuOpen() {
     setMenuOpen(true);
@@ -55,6 +58,12 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
 
   function onMenuClose() {
     setMenuOpen(false);
+  }
+
+  function onToggleBudgetDetailedView() {
+    setBudgetDetailedViewEnabled(
+      budgetDetailedViewEnabled === 'true' ? 'false' : 'true',
+    );
   }
 
   const prevMonthName = monthUtils.format(
@@ -260,6 +269,10 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
                       ),
                     });
                   }}
+                  budgetDetailedViewEnabled={
+                    budgetDetailedViewEnabled === 'true'
+                  }
+                  onToggleBudgetDetailedView={onToggleBudgetDetailedView}
                 />
               </Popover>
             </View>

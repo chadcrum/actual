@@ -14,6 +14,7 @@ import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
+import { BudgetMonthColumns } from './envelope/BudgetMonthColumns';
 import { RenderMonths } from './RenderMonths';
 import { getScrollbarWidth } from './util';
 
@@ -180,7 +181,25 @@ export const BudgetTotals = memo(function BudgetTotals({
         </Popover>
       </View>
       <RenderMonths>
-        <MonthComponent />
+        {({ month }) => (
+          <MonthComponent
+            month={month}
+            underfundedColumn={
+              <BudgetMonthColumns
+                month={month}
+                type="header"
+                columnType="underfunded"
+              />
+            }
+            goalColumn={
+              <BudgetMonthColumns
+                month={month}
+                type="header"
+                columnType="goal"
+              />
+            }
+          />
+        )}
       </RenderMonths>
     </View>
   );

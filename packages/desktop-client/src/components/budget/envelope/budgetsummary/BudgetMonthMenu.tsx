@@ -1,6 +1,7 @@
 import React, { type ComponentPropsWithoutRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { Menu } from '@actual-app/components/menu';
 
 import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
@@ -16,7 +17,9 @@ type BudgetMonthMenuProps = Omit<
   onApplyBudgetTemplates: () => void;
   onOverwriteWithBudgetTemplates: () => void;
   onEndOfMonthCleanup: () => void;
-  onResetBudgetTemplates: () => void; // NEW
+  onResetBudgetTemplates: () => void;
+  budgetDetailedViewEnabled?: boolean;
+  onToggleBudgetDetailedView?: () => void;
 };
 export function BudgetMonthMenu({
   onCopyLastMonthBudget,
@@ -26,13 +29,17 @@ export function BudgetMonthMenu({
   onApplyBudgetTemplates,
   onOverwriteWithBudgetTemplates,
   onEndOfMonthCleanup,
-  onResetBudgetTemplates, // NEW
+  onResetBudgetTemplates,
+  budgetDetailedViewEnabled,
+  onToggleBudgetDetailedView,
   ...props
 }: BudgetMonthMenuProps) {
   const { t } = useTranslation();
+  const { isNarrowWidth } = useResponsive();
 
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
-  const isResetTemplatesEnabled = useFeatureFlag('resetBudgetTemplates'); // NEW
+  const isResetTemplatesEnabled = useFeatureFlag('resetBudgetTemplates');
+  const isBudgetDetailedViewEnabled = useFeatureFlag('budget-detailed-view');
   return (
     <Menu
       {...props}
@@ -67,7 +74,10 @@ export function BudgetMonthMenu({
             break;
           case 'reset-templates-for-month':
             onResetBudgetTemplates();
-            break; // NEW
+            break;
+          case 'toggle-detailed-view':
+            onToggleBudgetDetailedView?.();
+            break;
         }
       }}
       items={[
@@ -111,6 +121,15 @@ export function BudgetMonthMenu({
                     },
                   ]
                 : []), // NEW: Nested flag check
+            ]
+          : []),
+        ...(isBudgetDetailedViewEnabled && !isNarrowWidth
+          ? [
+              {
+                name: 'toggle-detailed-view',
+                text: t('Detailed view'),
+                toggle: budgetDetailedViewEnabled,
+              },
             ]
           : []),
       ]}
