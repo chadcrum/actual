@@ -9,7 +9,6 @@ import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
 type CategoryFundingData = {
   goal: number;
   budgeted: number;
-  balance: number;
   longGoal: number;
 };
 
@@ -31,7 +30,6 @@ export function useUnderfundedAmount(
   const [categoryData, setCategoryData] = useState<CategoryFundingData>({
     goal: 0,
     budgeted: 0,
-    balance: 0,
     longGoal: 0,
   });
 
@@ -41,7 +39,6 @@ export function useUnderfundedAmount(
       setCategoryData({
         goal: 0,
         budgeted: 0,
-        balance: 0,
         longGoal: 0,
       });
       return;
@@ -85,20 +82,6 @@ export function useUnderfundedAmount(
       ),
     );
 
-    // Subscribe to balance
-    unbinds.push(
-      spreadsheet.bind(
-        sheetName,
-        envelopeBudget.catBalance(categoryId),
-        result => {
-          setCategoryData(prev => ({
-            ...prev,
-            balance: typeof result.value === 'number' ? result.value : 0,
-          }));
-        },
-      ),
-    );
-
     // Subscribe to longGoal
     unbinds.push(
       spreadsheet.bind(
@@ -118,18 +101,15 @@ export function useUnderfundedAmount(
 
   // Calculate underfunded amount
   return useMemo(() => {
-    const { goal, budgeted, balance, longGoal } = categoryData;
+    const { goal, budgeted } = categoryData;
 
     // If goal is 0, return 0 (no goal = not underfunded)
     if (goal === 0) {
       return 0;
     }
 
-    // Calculate difference based on goal type
-    const difference =
-      longGoal === 1
-        ? balance - goal // Long-term goals: compare balance
-        : budgeted - goal; // Template goals: compare budgeted
+    // Calculate difference: budgeted vs goal (same for all goal types)
+    const difference = budgeted - goal;
 
     // If difference < 0: return absolute value of shortfall
     // Otherwise: return 0
