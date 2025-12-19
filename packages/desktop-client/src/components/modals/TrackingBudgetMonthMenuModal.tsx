@@ -216,6 +216,16 @@ export function TrackingBudgetMonthMenuModal({
                     ),
                   });
                 }}
+                onResetBudgetTemplates={() => {
+                  onBudgetAction(month, 'reset-templates-for-month');
+                  close();
+                  showUndoNotification({
+                    message: t(
+                      '{{displayMonth}} budget templates have been reset to zero.',
+                      { displayMonth },
+                    ),
+                  });
+                }}
               />
             )}
           </View>

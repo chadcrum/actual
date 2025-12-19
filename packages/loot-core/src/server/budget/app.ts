@@ -16,6 +16,7 @@ import * as actions from './actions';
 import * as budget from './base';
 import * as cleanupActions from './cleanup-template';
 import * as goalActions from './goal-template';
+import * as resetTemplateActions from './reset-goal-template';
 import * as goalNoteActions from './template-notes';
 
 export interface BudgetHandlers {
@@ -33,6 +34,8 @@ export interface BudgetHandlers {
   'budget/overwrite-goal-template': typeof goalActions.overwriteTemplate;
   'budget/apply-single-template': typeof goalActions.applySingleCategoryTemplate;
   'budget/cleanup-goal-template': typeof cleanupActions.cleanupTemplate;
+  'budget/reset-templates-for-month': typeof resetTemplateActions.resetTemplatesForMonth; // NEW
+  'budget/reset-single-category-template': typeof resetTemplateActions.resetSingleCategoryTemplate; // NEW
   'budget/hold-for-next-month': typeof actions.holdForNextMonth;
   'budget/reset-hold': typeof actions.resetHold;
   'budget/cover-overspending': typeof actions.coverOverspending;
@@ -101,6 +104,14 @@ app.method(
   'budget/cleanup-goal-template',
   mutator(undoable(cleanupActions.cleanupTemplate)),
 );
+app.method(
+  'budget/reset-templates-for-month',
+  mutator(undoable(resetTemplateActions.resetTemplatesForMonth)),
+); // NEW
+app.method(
+  'budget/reset-single-category-template',
+  mutator(undoable(resetTemplateActions.resetSingleCategoryTemplate)),
+); // NEW
 app.method(
   'budget/hold-for-next-month',
   mutator(undoable(actions.holdForNextMonth)),

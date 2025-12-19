@@ -67,7 +67,10 @@ export function useGoalTargetSum(month: string): number {
                 if (existing === undefined || existing === 0) {
                   return {
                     ...prev,
-                    [categoryId]: typeof prevResult.value === 'number' ? prevResult.value : 0,
+                    [categoryId]:
+                      typeof prevResult.value === 'number'
+                        ? prevResult.value
+                        : 0,
                   };
                 }
                 return prev;
@@ -88,7 +91,10 @@ export function useGoalTargetSum(month: string): number {
               // Use current month's goal if not null, otherwise keep fallback value (or 0)
               if (typeof result.value === 'number') {
                 updated[categoryId] = result.value;
-              } else if (result.value === null && prev[categoryId] === undefined) {
+              } else if (
+                result.value === null &&
+                prev[categoryId] === undefined
+              ) {
                 // If null and no previous value, use 0
                 updated[categoryId] = 0;
               }

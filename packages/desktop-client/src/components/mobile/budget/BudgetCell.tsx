@@ -103,6 +103,14 @@ export function BudgetCell<
                 pre: categoryNotes ?? undefined,
               });
             },
+            onResetBudgetTemplate: () => {
+              onBudgetAction(month, 'reset-single-category-template', {
+                category: category.id,
+              });
+              showUndoNotification({
+                message: `${category.name} template has been reset to zero.`,
+              });
+            },
           },
         },
       }),

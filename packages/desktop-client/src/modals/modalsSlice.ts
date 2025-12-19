@@ -303,6 +303,7 @@ export type Modal =
         onCopyLastMonthAverage: () => void;
         onSetMonthsAverage: (numberOfMonths: number) => void;
         onApplyBudgetTemplate: () => void;
+        onResetBudgetTemplate: () => void; // NEW
       };
     }
   | {
@@ -314,6 +315,7 @@ export type Modal =
         onCopyLastMonthAverage: () => void;
         onSetMonthsAverage: (numberOfMonths: number) => void;
         onApplyBudgetTemplate: () => void;
+        onResetBudgetTemplate: () => void; // NEW
       };
     }
   | {

@@ -8,7 +8,8 @@ export type FeatureFlag =
   | 'plugins'
   | 'forceReload'
   | 'increaseMobileBudgetTableFontSize'
-  | 'budget-tooltip-goals';
+  | 'budget-tooltip-goals'
+  | 'resetBudgetTemplates'; // NEW: Experimental reset template feature
 
 /**
  * Cross-device preferences. These sync across devices when they are changed.

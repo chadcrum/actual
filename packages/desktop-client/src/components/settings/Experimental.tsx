@@ -144,10 +144,15 @@ export function ExperimentalFeatures() {
             <FeatureToggle flag="goalTemplatesEnabled">
               <Trans>Goal templates</Trans>
             </FeatureToggle>
-            {showGoalTemplatesUI && (
+            {goalTemplatesEnabled && (
               <View style={{ paddingLeft: 22 }}>
-                <FeatureToggle flag="goalTemplatesUIEnabled">
-                  <Trans>Subfeature: Budget automations UI</Trans>
+                {showGoalTemplatesUI && (
+                  <FeatureToggle flag="goalTemplatesUIEnabled">
+                    <Trans>Subfeature: Budget automations UI</Trans>
+                  </FeatureToggle>
+                )}
+                <FeatureToggle flag="resetBudgetTemplates">
+                  <Trans>Subfeature: Reset budget templates</Trans>
                 </FeatureToggle>
               </View>
             )}

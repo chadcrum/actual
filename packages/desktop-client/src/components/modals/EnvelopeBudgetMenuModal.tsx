@@ -33,6 +33,7 @@ export function EnvelopeBudgetMenuModal({
   onCopyLastMonthAverage,
   onSetMonthsAverage,
   onApplyBudgetTemplate,
+  onResetBudgetTemplate,
 }: EnvelopeBudgetMenuModalProps) {
   const defaultMenuItemStyle: CSSProperties = {
     ...styles.mobileMenuItem,
@@ -110,6 +111,7 @@ export function EnvelopeBudgetMenuModal({
             onCopyLastMonthAverage={onCopyLastMonthAverage}
             onSetMonthsAverage={onSetMonthsAverage}
             onApplyBudgetTemplate={onApplyBudgetTemplate}
+            onResetBudgetTemplate={onResetBudgetTemplate}
           />
         </>
       )}

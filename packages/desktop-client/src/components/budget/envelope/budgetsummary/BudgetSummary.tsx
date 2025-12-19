@@ -250,6 +250,16 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
                       ),
                     });
                   }}
+                  onResetBudgetTemplates={() => {
+                    onBudgetAction(month, 'reset-templates-for-month');
+                    onMenuClose();
+                    showUndoNotification({
+                      message: t(
+                        '{{displayMonth}} budget templates have been reset to zero.',
+                        { displayMonth },
+                      ),
+                    });
+                  }}
                 />
               </Popover>
             </View>

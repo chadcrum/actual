@@ -89,7 +89,10 @@ export function useGoalFundingStatus(month: string): FundingStatus {
                     ...prev,
                     [categoryId]: {
                       ...prev[categoryId],
-                      goal: typeof prevResult.value === 'number' ? prevResult.value : 0,
+                      goal:
+                        typeof prevResult.value === 'number'
+                          ? prevResult.value
+                          : 0,
                       budgeted: prev[categoryId]?.budgeted ?? 0,
                       balance: prev[categoryId]?.balance ?? 0,
                       longGoal: prev[categoryId]?.longGoal ?? 0,
@@ -113,7 +116,10 @@ export function useGoalFundingStatus(month: string): FundingStatus {
               ...prev,
               [categoryId]: {
                 ...prev[categoryId],
-                goal: typeof result.value === 'number' ? result.value : (prev[categoryId]?.goal ?? 0),
+                goal:
+                  typeof result.value === 'number'
+                    ? result.value
+                    : (prev[categoryId]?.goal ?? 0),
                 budgeted: prev[categoryId]?.budgeted ?? 0,
                 balance: prev[categoryId]?.balance ?? 0,
                 longGoal: prev[categoryId]?.longGoal ?? 0,
@@ -177,7 +183,10 @@ export function useGoalFundingStatus(month: string): FundingStatus {
                       goal: prev[categoryId]?.goal ?? 0,
                       budgeted: prev[categoryId]?.budgeted ?? 0,
                       balance: prev[categoryId]?.balance ?? 0,
-                      longGoal: typeof prevResult.value === 'number' ? prevResult.value : 0,
+                      longGoal:
+                        typeof prevResult.value === 'number'
+                          ? prevResult.value
+                          : 0,
                     },
                   };
                 }
@@ -200,7 +209,10 @@ export function useGoalFundingStatus(month: string): FundingStatus {
                 goal: prev[categoryId]?.goal ?? 0,
                 budgeted: prev[categoryId]?.budgeted ?? 0,
                 balance: prev[categoryId]?.balance ?? 0,
-                longGoal: typeof result.value === 'number' ? result.value : (prev[categoryId]?.longGoal ?? 0),
+                longGoal:
+                  typeof result.value === 'number'
+                    ? result.value
+                    : (prev[categoryId]?.longGoal ?? 0),
               },
             }));
           },

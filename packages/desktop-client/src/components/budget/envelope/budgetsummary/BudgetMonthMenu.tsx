@@ -16,6 +16,7 @@ type BudgetMonthMenuProps = Omit<
   onApplyBudgetTemplates: () => void;
   onOverwriteWithBudgetTemplates: () => void;
   onEndOfMonthCleanup: () => void;
+  onResetBudgetTemplates: () => void; // NEW
 };
 export function BudgetMonthMenu({
   onCopyLastMonthBudget,
@@ -25,11 +26,13 @@ export function BudgetMonthMenu({
   onApplyBudgetTemplates,
   onOverwriteWithBudgetTemplates,
   onEndOfMonthCleanup,
+  onResetBudgetTemplates, // NEW
   ...props
 }: BudgetMonthMenuProps) {
   const { t } = useTranslation();
 
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
+  const isResetTemplatesEnabled = useFeatureFlag('resetBudgetTemplates'); // NEW
   return (
     <Menu
       {...props}
@@ -62,6 +65,9 @@ export function BudgetMonthMenu({
           case 'cleanup-goal-template':
             onEndOfMonthCleanup();
             break;
+          case 'reset-templates-for-month':
+            onResetBudgetTemplates();
+            break; // NEW
         }
       }}
       items={[
@@ -97,6 +103,14 @@ export function BudgetMonthMenu({
                 name: 'cleanup-goal-template',
                 text: t('End of month cleanup'),
               },
+              ...(isResetTemplatesEnabled
+                ? [
+                    {
+                      name: 'reset-templates-for-month',
+                      text: t('Reset budget template'),
+                    },
+                  ]
+                : []), // NEW: Nested flag check
             ]
           : []),
       ]}

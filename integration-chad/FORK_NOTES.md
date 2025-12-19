@@ -275,6 +275,40 @@ When merging upstream commits:
 
 ---
 
+## Reset Budget Templates Feature
+
+**Flag:** `resetBudgetTemplates` (experimental)
+
+**Status:** ✅ Complete implementation
+
+**Purpose:** Allow users to reset/unapply budget templates for a specific month without removing template definitions.
+
+**Added:** Dec 19, 2025
+
+**Seams Added:**
+
+- Month menu items (nested within goalTemplatesEnabled check)
+- Category menu items (nested within goalTemplatesEnabled check)
+
+**Core Logic:**
+
+- `resetTemplatesForMonth()` - Clears goal state for all templated categories in a month
+- `resetSingleCategoryTemplate()` - Clears goal state for single category in a month
+- API endpoints: `budget/reset-templates-for-month`, `budget/reset-single-category-template`
+
+**Files Modified** (additive changes only):
+
+- Feature flag: `prefs.ts`, `useFeatureFlag.ts`
+- Backend: `reset-goal-template.ts` (new), `goal-template.ts` (cleanup), `app.ts`
+- Redux: `budgetSlice.ts`
+- UI: 4 menu components + 4 parent components (envelope/tracking × month/category)
+
+**Rationale:** Users frequently need to "undo" template applications without losing their template definitions. Previously required manually removing `#template` from notes, re-applying, then adding back.
+
+**Removability:** Clean (search for `// NEW` comments and remove, plus feature flag)
+
+---
+
 ## Appendix: Alignment with AGENTS Principles
 
 | Principle                               | Status | Notes                                                               |
