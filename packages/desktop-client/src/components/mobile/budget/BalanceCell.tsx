@@ -85,11 +85,12 @@ export function BalanceCell({
       longGoal={longGoal}
       CarryoverIndicator={MobileCarryoverIndicator}
     >
-      {({ type, value, className: defaultClassName }) => (
+      {({ type, value, className: defaultClassName, pillStyle }) => (
         <Button
           variant="bare"
           style={{
             ...PILL_STYLE,
+            ...(pillStyle || {}),
             maxWidth: columnWidth,
           }}
           onPress={onPress}
@@ -103,8 +104,9 @@ export function BalanceCell({
               maxFontSizePx={increaseFonts ? parseInt(fontSize) : 12}
               mode="oneline"
               className={cx(
-                defaultClassName,
+                !pillStyle && defaultClassName,
                 css({
+                  ...(pillStyle && { color: pillStyle.color }),
                   maxWidth: columnWidth,
                   textAlign: 'right',
                   fontSize: increaseFonts

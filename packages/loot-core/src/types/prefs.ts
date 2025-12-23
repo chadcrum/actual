@@ -10,7 +10,8 @@ export type FeatureFlag =
   | 'increaseMobileBudgetTableFontSize'
   | 'budget-tooltip-goals'
   | 'resetBudgetTemplates'
-  | 'budget-detailed-view';
+  | 'budget-detailed-view'
+  | 'ynabStyleMobilePills';
 
 /**
  * Cross-device preferences. These sync across devices when they are changed.

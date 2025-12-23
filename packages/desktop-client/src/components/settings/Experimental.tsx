@@ -218,6 +218,9 @@ export function ExperimentalFeatures() {
                 </View>
               </View>
             )}
+            <FeatureToggle flag="ynabStyleMobilePills">
+              <Trans>YNAB-style pill styling (mobile budget)</Trans>
+            </FeatureToggle>
             <GlobalFeatureToggle
               prefName="plugins"
               disableToggle={true}

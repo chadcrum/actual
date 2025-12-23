@@ -75,7 +75,16 @@ function ToBudget({ toBudget, onPress, show3Columns }: ToBudgetProps) {
   const format = useFormat();
   const sidebarColumnWidth = getColumnWidth({ show3Columns, isSidebar: true });
   const increaseFonts = useFeatureFlag('increaseMobileBudgetTableFontSize');
+  const ynabPillsEnabled = useFeatureFlag('ynabStyleMobilePills');
   const [fontSize = '14'] = useSyncedPref('mobileBudgetTableFontSize');
+
+  const pillBackgroundColor = ynabPillsEnabled
+    ? amount < 0
+      ? theme.errorText
+      : amount > 0
+        ? theme.noticeText
+        : theme.pillBackgroundLight
+    : undefined;
 
   return (
     <View
@@ -105,7 +114,16 @@ function ToBudget({ toBudget, onPress, show3Columns }: ToBudgetProps) {
           </View>
           <CellValue binding={toBudget} type="financial">
             {({ type, value }) => (
-              <View>
+              <View
+                style={{
+                  ...(ynabPillsEnabled && {
+                    backgroundColor: pillBackgroundColor,
+                    borderRadius: 8,
+                    padding: '4px 12px',
+                    display: 'inline-block',
+                  })
+                }}
+              >
                 <PrivacyFilter>
                   <AutoTextSize
                     key={value}
@@ -118,8 +136,11 @@ function ToBudget({ toBudget, onPress, show3Columns }: ToBudgetProps) {
                         ? `${fontSize}px`
                         : theme.mobileBudgetTableFontSize,
                       fontWeight: '700',
-                      color:
-                        amount < 0
+                      color: ynabPillsEnabled
+                        ? amount === 0
+                          ? '#fff'
+                          : '#000'
+                        : amount < 0
                           ? theme.errorText
                           : amount > 0
                             ? theme.noticeText

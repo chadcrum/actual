@@ -80,12 +80,40 @@ export function makeBalanceAmountStyle(
     if (greyed) {
       return greyed;
     }
+    // Positive balance without template also shows as green
+    if (value > 0) {
+      return { color: theme.noticeText };
+    }
   } else {
     if (budgetedValue < goalValue) {
       return { color: theme.warningText };
     }
     return { color: theme.noticeText };
   }
+}
+
+export function makePillStyleFromTextColor(
+  textColorStyle: CSSProperties | undefined,
+  isLargePill: boolean = false,
+): CSSProperties | undefined {
+  if (!textColorStyle?.color) {
+    // Use light grey for amounts with no color (defaults) with white text
+    return {
+      backgroundColor: theme.pillBackgroundLight || theme.tableTextSubdued,
+      color: '#fff',
+      borderRadius: isLargePill ? 8 : 12,
+      padding: isLargePill ? '4px 12px' : '2px 8px',
+      display: 'inline-block',
+    };
+  }
+
+  return {
+    backgroundColor: textColorStyle.color,
+    color: '#000',
+    borderRadius: isLargePill ? 8 : 12,
+    padding: isLargePill ? '4px 12px' : '2px 8px',
+    display: 'inline-block',
+  };
 }
 
 export function makeAmountFullStyle(
