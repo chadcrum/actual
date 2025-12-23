@@ -144,10 +144,15 @@ export function ExperimentalFeatures() {
             <FeatureToggle flag="goalTemplatesEnabled">
               <Trans>Goal templates</Trans>
             </FeatureToggle>
-            {showGoalTemplatesUI && (
+            {goalTemplatesEnabled && (
               <View style={{ paddingLeft: 22 }}>
-                <FeatureToggle flag="goalTemplatesUIEnabled">
-                  <Trans>Subfeature: Budget automations UI</Trans>
+                {showGoalTemplatesUI && (
+                  <FeatureToggle flag="goalTemplatesUIEnabled">
+                    <Trans>Subfeature: Budget automations UI</Trans>
+                  </FeatureToggle>
+                )}
+                <FeatureToggle flag="resetBudgetTemplates">
+                  <Trans>Subfeature: Reset budget templates</Trans>
                 </FeatureToggle>
               </View>
             )}
@@ -182,6 +187,9 @@ export function ExperimentalFeatures() {
             <FeatureToggle flag="budget-tooltip-goals">
               <Trans>Budget tooltip goals</Trans>
             </FeatureToggle>
+            <FeatureToggle flag="budget-detailed-view">
+              <Trans>Budget detailed view</Trans>
+            </FeatureToggle>
             <FeatureToggle flag="increaseMobileBudgetTableFontSize">
               <Trans>Increase mobile budget table font size</Trans>
             </FeatureToggle>
@@ -210,6 +218,9 @@ export function ExperimentalFeatures() {
                 </View>
               </View>
             )}
+            <FeatureToggle flag="ynabStyleMobilePills">
+              <Trans>YNAB-style pill styling (mobile budget)</Trans>
+            </FeatureToggle>
             <GlobalFeatureToggle
               prefName="plugins"
               disableToggle={true}

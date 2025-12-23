@@ -317,6 +317,18 @@ type ApplyBudgetActionPayload =
       args: never;
     }
   | {
+      type: 'reset-templates-for-month';
+      month: string;
+      args: never;
+    } // NEW
+  | {
+      type: 'reset-single-category-template';
+      month: string;
+      args: {
+        category: CategoryEntity['id'];
+      };
+    } // NEW
+  | {
       type: 'hold';
       month: string;
       args: {
@@ -487,6 +499,25 @@ export const applyBudgetAction = createAppAsyncThunk(
           }),
         );
         break;
+      case 'reset-templates-for-month':
+        dispatch(
+          addNotification({
+            notification: await send('budget/reset-templates-for-month', {
+              month,
+            }),
+          }),
+        );
+        break; // NEW
+      case 'reset-single-category-template':
+        dispatch(
+          addNotification({
+            notification: await send('budget/reset-single-category-template', {
+              month,
+              category: args.category,
+            }),
+          }),
+        );
+        break; // NEW
       case 'hold':
         await send('budget/hold-for-next-month', {
           month,

@@ -33,6 +33,7 @@ export function TrackingBudgetMenuModal({
   onCopyLastMonthAverage,
   onSetMonthsAverage,
   onApplyBudgetTemplate,
+  onResetBudgetTemplate,
 }: TrackingBudgetMenuModalProps) {
   const defaultMenuItemStyle: CSSProperties = {
     ...styles.mobileMenuItem,
@@ -110,6 +111,7 @@ export function TrackingBudgetMenuModal({
             onCopyLastMonthAverage={onCopyLastMonthAverage}
             onSetMonthsAverage={onSetMonthsAverage}
             onApplyBudgetTemplate={onApplyBudgetTemplate}
+            onResetBudgetTemplate={onResetBudgetTemplate}
           />
         </>
       )}

@@ -11,7 +11,6 @@ import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
 type CategoryFundingData = {
   goal: number;
   budgeted: number;
-  balance: number;
   longGoal: number;
 };
 
@@ -89,9 +88,11 @@ export function useGoalFundingStatus(month: string): FundingStatus {
                     ...prev,
                     [categoryId]: {
                       ...prev[categoryId],
-                      goal: typeof prevResult.value === 'number' ? prevResult.value : 0,
+                      goal:
+                        typeof prevResult.value === 'number'
+                          ? prevResult.value
+                          : 0,
                       budgeted: prev[categoryId]?.budgeted ?? 0,
-                      balance: prev[categoryId]?.balance ?? 0,
                       longGoal: prev[categoryId]?.longGoal ?? 0,
                     },
                   };
@@ -113,9 +114,11 @@ export function useGoalFundingStatus(month: string): FundingStatus {
               ...prev,
               [categoryId]: {
                 ...prev[categoryId],
-                goal: typeof result.value === 'number' ? result.value : (prev[categoryId]?.goal ?? 0),
+                goal:
+                  typeof result.value === 'number'
+                    ? result.value
+                    : (prev[categoryId]?.goal ?? 0),
                 budgeted: prev[categoryId]?.budgeted ?? 0,
-                balance: prev[categoryId]?.balance ?? 0,
                 longGoal: prev[categoryId]?.longGoal ?? 0,
               },
             }));
@@ -134,26 +137,6 @@ export function useGoalFundingStatus(month: string): FundingStatus {
               [categoryId]: {
                 goal: prev[categoryId]?.goal ?? 0,
                 budgeted: typeof result.value === 'number' ? result.value : 0,
-                balance: prev[categoryId]?.balance ?? 0,
-                longGoal: prev[categoryId]?.longGoal ?? 0,
-              },
-            }));
-          },
-        ),
-      );
-
-      // Subscribe to balance
-      unbinds.push(
-        spreadsheet.bind(
-          sheetName,
-          envelopeBudget.catBalance(categoryId),
-          result => {
-            setCategoryData(prev => ({
-              ...prev,
-              [categoryId]: {
-                goal: prev[categoryId]?.goal ?? 0,
-                budgeted: prev[categoryId]?.budgeted ?? 0,
-                balance: typeof result.value === 'number' ? result.value : 0,
                 longGoal: prev[categoryId]?.longGoal ?? 0,
               },
             }));
@@ -176,8 +159,10 @@ export function useGoalFundingStatus(month: string): FundingStatus {
                     [categoryId]: {
                       goal: prev[categoryId]?.goal ?? 0,
                       budgeted: prev[categoryId]?.budgeted ?? 0,
-                      balance: prev[categoryId]?.balance ?? 0,
-                      longGoal: typeof prevResult.value === 'number' ? prevResult.value : 0,
+                      longGoal:
+                        typeof prevResult.value === 'number'
+                          ? prevResult.value
+                          : 0,
                     },
                   };
                 }
@@ -199,8 +184,10 @@ export function useGoalFundingStatus(month: string): FundingStatus {
               [categoryId]: {
                 goal: prev[categoryId]?.goal ?? 0,
                 budgeted: prev[categoryId]?.budgeted ?? 0,
-                balance: prev[categoryId]?.balance ?? 0,
-                longGoal: typeof result.value === 'number' ? result.value : (prev[categoryId]?.longGoal ?? 0),
+                longGoal:
+                  typeof result.value === 'number'
+                    ? result.value
+                    : (prev[categoryId]?.longGoal ?? 0),
               },
             }));
           },
@@ -220,7 +207,7 @@ export function useGoalFundingStatus(month: string): FundingStatus {
     });
 
     return () => unbinds.forEach(unbind => unbind());
-  }, [visibleCategoryIds, sheetName, spreadsheet]);
+  }, [visibleCategoryIds, sheetName, spreadsheet, month]);
 
   // Calculate underfunded and overfunded sums
   return useMemo(() => {
@@ -230,11 +217,8 @@ export function useGoalFundingStatus(month: string): FundingStatus {
     Object.values(categoryData).forEach(data => {
       // Only process categories with goals set
       if (data.goal > 0) {
-        // Calculate difference based on goal type (same logic as BalanceWithCarryover)
-        const difference =
-          data.longGoal === 1
-            ? data.balance - data.goal // Long-term goals: compare balance
-            : data.budgeted - data.goal; // Template goals: compare budgeted
+        // Calculate difference: budgeted vs goal (same for all goal types)
+        const difference = data.budgeted - data.goal;
 
         if (difference < 0) {
           // Underfunded: add absolute value of shortfall

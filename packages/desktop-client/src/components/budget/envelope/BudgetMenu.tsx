@@ -12,16 +12,19 @@ type BudgetMenuProps = Omit<
   onCopyLastMonthAverage: () => void;
   onSetMonthsAverage: (numberOfMonths: number) => void;
   onApplyBudgetTemplate: () => void;
+  onResetBudgetTemplate: () => void; // NEW
 };
 export function BudgetMenu({
   onCopyLastMonthAverage,
   onSetMonthsAverage,
   onApplyBudgetTemplate,
+  onResetBudgetTemplate, // NEW
   ...props
 }: BudgetMenuProps) {
   const { t } = useTranslation();
 
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
+  const isResetTemplatesEnabled = useFeatureFlag('resetBudgetTemplates'); // NEW
   const onMenuSelect = (name: string) => {
     switch (name) {
       case 'copy-single-last':
@@ -39,6 +42,9 @@ export function BudgetMenu({
       case 'apply-single-category-template':
         onApplyBudgetTemplate?.();
         break;
+      case 'reset-single-category-template':
+        onResetBudgetTemplate?.();
+        break; // NEW
       default:
         throw new Error(`Unrecognized menu item: ${name}`);
     }
@@ -71,6 +77,14 @@ export function BudgetMenu({
                 name: 'apply-single-category-template',
                 text: t('Overwrite with template'),
               },
+              ...(isResetTemplatesEnabled
+                ? [
+                    {
+                      name: 'reset-single-category-template',
+                      text: t('Reset template'),
+                    },
+                  ]
+                : []), // NEW
             ]
           : []),
       ]}

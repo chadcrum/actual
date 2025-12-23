@@ -4,7 +4,6 @@ import { Trans } from 'react-i18next';
 import { AlignedText } from '@actual-app/components/aligned-text';
 import { Block } from '@actual-app/components/block';
 import { styles } from '@actual-app/components/styles';
-import { theme } from '@actual-app/components/theme';
 import { Tooltip } from '@actual-app/components/tooltip';
 import { View } from '@actual-app/components/view';
 
@@ -28,7 +27,7 @@ type TotalsListProps = {
 export function TotalsList({
   prevMonthName,
 
-  month, // Required by interface for child components, but not used directly in this component
+  month: _month, // Required by interface for child components, but not used directly in this component
   style,
   goalTargetRow,
   goalTargetLabel,

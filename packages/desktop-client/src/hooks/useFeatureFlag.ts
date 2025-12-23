@@ -13,6 +13,9 @@ const DEFAULT_FEATURE_FLAG_STATE: Record<FeatureFlag, boolean> = {
   forceReload: false,
   increaseMobileBudgetTableFontSize: false,
   'budget-tooltip-goals': false,
+  resetBudgetTemplates: false,
+  'budget-detailed-view': false,
+  ynabStyleMobilePills: false,
 };
 
 export function useFeatureFlag(name: FeatureFlag): boolean {

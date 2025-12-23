@@ -86,7 +86,15 @@ const cellStyle: CSSProperties = {
   fontWeight: 600,
 };
 
-export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
+export const BudgetTotalsMonth = memo(function BudgetTotalsMonth({
+  month: _month,
+  goalColumn,
+  underfundedColumn,
+}: {
+  month: string;
+  goalColumn?: React.ReactNode;
+  underfundedColumn?: React.ReactNode;
+}) {
   return (
     <View
       style={{
@@ -110,6 +118,8 @@ export const BudgetTotalsMonth = memo(function BudgetTotalsMonth() {
           )}
         </EnvelopeCellValue>
       </View>
+      {underfundedColumn}
+      {goalColumn}
       <View style={headerLabelStyle}>
         <Text style={{ color: theme.tableHeaderText }}>
           <Trans>Spent</Trans>
@@ -152,6 +162,8 @@ export function IncomeHeaderMonth() {
 export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
   month,
   group,
+  goalColumn,
+  underfundedColumn,
 }: CategoryGroupMonthProps) {
   const { id } = group;
 
@@ -175,6 +187,8 @@ export const ExpenseGroupMonth = memo(function ExpenseGroupMonth({
           type: 'financial',
         }}
       />
+      {underfundedColumn}
+      {goalColumn}
       <EnvelopeSheetCell
         name="spent"
         width="flex"
@@ -210,6 +224,8 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
   onEdit,
   onBudgetAction,
   onShowActivity,
+  goalColumn,
+  underfundedColumn,
 }: CategoryMonthProps) {
   const { t } = useTranslation();
   const format = useFormat();
@@ -352,6 +368,14 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
                     message: t(`Budget template applied.`),
                   });
                 }}
+                onResetBudgetTemplate={() => {
+                  onMenuAction(month, 'reset-single-category-template', {
+                    category: category.id,
+                  });
+                  showUndoNotification({
+                    message: t('Category template has been reset to zero.'),
+                  });
+                }}
               />
             </Popover>
           </View>
@@ -397,6 +421,8 @@ export const ExpenseCategoryMonth = memo(function ExpenseCategoryMonth({
           }}
         />
       </View>
+      {underfundedColumn}
+      {goalColumn}
       <Field name="spent" width="flex" style={{ textAlign: 'right' }}>
         <View
           data-testid="category-month-spent"

@@ -15,6 +15,7 @@ type BudgetMonthMenuProps = Omit<
   onCheckTemplates: () => void;
   onApplyBudgetTemplates: () => void;
   onOverwriteWithBudgetTemplates: () => void;
+  onResetBudgetTemplates: () => void; // NEW
 };
 
 export function BudgetMonthMenu({
@@ -24,10 +25,12 @@ export function BudgetMonthMenu({
   onCheckTemplates,
   onApplyBudgetTemplates,
   onOverwriteWithBudgetTemplates,
+  onResetBudgetTemplates, // NEW
   ...props
 }: BudgetMonthMenuProps) {
   const { t } = useTranslation();
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
+  const isResetTemplatesEnabled = useFeatureFlag('resetBudgetTemplates'); // NEW
   return (
     <Menu
       {...props}
@@ -57,6 +60,9 @@ export function BudgetMonthMenu({
           case 'overwrite-goal-template':
             onOverwriteWithBudgetTemplates();
             break;
+          case 'reset-templates-for-month':
+            onResetBudgetTemplates();
+            break; // NEW
         }
       }}
       items={[
@@ -88,6 +94,14 @@ export function BudgetMonthMenu({
                 name: 'overwrite-goal-template',
                 text: t('Overwrite with budget template'),
               },
+              ...(isResetTemplatesEnabled
+                ? [
+                    {
+                      name: 'reset-templates-for-month',
+                      text: t('Reset budget template'),
+                    },
+                  ]
+                : []), // NEW: Nested flag check
             ]
           : []),
       ]}

@@ -17,7 +17,7 @@ import { css } from '@emotion/css';
 
 import { type TransObjectLiteral } from 'loot-core/types/util';
 
-import { makeBalanceAmountStyle } from './util';
+import { makeBalanceAmountStyle, makePillStyleFromTextColor } from './util';
 
 import {
   CellValue,
@@ -75,6 +75,7 @@ type CellValueChildren = ComponentPropsWithoutRef<typeof CellValue>['children'];
 type ChildrenWithClassName = (
   props: Parameters<CellValueChildren>[0] & {
     className: string;
+    pillStyle?: CSSProperties;
   },
 ) => ReturnType<CellValueChildren>;
 
@@ -121,6 +122,7 @@ export function BalanceWithCarryover({
   const budgetedValue = useSheetValue(budgeted);
   const longGoalValue = useSheetValue(longGoal);
   const isGoalTemplatesEnabled = useFeatureFlag('goalTemplatesEnabled');
+  const ynabPillsEnabled = useFeatureFlag('ynabStyleMobilePills');
   const getBalanceAmountStyle = useCallback(
     (balanceValue: number) =>
       makeBalanceAmountStyle(
@@ -273,6 +275,9 @@ export function BalanceWithCarryover({
                 name,
                 value: balanceValue,
                 className: getDefaultClassName(balanceValue),
+                pillStyle: ynabPillsEnabled
+                  ? makePillStyleFromTextColor(getBalanceAmountStyle(balanceValue))
+                  : undefined,
               })
             ) : (
               <CellValueText
@@ -286,7 +291,15 @@ export function BalanceWithCarryover({
 
           {carryoverValue && (
             <CarryoverIndicatorComponent
-              style={getBalanceAmountStyle(balanceValue)}
+              style={
+                ynabPillsEnabled
+                  ? {
+                      color:
+                        makePillStyleFromTextColor(getBalanceAmountStyle(balanceValue))
+                          ?.backgroundColor || theme.pillBackgroundLight,
+                    }
+                  : getBalanceAmountStyle(balanceValue)
+              }
             />
           )}
           {shouldInlineGoalStatus &&

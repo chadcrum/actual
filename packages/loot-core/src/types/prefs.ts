@@ -8,7 +8,10 @@ export type FeatureFlag =
   | 'plugins'
   | 'forceReload'
   | 'increaseMobileBudgetTableFontSize'
-  | 'budget-tooltip-goals';
+  | 'budget-tooltip-goals'
+  | 'resetBudgetTemplates'
+  | 'budget-detailed-view'
+  | 'ynabStyleMobilePills';
 
 /**
  * Cross-device preferences. These sync across devices when they are changed.
@@ -50,7 +53,8 @@ export type SyncedPrefs = Partial<
     | `ofx-fallback-missing-payee-${string}`
     | `flip-amount-${string}-${'csv' | 'qif'}`
     | `flags.${FeatureFlag}`
-    | `learn-categories`,
+    | `learn-categories`
+    | 'budget.detailed-view-enabled',
     string
   >
 >;

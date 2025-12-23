@@ -326,6 +326,14 @@ export const CategoryMonth = memo(function CategoryMonth({
                     message: `Budget template applied.`,
                   });
                 }}
+                onResetBudgetTemplate={() => {
+                  onMenuAction(month, 'reset-single-category-template', {
+                    category: category.id,
+                  });
+                  showUndoNotification({
+                    message: 'Category template has been reset to zero.',
+                  });
+                }}
               />
             </Popover>
           </View>
