@@ -46,7 +46,7 @@ This document tracks all customizations to the Actual Budget fork, including fea
 
 **Status:** ✅ Well-implemented seam (refactored)
 
-**Purpose:** Enhance budget summary displays with goal target information showing the sum of all visible expense category goals
+**Purpose:** Enhance budget summary displays with goal target information and carryover balance
 
 **Current Implementation:**
 
@@ -54,21 +54,28 @@ This document tracks all customizations to the Actual Budget fork, including fea
 - Components:
   - `GoalTargetRow.tsx` - Displays calculated goal target value
   - `GoalTargetLabel.tsx` - Displays "Goal Target" label
-  - `TotalsList.tsx` - Accepts goal components as optional props (pure presentation)
+  - `CarryoverBalanceRow.tsx` - Displays carryover balance from last month
+  - `CarryoverBalanceLabel.tsx` - Displays "Carry Over" label
+  - `TotalsList.tsx` - Accepts all optional components as props (pure presentation)
 - Hook: `useGoalTargetSum.ts` - Calculates sum of visible expense category goals
 - UI Control: Settings > Experimental > "Budget tooltip goals"
-- Behavior: When enabled, renders Goal Target row in budget summary displays
+- Behavior: When enabled, renders Goal Target row and Carry Over row in budget summary displays
 
 **Technical Details:**
 
 - Feature flag checked at **boundary/container level** (BudgetSummary, ToBudgetAmount, EnvelopeBudgetSummaryModal)
-- TotalsList is pure presentational component accepting optional `goalTargetRow` and `goalTargetLabel` props
-- Goal components injected via composition pattern (not embedded conditionals)
+- TotalsList is pure presentational component accepting optional props for all flag-gated components:
+  - `carryoverBalanceRow` / `carryoverBalanceLabel`
+  - `goalTargetRow` / `goalTargetLabel`
+  - `underfundedRow` / `underfundedLabel`
+  - `overfundedRow` / `overfundedLabel`
+- Components injected via composition pattern (not embedded conditionals)
 - Calculation hook properly handles:
   - Visibility filtering (hides hidden categories)
   - Category type filtering (excludes income categories)
   - Reactive updates (subscribes to spreadsheet changes)
   - Currency formatting
+- Binding: `envelopeBudget.fromLastMonth` for carryover balance value
 - Appears in 3 locations consistently:
   1. BudgetSummary (expanded summary view)
   2. ToBudgetAmount tooltip (on hover)
@@ -78,7 +85,7 @@ This document tracks all customizations to the Actual Budget fork, including fea
 
 - High-level seam at container/boundary level (not leaf component)
 - Feature flag logic at boundary level, not in presentational components
-- Pure presentational components (TotalsList, GoalTargetLabel)
+- Pure presentational components (TotalsList, all Label components)
 - Additive composition pattern using props
 - Easy to remove (delete props from 3 call sites)
 - Upstream behavior unchanged when flag disabled
@@ -86,11 +93,11 @@ This document tracks all customizations to the Actual Budget fork, including fea
 
 **Removability:** Very High
 
-- Delete GoalTargetRow.tsx and GoalTargetLabel.tsx files
+- Delete CarryoverBalanceRow.tsx, CarryoverBalanceLabel.tsx, GoalTargetRow.tsx, and GoalTargetLabel.tsx files
 - Remove optional props from TotalsList type definition
 - Remove prop passing from 3 container components
 - No changes to core logic or other components
-- Feature cleanly removed in 5 focused changes
+- Feature cleanly removed in 7 focused changes
 
 ---
 

@@ -10,6 +10,8 @@ import {
 } from 'loot-core/shared/months';
 import { groupById } from 'loot-core/shared/util';
 
+import { CarryoverBalanceLabel } from '@desktop-client/components/budget/envelope/budgetsummary/CarryoverBalanceLabel';
+import { CarryoverBalanceRow } from '@desktop-client/components/budget/envelope/budgetsummary/CarryoverBalanceRow';
 import { GoalTargetLabel } from '@desktop-client/components/budget/envelope/budgetsummary/GoalTargetLabel';
 import { GoalTargetRow } from '@desktop-client/components/budget/envelope/budgetsummary/GoalTargetRow';
 import { OverfundedLabel } from '@desktop-client/components/budget/envelope/budgetsummary/OverfundedLabel';
@@ -179,6 +181,16 @@ export function EnvelopeBudgetSummaryModal({
               style={{
                 ...styles.mediumText,
               }}
+              carryoverBalanceRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <CarryoverBalanceRow month={month} />
+                ) : undefined
+              }
+              carryoverBalanceLabel={
+                isBudgetTooltipGoalsEnabled ? (
+                  <CarryoverBalanceLabel />
+                ) : undefined
+              }
               goalTargetRow={
                 isBudgetTooltipGoalsEnabled ? (
                   <GoalTargetRow month={month} />

@@ -8,6 +8,8 @@ import { Tooltip } from '@actual-app/components/tooltip';
 import { View } from '@actual-app/components/view';
 import { css } from '@emotion/css';
 
+import { CarryoverBalanceLabel } from './CarryoverBalanceLabel';
+import { CarryoverBalanceRow } from './CarryoverBalanceRow';
 import { GoalTargetLabel } from './GoalTargetLabel';
 import { GoalTargetRow } from './GoalTargetRow';
 import { OverfundedLabel } from './OverfundedLabel';
@@ -73,6 +75,16 @@ export function ToBudgetAmount({
               style={{
                 padding: 7,
               }}
+              carryoverBalanceRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <CarryoverBalanceRow month={month} />
+                ) : undefined
+              }
+              carryoverBalanceLabel={
+                isBudgetTooltipGoalsEnabled ? (
+                  <CarryoverBalanceLabel />
+                ) : undefined
+              }
               goalTargetRow={
                 isBudgetTooltipGoalsEnabled ? (
                   <GoalTargetRow month={month} />

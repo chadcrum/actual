@@ -16,6 +16,8 @@ import { css } from '@emotion/css';
 import * as monthUtils from 'loot-core/shared/months';
 
 import { BudgetMonthMenu } from './BudgetMonthMenu';
+import { CarryoverBalanceLabel } from './CarryoverBalanceLabel';
+import { CarryoverBalanceRow } from './CarryoverBalanceRow';
 import { GoalTargetLabel } from './GoalTargetLabel';
 import { GoalTargetRow } from './GoalTargetRow';
 import { OverfundedLabel } from './OverfundedLabel';
@@ -309,6 +311,16 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
                 borderBottomWidth: 1,
                 borderColor: theme.tableBorder,
               }}
+              carryoverBalanceRow={
+                isBudgetTooltipGoalsEnabled ? (
+                  <CarryoverBalanceRow month={month} />
+                ) : undefined
+              }
+              carryoverBalanceLabel={
+                isBudgetTooltipGoalsEnabled ? (
+                  <CarryoverBalanceLabel />
+                ) : undefined
+              }
               goalTargetRow={
                 isBudgetTooltipGoalsEnabled ? (
                   <GoalTargetRow month={month} />

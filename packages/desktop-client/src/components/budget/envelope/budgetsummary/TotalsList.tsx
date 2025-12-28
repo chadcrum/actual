@@ -4,8 +4,13 @@ import { Trans } from 'react-i18next';
 import { AlignedText } from '@actual-app/components/aligned-text';
 import { Block } from '@actual-app/components/block';
 import { styles } from '@actual-app/components/styles';
+import { theme } from '@actual-app/components/theme';
 import { Tooltip } from '@actual-app/components/tooltip';
 import { View } from '@actual-app/components/view';
+
+import { TooltipSeparator } from './TooltipSeparator';
+import { TotalIncomeRow } from './TotalIncomeRow';
+import { TotalSpentRow } from './TotalSpentRow';
 
 import { EnvelopeCellValue } from '@desktop-client/components/budget/envelope/EnvelopeBudgetComponents';
 import { CellValueText } from '@desktop-client/components/spreadsheet/CellValue';
@@ -16,6 +21,8 @@ type TotalsListProps = {
   prevMonthName: string;
   month: string;
   style?: CSSProperties;
+  carryoverBalanceRow?: ReactNode;
+  carryoverBalanceLabel?: ReactNode;
   goalTargetRow?: ReactNode;
   goalTargetLabel?: ReactNode;
   underfundedRow?: ReactNode;
@@ -27,8 +34,10 @@ type TotalsListProps = {
 export function TotalsList({
   prevMonthName,
 
-  month: _month, // Required by interface for child components, but not used directly in this component
+  month, // Required by interface for child components
   style,
+  carryoverBalanceRow,
+  carryoverBalanceLabel,
   goalTargetRow,
   goalTargetLabel,
   underfundedRow,
@@ -54,6 +63,10 @@ export function TotalsList({
           minWidth: 50,
         }}
       >
+        <TotalIncomeRow month={month} />
+        <TotalSpentRow month={month} />
+        {carryoverBalanceRow}
+        <TooltipSeparator />
         {overfundedRow}
         {underfundedRow}
         {goalTargetRow}
@@ -141,6 +154,18 @@ export function TotalsList({
       </View>
 
       <View>
+        <Block style={{ color: theme.tableText }}>
+          <Trans>Total Income</Trans>
+        </Block>
+
+        <Block style={{ color: theme.tableText }}>
+          <Trans>Total Spent</Trans>
+        </Block>
+
+        {carryoverBalanceLabel}
+
+        <TooltipSeparator />
+
         {overfundedLabel}
         {underfundedLabel}
         {goalTargetLabel}
