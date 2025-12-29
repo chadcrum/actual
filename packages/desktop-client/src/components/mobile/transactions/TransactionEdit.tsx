@@ -558,20 +558,19 @@ type TransactionEditInnerProps = {
   onAddSplit: (id: TransactionEntity['id']) => void;
 };
 
-const TransactionEditInner = memo<TransactionEditInnerProps>(
-  function TransactionEditInner({
-    isAdding,
-    accounts,
-    categories,
-    payees,
-    dateFormat,
-    transactions: unserializedTransactions,
-    onSave,
-    onUpdate,
-    onDelete,
-    onSplit,
-    onAddSplit,
-  }) {
+function TransactionEditInner({
+  isAdding,
+  accounts,
+  categories,
+  payees,
+  dateFormat,
+  transactions: unserializedTransactions,
+  onSave,
+  onUpdate,
+  onDelete,
+  onSplit,
+  onAddSplit,
+}: TransactionEditInnerProps) {
     const { t } = useTranslation();
     const randomStuffEnabled = useFeatureFlag('randomStuff');
     console.log('[TransactionEditInner] randomStuffEnabled:', randomStuffEnabled);
@@ -1321,7 +1320,7 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
 
           {!isAdding && (
             <>
-              {console.log('[TransactionEditInner] rendering buttons, randomStuffEnabled:', randomStuffEnabled, 'isAdding:', isAdding) || randomStuffEnabled && (
+              {randomStuffEnabled && (
                 <View style={{ alignItems: 'center' }}>
                   <Button
                     variant="bare"
@@ -1387,8 +1386,7 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
         </View>
       </Page>
     );
-  },
-);
+}
 
 function isTemporary(transaction: TransactionEntity) {
   return transaction.id.indexOf('temp') === 0;
