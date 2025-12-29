@@ -1,11 +1,12 @@
+import * as monthUtils from '../../shared/months';
+import { q } from '../../shared/query';
 import { CategoryEntity } from '../../types/models';
 import type { Template } from '../../types/models/templates';
-import { q } from '../../shared/query';
-import * as monthUtils from '../../shared/months';
 import { aqlQuery } from '../aql';
-import { storeNoteTemplates } from './template-notes';
-import { setGoal, getSheetValue } from './actions';
 import { batchMessages } from '../sync';
+
+import { setGoal, getSheetValue } from './actions';
+import { storeNoteTemplates } from './template-notes';
 
 type Notification = {
   type?: 'message' | 'error' | 'warning' | undefined;

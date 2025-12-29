@@ -14,6 +14,7 @@ import { Button } from '@actual-app/components/button';
 import { SvgSplit } from '@actual-app/components/icons/v0';
 import {
   SvgAdd,
+  SvgLightBulb,
   SvgPiggyBank,
   SvgTrash,
 } from '@actual-app/components/icons/v1';
@@ -56,7 +57,10 @@ import {
 import {
   type AccountEntity,
   type CategoryEntity,
+  type NewRuleEntity,
   type PayeeEntity,
+  type RuleActionEntity,
+  type RuleConditionEntity,
   type TransactionEntity,
 } from 'loot-core/types/models';
 
@@ -76,6 +80,7 @@ import { AmountInput } from '@desktop-client/components/util/AmountInput';
 import { useAccounts } from '@desktop-client/hooks/useAccounts';
 import { useCategories } from '@desktop-client/hooks/useCategories';
 import { useDateFormat } from '@desktop-client/hooks/useDateFormat';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useInitialMount } from '@desktop-client/hooks/useInitialMount';
 import { useLocalPref } from '@desktop-client/hooks/useLocalPref';
 import { useNavigate } from '@desktop-client/hooks/useNavigate';
@@ -568,6 +573,7 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
     onAddSplit,
   }) {
     const { t } = useTranslation();
+    const randomStuffEnabled = useFeatureFlag('randomStuff');
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [showHiddenCategories] = useLocalPref('budget.showHiddenCategories');
@@ -984,8 +990,86 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
       [scrollChildTransactionIntoView],
     );
 
-    // Child transactions should always default to the signage
-    // of the parent transaction
+    const onCreateRule = useCallback(async () => {
+      const { data } = await aqlQuery(
+        q('transactions')
+          .filter({ id: { $oneof: [transaction.id] } })
+          .select('*')
+          .options({ splits: 'grouped' }),
+      );
+
+      const transactions = ungroupTransactions(data);
+      const ruleTransaction = transactions[0];
+      const childTransactions = transactions.filter(
+        t => t.parent_id === ruleTransaction.id,
+      );
+
+      const payeeCondition = ruleTransaction.imported_payee
+        ? ({
+            field: 'imported_payee',
+            op: 'is',
+            value: ruleTransaction.imported_payee,
+            type: 'string',
+          } satisfies RuleConditionEntity)
+        : ({
+            field: 'payee',
+            op: 'is',
+            value: ruleTransaction.payee!,
+            type: 'id',
+          } satisfies RuleConditionEntity);
+
+      const amountCondition = {
+        field: 'amount',
+        op: 'isapprox',
+        value: ruleTransaction.amount,
+        type: 'number',
+      } satisfies RuleConditionEntity;
+
+      const rule = {
+        stage: null,
+        conditionsOp: 'and',
+        conditions: [payeeCondition, amountCondition],
+        actions: [
+          ...(childTransactions.length === 0
+            ? [
+                {
+                  op: 'set',
+                  field: 'category',
+                  value: ruleTransaction.category,
+                  type: 'id',
+                  options: {
+                    splitIndex: 0,
+                  },
+                } satisfies RuleActionEntity,
+              ]
+            : []),
+          ...childTransactions.flatMap((sub, index) => [
+            {
+              op: 'set-split-amount',
+              value: sub.amount,
+              options: {
+                splitIndex: index + 1,
+                method: 'fixed-amount',
+              },
+            } satisfies RuleActionEntity,
+            {
+              op: 'set',
+              field: 'category',
+              value: sub.category,
+              type: 'id',
+              options: {
+                splitIndex: index + 1,
+              },
+            } satisfies RuleActionEntity,
+          ]),
+        ],
+      } satisfies NewRuleEntity;
+
+      dispatch(pushModal({ modal: { name: 'edit-rule', options: { rule } } }));
+    }, [transaction, dispatch]);
+
+    // Child transactions should always default to signage
+    // of parent transaction
     const childAmountSign = transaction.amount <= 0 ? '-' : '+';
 
     const account = getAccount(transaction);
@@ -1235,35 +1319,69 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
           </View>
 
           {!isAdding && (
-            <View style={{ alignItems: 'center' }}>
-              <Button
-                variant="bare"
-                onPress={() => onDeleteInner(transaction.id)}
-                style={{
-                  height: 40,
-                  borderWidth: 0,
-                  marginLeft: styles.mobileEditingPadding,
-                  marginRight: styles.mobileEditingPadding,
-                  marginTop: 10,
-                  backgroundColor: 'transparent',
-                }}
-              >
-                <SvgTrash
-                  width={17}
-                  height={17}
-                  style={{ color: theme.errorText }}
-                />
-                <Text
+            <>
+              {randomStuffEnabled && (
+                <View style={{ alignItems: 'center' }}>
+                  <Button
+                    variant="bare"
+                    onPress={() => onCreateRule()}
+                    style={{
+                      height: 40,
+                      borderWidth: 0,
+                      marginLeft: styles.mobileEditingPadding,
+                      marginRight: styles.mobileEditingPadding,
+                      marginTop: 10,
+                      backgroundColor: 'transparent',
+                    }}
+                  >
+                    <SvgLightBulb
+                      width={17}
+                      height={17}
+                      style={{ color: theme.pageText }}
+                    />
+                    <Text
+                      style={{
+                        color: theme.pageText,
+                        marginLeft: 5,
+                        userSelect: 'none',
+                      }}
+                    >
+                      <Trans>Create rule</Trans>
+                    </Text>
+                  </Button>
+                </View>
+              )}
+
+              <View style={{ alignItems: 'center' }}>
+                <Button
+                  variant="bare"
+                  onPress={() => onDeleteInner(transaction.id)}
                   style={{
-                    color: theme.errorText,
-                    marginLeft: 5,
-                    userSelect: 'none',
+                    height: 40,
+                    borderWidth: 0,
+                    marginLeft: styles.mobileEditingPadding,
+                    marginRight: styles.mobileEditingPadding,
+                    marginTop: 10,
+                    backgroundColor: 'transparent',
                   }}
                 >
-                  <Trans>Delete transaction</Trans>
-                </Text>
-              </Button>
-            </View>
+                  <SvgTrash
+                    width={17}
+                    height={17}
+                    style={{ color: theme.errorText }}
+                  />
+                  <Text
+                    style={{
+                      color: theme.errorText,
+                      marginLeft: 5,
+                      userSelect: 'none',
+                    }}
+                  >
+                    <Trans>Delete transaction</Trans>
+                  </Text>
+                </Button>
+              </View>
+            </>
           )}
         </View>
       </Page>

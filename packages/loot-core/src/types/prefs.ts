@@ -11,7 +11,8 @@ export type FeatureFlag =
   | 'budget-tooltip-goals'
   | 'resetBudgetTemplates'
   | 'budget-detailed-view'
-  | 'ynabStyleMobilePills';
+  | 'ynabStyleMobilePills'
+  | 'randomStuff';
 
 /**
  * Cross-device preferences. These sync across devices when they are changed.

@@ -276,7 +276,9 @@ export function BalanceWithCarryover({
                 value: balanceValue,
                 className: getDefaultClassName(balanceValue),
                 pillStyle: ynabPillsEnabled
-                  ? makePillStyleFromTextColor(getBalanceAmountStyle(balanceValue))
+                  ? makePillStyleFromTextColor(
+                      getBalanceAmountStyle(balanceValue),
+                    )
                   : undefined,
               })
             ) : (
@@ -295,8 +297,9 @@ export function BalanceWithCarryover({
                 ynabPillsEnabled
                   ? {
                       color:
-                        makePillStyleFromTextColor(getBalanceAmountStyle(balanceValue))
-                          ?.backgroundColor || theme.pillBackgroundLight,
+                        makePillStyleFromTextColor(
+                          getBalanceAmountStyle(balanceValue),
+                        )?.backgroundColor || theme.pillBackgroundLight,
                     }
                   : getBalanceAmountStyle(balanceValue)
               }

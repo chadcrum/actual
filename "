@@ -1,0 +1,131 @@
+# Agent Handover
+
+## Objective
+Add "Create rule" button to the mobile web client transaction edit modal that allows users to create transaction rules based on an existing transaction.
+
+## Current Status
+- Created branch `feature/mobile-create-rule` from integration
+- Implemented onCreateRule handler function that creates rules based on transaction data
+- Added "Create rule" button to mobile transaction edit modal (placed above "Delete transaction" button)
+- All type checking and linting passed successfully
+
+## Recent Changes
+- `packages/desktop-client/src/components/mobile/transactions/TransactionEdit.tsx` (lines 1-1688)
+  - Added icon import: `SvgLightBulb` (line 16)
+  - Added type imports: `NewRuleEntity`, `RuleActionEntity`, `RuleConditionEntity` (lines 60-63)
+  - Added `onCreateRule` handler function (lines 991-1058)
+  - Added "Create rule" button in the `!isAdding` conditional block (lines 1322-1346)
+  - Wrapped "Create rule" and "Delete transaction" buttons in fragment
+  - Rationale: Mirrors desktop functionality found in `packages/desktop-client/src/components/accounts/Account.tsx:1280-1357`
+
+## Active TODOs
+- [completed] Create branch from integration
+- [completed] Add missing type imports (NewRuleEntity, RuleActionEntity, RuleConditionEntity)
+- [completed] Add SvgLightBulb icon import
+- [completed] Implement onCreateRule handler function
+- [completed] Add "Create rule" button to mobile transaction edit modal
+- [completed] Run typecheck validation
+- [completed] Run lint validation
+- [pending] Manual testing on mobile web client (long-press transaction → tap "Edit" → verify "Create rule" button appears)
+- [pending] Click "Create rule" button and verify rule creation modal opens with pre-filled data
+
+## Key Decisions & Context
+- **Button Placement**: User confirmed placing "Create rule" button below "Delete transaction" button
+- **Icon Choice**: Used `SvgLightBulb` icon (commonly used for rules/features in the codebase)
+- **Styling**: Used `bare` variant to match the Delete button styling, `theme.pageText` for normal text color
+- **Implementation Pattern**: Copied logic from desktop implementation in `Account.tsx:1280-1357`
+- **Rule Creation Logic**: Creates conditions based on payee (imported_payee or payee) and amount, actions based on category
+- **Split Transaction Support**: Properly handles split transactions with flatMap to create actions for each child transaction
+- **Visibility**: Button only shows when editing existing transaction (`!isAdding`), not when creating new transactions
+- **Modal Pattern**: Uses existing `pushModal` with `name: 'edit-rule'` to open rule creation screen
+
+## Blockers & Issues
+- **No blockers encountered**: Implementation completed successfully
+- **No current issues**: All type checking and linting passed
+
+## Tool Usage
+- `git checkout -b feature/mobile-create-rule integration` → Branch created from integration
+- `yarn typecheck` → All files passed (no errors)
+- `yarn lint:fix` → No lint errors found
+- `git diff packages/desktop-client/src/components/mobile/transactions/TransactionEdit.tsx` → Reviewed changes
+- Searched for existing "Create rule" implementations → Found in TransactionMenu.tsx, SelectedTransactionsButton.tsx, PayeeTableRow.tsx
+- Searched for mobile transaction components → Found TransactionEdit.tsx, TransactionListItem.tsx, TransactionList.tsx
+- Searched for rule-related icons → No specific rule icon found, chose SvgLightBulb
+
+## Environment
+- Branch: `feature/mobile-create-rule` (based on integration, commit: `1e79e775e`)
+- Working directory: `/home/chid/git/actual`
+- Modified file: `packages/desktop-client/src/components/mobile/transactions/TransactionEdit.tsx`
+- Files open for reference: `packages/desktop-client/src/components/accounts/Account.tsx` (desktop onCreateRule reference)
+- Untracked: `.kilocode/` directory (agent tracking)
+- Git status: 1 file modified, ready to commit
+
+## Validation Status
+- **Type checking**: 1523 strict files compiled successfully, 0 errors
+- **Linting**: No errors or warnings found
+- **Code review**: Changes mirror existing desktop pattern in Account.tsx
+- **Manual testing**: Not yet completed (requires running mobile web client)
+- **Security**: No security concerns identified (uses existing aqlQuery and pushModal patterns)
+
+## Next Steps
+1. [HIGH] Manual testing on mobile web client
+   - Start development server: `yarn start`
+   - Navigate to mobile view (small screen width or mobile device)
+   - Long-press a transaction
+   - Tap "Edit"
+   - Verify "Create rule" button appears above "Delete transaction" button
+   - Click "Create rule" and verify rule creation modal opens with pre-filled conditions and actions
+   - Test with regular transaction and split transaction
+   - Expected: Button only shows for existing transactions, not new transactions
+
+2. [MEDIUM] Verify rule creation flow
+   - After clicking "Create rule", confirm modal displays correct:
+     - Conditions: payee (imported_payee or payee) + amount (isapprox)
+     - Actions: category for regular transaction, split amounts and categories for split transaction
+   - Complete rule creation and verify rule is saved
+   - Test that rule applies to future transactions
+
+3. [LOW] Consider adding icon selection (optional)
+   - Could create dedicated rule icon in future if SvgLightBulb doesn't fit
+   - Currently matches pattern used elsewhere in codebase
+
+4. [LOW] Update documentation (optional)
+   - If user-facing documentation exists, mention new mobile feature
+   - Check if any release notes or changelog needs updating
+
+## Implementation Details
+
+### onCreateRule Function Logic
+```typescript
+1. Query transaction with grouped splits using aqlQuery
+2. Use ungroupTransactions to flatten parent/children
+3. Create payee condition:
+   - If imported_payee exists: field='imported_payee', op='is', value=imported_payee
+   - Otherwise: field='payee', op='is', value=payee.id
+4. Create amount condition: field='amount', op='isapprox', value=transaction.amount
+5. Build rule actions:
+   - For regular transaction: set category action
+   - For split transactions: set-split-amount and set category for each child
+6. Dispatch pushModal with 'edit-rule' modal and the constructed rule
+```
+
+### Button Implementation
+```typescript
+- Visibility: Conditional on !isAdding (only when editing)
+- Position: Above "Delete transaction" button
+- Styling: bare variant, transparent background, 40px height
+- Icon: SvgLightBulb (17x17px, theme.pageText color)
+- Text: "Create rule" (Trans component for i18n)
+- Layout: Wrapped in fragment with Delete button
+```
+
+### Dependencies
+- Requires existing: aqlQuery, pushModal, ungroupTransactions (from loot-core/shared/transactions)
+- Uses existing types: NewRuleEntity, RuleConditionEntity, RuleActionEntity
+- Follows existing pattern: Desktop onCreateRule in Account.tsx
+
+### Files Referenced During Implementation
+- `packages/desktop-client/src/components/accounts/Account.tsx:1280-1357` - Desktop onCreateRule reference
+- `packages/desktop-client/src/components/transactions/TransactionMenu.tsx:231` - Create rule menu item
+- `packages/desktop-client/src/components/mobile/payees/PayeesListItem.tsx:60` - Mobile Create rule pattern
+- `packages/loot-core/src/types/models/rule.ts` - Rule type definitions

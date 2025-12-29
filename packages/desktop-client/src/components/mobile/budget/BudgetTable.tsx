@@ -121,7 +121,7 @@ function ToBudget({ toBudget, onPress, show3Columns }: ToBudgetProps) {
                     borderRadius: 8,
                     padding: '4px 12px',
                     display: 'inline-block',
-                  })
+                  }),
                 }}
               >
                 <PrivacyFilter>
