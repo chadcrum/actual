@@ -3,7 +3,6 @@ import React, {
   useEffect,
   useState,
   useRef,
-  memo,
   useMemo,
   useCallback,
 } from 'react';
@@ -571,791 +570,753 @@ function TransactionEditInner({
   onSplit,
   onAddSplit,
 }: TransactionEditInnerProps) {
-    const { t } = useTranslation();
-    const randomStuffEnabled = useFeatureFlag('randomStuff');
-    console.log('[TransactionEditInner] randomStuffEnabled:', randomStuffEnabled);
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const [showHiddenCategories] = useLocalPref('budget.showHiddenCategories');
-    const [upcomingLength = '7'] = useSyncedPref(
-      'upcomingScheduledTransactionLength',
-    );
-    const transactions = useMemo(
-      () =>
-        unserializedTransactions.map(t =>
-          serializeTransaction(t, dateFormat),
-        ) || [],
-      [unserializedTransactions, dateFormat],
-    );
-    const { grouped: categoryGroups } = useCategories();
+  const { t } = useTranslation();
+  const randomStuffEnabled = useFeatureFlag('randomStuff');
+  console.log('[TransactionEditInner] randomStuffEnabled:', randomStuffEnabled);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [showHiddenCategories] = useLocalPref('budget.showHiddenCategories');
+  const [upcomingLength = '7'] = useSyncedPref(
+    'upcomingScheduledTransactionLength',
+  );
+  const transactions = useMemo(
+    () =>
+      unserializedTransactions.map(t => serializeTransaction(t, dateFormat)) ||
+      [],
+    [unserializedTransactions, dateFormat],
+  );
+  const { grouped: categoryGroups } = useCategories();
 
-    useEffect(() => {
-      if (window.history.length === 1) {
-        window.history.replaceState(null, 'Actual Budget', '/');
-        window.history.pushState(null, 'Add Transaction', '/transactions/new');
+  useEffect(() => {
+    if (window.history.length === 1) {
+      window.history.replaceState(null, 'Actual Budget', '/');
+      window.history.pushState(null, 'Add Transaction', '/transactions/new');
+    }
+  }, []);
+
+  const [transaction, ...childTransactions] = transactions;
+
+  const { editingField, onRequestActiveEdit, onClearActiveEdit } =
+    useSingleActiveEditForm()!;
+  const [totalAmountFocused, setTotalAmountFocused] = useState(
+    // iOS does not support automatically opening up the keyboard for the
+    // total amount field. Hence we should not focus on it on page render.
+    !Platform.isIOSAgent,
+  );
+  const childTransactionElementRefMap = useRef<
+    Record<TransactionEntity['id'], HTMLDivElement | null>
+  >({});
+  const hasAccountChanged = useRef(false);
+
+  const payeesById = useMemo(() => groupById(payees), [payees]);
+  const accountsById = useMemo(() => groupById(accounts), [accounts]);
+
+  const onTotalAmountEdit = useCallback(() => {
+    onRequestActiveEdit?.(getFieldName(transaction.id, 'amount'), () => {
+      setTotalAmountFocused(true);
+      return () => setTotalAmountFocused(false);
+    });
+  }, [onRequestActiveEdit, transaction.id]);
+
+  const isInitialMount = useInitialMount();
+
+  useEffect(() => {
+    if (isInitialMount && isAdding && !Platform.isIOSAgent) {
+      onTotalAmountEdit();
+    }
+  }, [isAdding, isInitialMount, onTotalAmountEdit]);
+
+  const getAccount = useCallback(
+    (trans: TransactionEntity) => {
+      return trans?.account ? accountsById?.[trans.account] : undefined;
+    },
+    [accountsById],
+  );
+
+  const getPayee = useCallback(
+    (trans: TransactionEntity) => {
+      return trans?.payee ? payeesById?.[trans.payee] : undefined;
+    },
+    [payeesById],
+  );
+
+  const getTransferAccount = useCallback(
+    (trans: TransactionEntity) => {
+      const payee = trans ? getPayee(trans) : null;
+      return payee && payee?.transfer_acct
+        ? accountsById?.[payee.transfer_acct]
+        : undefined;
+    },
+    [accountsById, getPayee],
+  );
+
+  const isBudgetTransfer = useCallback(
+    (trans: TransactionEntity) => {
+      const transferAcct = trans ? getTransferAccount(trans) : null;
+      return transferAcct ? !transferAcct.offbudget : false;
+    },
+    [getTransferAccount],
+  );
+
+  const getCategory = useCallback(
+    (trans: TransactionEntity, isOffBudget: boolean) => {
+      if (isOffBudget) {
+        return t('Off budget');
+      } else if (isBudgetTransfer(trans)) {
+        return t('Transfer');
+      } else {
+        return lookupName(categories, trans.category) ?? '';
       }
-    }, []);
+    },
+    [categories, isBudgetTransfer, t],
+  );
 
-    const [transaction, ...childTransactions] = transactions;
+  const onSaveInner = useCallback(() => {
+    const [unserializedTransaction] = unserializedTransactions;
 
-    const { editingField, onRequestActiveEdit, onClearActiveEdit } =
-      useSingleActiveEditForm()!;
-    const [totalAmountFocused, setTotalAmountFocused] = useState(
-      // iOS does not support automatically opening up the keyboard for the
-      // total amount field. Hence we should not focus on it on page render.
-      !Platform.isIOSAgent,
-    );
-    const childTransactionElementRefMap = useRef<
-      Record<TransactionEntity['id'], HTMLDivElement | null>
-    >({});
-    const hasAccountChanged = useRef(false);
-
-    const payeesById = useMemo(() => groupById(payees), [payees]);
-    const accountsById = useMemo(() => groupById(accounts), [accounts]);
-
-    const onTotalAmountEdit = useCallback(() => {
-      onRequestActiveEdit?.(getFieldName(transaction.id, 'amount'), () => {
-        setTotalAmountFocused(true);
-        return () => setTotalAmountFocused(false);
-      });
-    }, [onRequestActiveEdit, transaction.id]);
-
-    const isInitialMount = useInitialMount();
-
-    useEffect(() => {
-      if (isInitialMount && isAdding && !Platform.isIOSAgent) {
-        onTotalAmountEdit();
+    const onConfirmSave = () => {
+      let transactionsToSave = unserializedTransactions;
+      if (isAdding) {
+        transactionsToSave = realizeTempTransactions(unserializedTransactions);
       }
-    }, [isAdding, isInitialMount, onTotalAmountEdit]);
 
-    const getAccount = useCallback(
-      (trans: TransactionEntity) => {
-        return trans?.account ? accountsById?.[trans.account] : undefined;
-      },
-      [accountsById],
-    );
+      onSave(transactionsToSave);
+      navigate(-1);
+    };
 
-    const getPayee = useCallback(
-      (trans: TransactionEntity) => {
-        return trans?.payee ? payeesById?.[trans.payee] : undefined;
-      },
-      [payeesById],
-    );
+    const today = monthUtils.currentDay();
+    const isFuture = unserializedTransaction.date > today;
 
-    const getTransferAccount = useCallback(
-      (trans: TransactionEntity) => {
-        const payee = trans ? getPayee(trans) : null;
-        return payee && payee?.transfer_acct
-          ? accountsById?.[payee.transfer_acct]
-          : undefined;
-      },
-      [accountsById, getPayee],
-    );
+    if (isFuture) {
+      const upcomingDays = getUpcomingDays(upcomingLength, today);
+      const daysUntilTransaction = monthUtils.differenceInCalendarDays(
+        unserializedTransaction.date,
+        today,
+      );
+      const isBeyondWindow = daysUntilTransaction > upcomingDays;
 
-    const isBudgetTransfer = useCallback(
-      (trans: TransactionEntity) => {
-        const transferAcct = trans ? getTransferAccount(trans) : null;
-        return transferAcct ? !transferAcct.offbudget : false;
-      },
-      [getTransferAccount],
-    );
+      dispatch(
+        pushModal({
+          modal: {
+            name: 'convert-to-schedule',
+            options: {
+              isBeyondWindow,
+              daysUntilTransaction,
+              upcomingDays,
+              onConfirm: async () => {
+                if (
+                  !isAdding &&
+                  unserializedTransaction.id &&
+                  !unserializedTransaction.id.startsWith('temp')
+                ) {
+                  await send('transaction-delete', {
+                    id: unserializedTransaction.id,
+                  });
+                }
 
-    const getCategory = useCallback(
-      (trans: TransactionEntity, isOffBudget: boolean) => {
-        if (isOffBudget) {
-          return t('Off budget');
-        } else if (isBudgetTransfer(trans)) {
-          return t('Transfer');
-        } else {
-          return lookupName(categories, trans.category) ?? '';
+                const transactionForSchedule = unserializedTransaction.is_parent
+                  ? {
+                      ...unserializedTransaction,
+                      subtransactions: unserializedTransactions.filter(
+                        t =>
+                          t.is_child &&
+                          t.parent_id === unserializedTransaction.id,
+                      ),
+                    }
+                  : unserializedTransaction;
+
+                await createSingleTimeScheduleFromTransaction(
+                  transactionForSchedule,
+                );
+
+                dispatch(
+                  addNotification({
+                    notification: {
+                      type: 'message',
+                      message: t('Schedule created successfully'),
+                    },
+                  }),
+                );
+                navigate(-1);
+              },
+              onCancel: onConfirmSave,
+            },
+          },
+        }),
+      );
+      return;
+    }
+
+    if (unserializedTransaction.reconciled) {
+      // On mobile any save gives the warning.
+      // On the web only certain changes trigger a warning.
+      // Should we bring that here as well? Or does the nature of the editing form
+      // make this more appropriate?
+      dispatch(
+        pushModal({
+          modal: {
+            name: 'confirm-transaction-edit',
+            options: {
+              onConfirm: onConfirmSave,
+              confirmReason: 'editReconciled',
+            },
+          },
+        }),
+      );
+    } else {
+      onConfirmSave();
+    }
+  }, [
+    isAdding,
+    dispatch,
+    navigate,
+    onSave,
+    unserializedTransactions,
+    upcomingLength,
+    t,
+  ]);
+
+  const onUpdateInner = useCallback(
+    async <Field extends keyof TransactionEntity>(
+      serializedTransaction: TransactionEntity,
+      name: Field,
+      value: TransactionEntity[Field],
+    ) => {
+      const newTransaction = { ...serializedTransaction, [name]: value };
+      await onUpdate(newTransaction, name);
+      onClearActiveEdit();
+
+      if (name === 'account') {
+        hasAccountChanged.current = serializedTransaction.account !== value;
+      }
+    },
+    [onClearActiveEdit, onUpdate],
+  );
+
+  const onTotalAmountUpdate = useCallback(
+    (value: number) => {
+      if (transaction.amount !== value) {
+        // @ts-expect-error - fix me
+        onUpdateInner(transaction, 'amount', value.toString());
+      }
+    },
+    [onUpdateInner, transaction],
+  );
+
+  const onEditFieldInner = useCallback(
+    (
+      transactionId: TransactionEntity['id'],
+      name: 'category' | 'payee' | 'account' | 'date' | 'amount' | 'notes',
+    ) => {
+      onRequestActiveEdit?.(getFieldName(transaction.id, name), () => {
+        const transactionToEdit = transactions.find(
+          t => t.id === transactionId,
+        );
+        const unserializedTransaction = unserializedTransactions.find(
+          t => t.id === transactionId,
+        );
+
+        if (!unserializedTransaction || !transactionToEdit) {
+          throw new Error(`Transaction ${transactionId} not found`);
         }
-      },
-      [categories, isBudgetTransfer, t],
-    );
 
-    const onSaveInner = useCallback(() => {
+        switch (name) {
+          case 'category':
+            dispatch(
+              pushModal({
+                modal: {
+                  name: 'category-autocomplete',
+                  options: {
+                    categoryGroups,
+                    showHiddenCategories,
+                    month: monthUtils.monthFromDate(
+                      unserializedTransaction.date,
+                    ),
+                    onSelect: categoryId => {
+                      onUpdateInner(transactionToEdit, name, categoryId);
+                    },
+                    onClose: () => {
+                      onClearActiveEdit();
+                    },
+                  },
+                },
+              }),
+            );
+            break;
+          case 'account':
+            dispatch(
+              pushModal({
+                modal: {
+                  name: 'account-autocomplete',
+                  options: {
+                    onSelect: accountId => {
+                      onUpdateInner(transactionToEdit, name, accountId);
+                    },
+                    onClose: () => {
+                      onClearActiveEdit();
+                    },
+                  },
+                },
+              }),
+            );
+            break;
+          case 'payee':
+            dispatch(
+              pushModal({
+                modal: {
+                  name: 'payee-autocomplete',
+                  options: {
+                    onSelect: payeeId => {
+                      onUpdateInner(transactionToEdit, name, payeeId);
+                    },
+                    onClose: () => {
+                      onClearActiveEdit();
+                    },
+                  },
+                },
+              }),
+            );
+            break;
+          default:
+            dispatch(
+              pushModal({
+                modal: {
+                  name: 'edit-field',
+                  options: {
+                    name,
+                    onSubmit: (name, value) => {
+                      onUpdateInner(transactionToEdit, name, value);
+                    },
+                    onClose: () => {
+                      onClearActiveEdit();
+                    },
+                  },
+                },
+              }),
+            );
+            break;
+        }
+      });
+    },
+    [
+      categoryGroups,
+      dispatch,
+      onUpdateInner,
+      onClearActiveEdit,
+      onRequestActiveEdit,
+      transaction.id,
+      transactions,
+      unserializedTransactions,
+      showHiddenCategories,
+    ],
+  );
+
+  const onDeleteInner = useCallback(
+    (id: TransactionEntity['id']) => {
       const [unserializedTransaction] = unserializedTransactions;
 
-      const onConfirmSave = () => {
-        let transactionsToSave = unserializedTransactions;
-        if (isAdding) {
-          transactionsToSave = realizeTempTransactions(
-            unserializedTransactions,
-          );
-        }
-
-        onSave(transactionsToSave);
-        navigate(-1);
-      };
-
-      const today = monthUtils.currentDay();
-      const isFuture = unserializedTransaction.date > today;
-
-      if (isFuture) {
-        const upcomingDays = getUpcomingDays(upcomingLength, today);
-        const daysUntilTransaction = monthUtils.differenceInCalendarDays(
-          unserializedTransaction.date,
-          today,
-        );
-        const isBeyondWindow = daysUntilTransaction > upcomingDays;
-
+      const onConfirmDelete = () => {
         dispatch(
           pushModal({
             modal: {
-              name: 'convert-to-schedule',
+              name: 'confirm-delete',
               options: {
-                isBeyondWindow,
-                daysUntilTransaction,
-                upcomingDays,
-                onConfirm: async () => {
-                  if (
-                    !isAdding &&
-                    unserializedTransaction.id &&
-                    !unserializedTransaction.id.startsWith('temp')
-                  ) {
-                    await send('transaction-delete', {
-                      id: unserializedTransaction.id,
-                    });
+                message: t('Are you sure you want to delete the transaction?'),
+                onConfirm: () => {
+                  onDelete(id);
+
+                  if (unserializedTransaction.id !== id) {
+                    // Only a child transaction was deleted.
+                    onClearActiveEdit();
+                    return;
                   }
 
-                  const transactionForSchedule =
-                    unserializedTransaction.is_parent
-                      ? {
-                          ...unserializedTransaction,
-                          subtransactions: unserializedTransactions.filter(
-                            t =>
-                              t.is_child &&
-                              t.parent_id === unserializedTransaction.id,
-                          ),
-                        }
-                      : unserializedTransaction;
-
-                  await createSingleTimeScheduleFromTransaction(
-                    transactionForSchedule,
-                  );
-
-                  dispatch(
-                    addNotification({
-                      notification: {
-                        type: 'message',
-                        message: t('Schedule created successfully'),
-                      },
-                    }),
-                  );
                   navigate(-1);
                 },
-                onCancel: onConfirmSave,
               },
             },
           }),
         );
-        return;
-      }
+      };
 
       if (unserializedTransaction.reconciled) {
-        // On mobile any save gives the warning.
-        // On the web only certain changes trigger a warning.
-        // Should we bring that here as well? Or does the nature of the editing form
-        // make this more appropriate?
         dispatch(
           pushModal({
             modal: {
               name: 'confirm-transaction-edit',
               options: {
-                onConfirm: onConfirmSave,
-                confirmReason: 'editReconciled',
+                onConfirm: onConfirmDelete,
+                confirmReason: 'deleteReconciled',
               },
             },
           }),
         );
       } else {
-        onConfirmSave();
+        onConfirmDelete();
       }
-    }, [
-      isAdding,
+    },
+    [
       dispatch,
       navigate,
-      onSave,
+      onClearActiveEdit,
+      onDelete,
       unserializedTransactions,
-      upcomingLength,
       t,
-    ]);
+    ],
+  );
 
-    const onUpdateInner = useCallback(
-      async <Field extends keyof TransactionEntity>(
-        serializedTransaction: TransactionEntity,
-        name: Field,
-        value: TransactionEntity[Field],
-      ) => {
-        const newTransaction = { ...serializedTransaction, [name]: value };
-        await onUpdate(newTransaction, name);
-        onClearActiveEdit();
+  const scrollChildTransactionIntoView = useCallback(
+    (id: TransactionEntity['id']) => {
+      const childTransactionEditElement =
+        childTransactionElementRefMap.current?.[id];
+      childTransactionEditElement?.scrollIntoView({
+        behavior: 'smooth',
+      });
+    },
+    [],
+  );
 
-        if (name === 'account') {
-          hasAccountChanged.current = serializedTransaction.account !== value;
-        }
-      },
-      [onClearActiveEdit, onUpdate],
+  const onEmptySplitFound = useCallback(
+    (id: TransactionEntity['id']) => {
+      scrollChildTransactionIntoView(id);
+    },
+    [scrollChildTransactionIntoView],
+  );
+
+  const onCreateRule = useCallback(async () => {
+    const { data } = await aqlQuery(
+      q('transactions')
+        .filter({ id: { $oneof: [transaction.id] } })
+        .select('*')
+        .options({ splits: 'grouped' }),
     );
 
-    const onTotalAmountUpdate = useCallback(
-      (value: number) => {
-        if (transaction.amount !== value) {
-          // @ts-expect-error - fix me
-          onUpdateInner(transaction, 'amount', value.toString());
-        }
-      },
-      [onUpdateInner, transaction],
+    const transactions = ungroupTransactions(data);
+    const ruleTransaction = transactions[0];
+    const childTransactions = transactions.filter(
+      t => t.parent_id === ruleTransaction.id,
     );
 
-    const onEditFieldInner = useCallback(
-      (
-        transactionId: TransactionEntity['id'],
-        name: 'category' | 'payee' | 'account' | 'date' | 'amount' | 'notes',
-      ) => {
-        onRequestActiveEdit?.(getFieldName(transaction.id, name), () => {
-          const transactionToEdit = transactions.find(
-            t => t.id === transactionId,
-          );
-          const unserializedTransaction = unserializedTransactions.find(
-            t => t.id === transactionId,
-          );
+    const payeeCondition = ruleTransaction.imported_payee
+      ? ({
+          field: 'imported_payee',
+          op: 'is',
+          value: ruleTransaction.imported_payee,
+          type: 'string',
+        } satisfies RuleConditionEntity)
+      : ({
+          field: 'payee',
+          op: 'is',
+          value: ruleTransaction.payee!,
+          type: 'id',
+        } satisfies RuleConditionEntity);
 
-          if (!unserializedTransaction || !transactionToEdit) {
-            throw new Error(`Transaction ${transactionId} not found`);
-          }
+    const amountCondition = {
+      field: 'amount',
+      op: 'isapprox',
+      value: ruleTransaction.amount,
+      type: 'number',
+    } satisfies RuleConditionEntity;
 
-          switch (name) {
-            case 'category':
-              dispatch(
-                pushModal({
-                  modal: {
-                    name: 'category-autocomplete',
-                    options: {
-                      categoryGroups,
-                      showHiddenCategories,
-                      month: monthUtils.monthFromDate(
-                        unserializedTransaction.date,
-                      ),
-                      onSelect: categoryId => {
-                        onUpdateInner(transactionToEdit, name, categoryId);
-                      },
-                      onClose: () => {
-                        onClearActiveEdit();
-                      },
-                    },
-                  },
-                }),
-              );
-              break;
-            case 'account':
-              dispatch(
-                pushModal({
-                  modal: {
-                    name: 'account-autocomplete',
-                    options: {
-                      onSelect: accountId => {
-                        onUpdateInner(transactionToEdit, name, accountId);
-                      },
-                      onClose: () => {
-                        onClearActiveEdit();
-                      },
-                    },
-                  },
-                }),
-              );
-              break;
-            case 'payee':
-              dispatch(
-                pushModal({
-                  modal: {
-                    name: 'payee-autocomplete',
-                    options: {
-                      onSelect: payeeId => {
-                        onUpdateInner(transactionToEdit, name, payeeId);
-                      },
-                      onClose: () => {
-                        onClearActiveEdit();
-                      },
-                    },
-                  },
-                }),
-              );
-              break;
-            default:
-              dispatch(
-                pushModal({
-                  modal: {
-                    name: 'edit-field',
-                    options: {
-                      name,
-                      onSubmit: (name, value) => {
-                        onUpdateInner(transactionToEdit, name, value);
-                      },
-                      onClose: () => {
-                        onClearActiveEdit();
-                      },
-                    },
-                  },
-                }),
-              );
-              break;
-          }
-        });
-      },
-      [
-        categoryGroups,
-        dispatch,
-        onUpdateInner,
-        onClearActiveEdit,
-        onRequestActiveEdit,
-        transaction.id,
-        transactions,
-        unserializedTransactions,
-        showHiddenCategories,
-      ],
-    );
-
-    const onDeleteInner = useCallback(
-      (id: TransactionEntity['id']) => {
-        const [unserializedTransaction] = unserializedTransactions;
-
-        const onConfirmDelete = () => {
-          dispatch(
-            pushModal({
-              modal: {
-                name: 'confirm-delete',
+    const rule = {
+      stage: null,
+      conditionsOp: 'and',
+      conditions: [payeeCondition, amountCondition],
+      actions: [
+        ...(childTransactions.length === 0
+          ? [
+              {
+                op: 'set',
+                field: 'category',
+                value: ruleTransaction.category,
+                type: 'id',
                 options: {
-                  message: t(
-                    'Are you sure you want to delete the transaction?',
-                  ),
-                  onConfirm: () => {
-                    onDelete(id);
-
-                    if (unserializedTransaction.id !== id) {
-                      // Only a child transaction was deleted.
-                      onClearActiveEdit();
-                      return;
-                    }
-
-                    navigate(-1);
-                  },
+                  splitIndex: 0,
                 },
-              },
-            }),
-          );
-        };
-
-        if (unserializedTransaction.reconciled) {
-          dispatch(
-            pushModal({
-              modal: {
-                name: 'confirm-transaction-edit',
-                options: {
-                  onConfirm: onConfirmDelete,
-                  confirmReason: 'deleteReconciled',
-                },
-              },
-            }),
-          );
-        } else {
-          onConfirmDelete();
-        }
-      },
-      [
-        dispatch,
-        navigate,
-        onClearActiveEdit,
-        onDelete,
-        unserializedTransactions,
-        t,
-      ],
-    );
-
-    const scrollChildTransactionIntoView = useCallback(
-      (id: TransactionEntity['id']) => {
-        const childTransactionEditElement =
-          childTransactionElementRefMap.current?.[id];
-        childTransactionEditElement?.scrollIntoView({
-          behavior: 'smooth',
-        });
-      },
-      [],
-    );
-
-    const onEmptySplitFound = useCallback(
-      (id: TransactionEntity['id']) => {
-        scrollChildTransactionIntoView(id);
-      },
-      [scrollChildTransactionIntoView],
-    );
-
-    const onCreateRule = useCallback(async () => {
-      const { data } = await aqlQuery(
-        q('transactions')
-          .filter({ id: { $oneof: [transaction.id] } })
-          .select('*')
-          .options({ splits: 'grouped' }),
-      );
-
-      const transactions = ungroupTransactions(data);
-      const ruleTransaction = transactions[0];
-      const childTransactions = transactions.filter(
-        t => t.parent_id === ruleTransaction.id,
-      );
-
-      const payeeCondition = ruleTransaction.imported_payee
-        ? ({
-            field: 'imported_payee',
-            op: 'is',
-            value: ruleTransaction.imported_payee,
-            type: 'string',
-          } satisfies RuleConditionEntity)
-        : ({
-            field: 'payee',
-            op: 'is',
-            value: ruleTransaction.payee!,
+              } satisfies RuleActionEntity,
+            ]
+          : []),
+        ...childTransactions.flatMap((sub, index) => [
+          {
+            op: 'set-split-amount',
+            value: sub.amount,
+            options: {
+              splitIndex: index + 1,
+              method: 'fixed-amount',
+            },
+          } satisfies RuleActionEntity,
+          {
+            op: 'set',
+            field: 'category',
+            value: sub.category,
             type: 'id',
-          } satisfies RuleConditionEntity);
+            options: {
+              splitIndex: index + 1,
+            },
+          } satisfies RuleActionEntity,
+        ]),
+      ],
+    } satisfies NewRuleEntity;
 
-      const amountCondition = {
-        field: 'amount',
-        op: 'isapprox',
-        value: ruleTransaction.amount,
-        type: 'number',
-      } satisfies RuleConditionEntity;
+    dispatch(pushModal({ modal: { name: 'edit-rule', options: { rule } } }));
+  }, [transaction, dispatch]);
 
-      const rule = {
-        stage: null,
-        conditionsOp: 'and',
-        conditions: [payeeCondition, amountCondition],
-        actions: [
-          ...(childTransactions.length === 0
-            ? [
-                {
-                  op: 'set',
-                  field: 'category',
-                  value: ruleTransaction.category,
-                  type: 'id',
-                  options: {
-                    splitIndex: 0,
-                  },
-                } satisfies RuleActionEntity,
-              ]
-            : []),
-          ...childTransactions.flatMap((sub, index) => [
-            {
-              op: 'set-split-amount',
-              value: sub.amount,
-              options: {
-                splitIndex: index + 1,
-                method: 'fixed-amount',
-              },
-            } satisfies RuleActionEntity,
-            {
-              op: 'set',
-              field: 'category',
-              value: sub.category,
-              type: 'id',
-              options: {
-                splitIndex: index + 1,
-              },
-            } satisfies RuleActionEntity,
-          ]),
-        ],
-      } satisfies NewRuleEntity;
+  // Child transactions should always default to signage
+  // of parent transaction
+  const childAmountSign = transaction.amount <= 0 ? '-' : '+';
 
-      dispatch(pushModal({ modal: { name: 'edit-rule', options: { rule } } }));
-    }, [transaction, dispatch]);
+  const account = getAccount(transaction);
+  const isOffBudget = account ? !!account.offbudget : false;
+  const title = getPrettyPayee({
+    t,
+    transaction,
+    payee: getPayee(transaction),
+    transferAccount: getTransferAccount(transaction),
+  });
 
-    // Child transactions should always default to signage
-    // of parent transaction
-    const childAmountSign = transaction.amount <= 0 ? '-' : '+';
+  const transactionDate = parseDate(transaction.date, dateFormat, new Date());
+  const dateDefaultValue = monthUtils.dayFromDate(transactionDate);
 
-    const account = getAccount(transaction);
-    const isOffBudget = account ? !!account.offbudget : false;
-    const title = getPrettyPayee({
-      t,
-      transaction,
-      payee: getPayee(transaction),
-      transferAccount: getTransferAccount(transaction),
-    });
-
-    const transactionDate = parseDate(transaction.date, dateFormat, new Date());
-    const dateDefaultValue = monthUtils.dayFromDate(transactionDate);
-
-    return (
-      <Page
-        header={
-          <MobilePageHeader
-            title={
-              transaction.payee == null
-                ? isAdding
-                  ? t('New Transaction')
-                  : t('Transaction')
-                : title
-            }
-            leftContent={<MobileBackButton />}
-          />
-        }
-        footer={
-          <Footer
-            transactions={transactions}
-            isAdding={isAdding}
-            onAdd={onSaveInner}
-            onSave={onSaveInner}
-            onSplit={onSplit}
-            onAddSplit={onAddSplit}
-            onEmptySplitFound={onEmptySplitFound}
-            editingField={editingField}
-            onEditField={onEditFieldInner}
-          />
-        }
-        padding={0}
+  return (
+    <Page
+      header={
+        <MobilePageHeader
+          title={
+            transaction.payee == null
+              ? isAdding
+                ? t('New Transaction')
+                : t('Transaction')
+              : title
+          }
+          leftContent={<MobileBackButton />}
+        />
+      }
+      footer={
+        <Footer
+          transactions={transactions}
+          isAdding={isAdding}
+          onAdd={onSaveInner}
+          onSave={onSaveInner}
+          onSplit={onSplit}
+          onAddSplit={onAddSplit}
+          onEmptySplitFound={onEmptySplitFound}
+          editingField={editingField}
+          onEditField={onEditFieldInner}
+        />
+      }
+      padding={0}
+    >
+      <View
+        data-testid="transaction-form"
+        style={{ flexShrink: 0, marginTop: 20, marginBottom: 20 }}
       >
         <View
-          data-testid="transaction-form"
-          style={{ flexShrink: 0, marginTop: 20, marginBottom: 20 }}
+          style={{
+            alignItems: 'center',
+          }}
         >
-          <View
-            style={{
-              alignItems: 'center',
+          <FieldLabel title={t('Amount')} flush style={{ marginBottom: 0 }} />
+          <FocusableAmountInput
+            value={transaction.amount}
+            zeroSign="-"
+            focused={totalAmountFocused}
+            onFocus={onTotalAmountEdit}
+            onBlur={() => onClearActiveEdit()}
+            onUpdateAmount={onTotalAmountUpdate}
+            focusedStyle={{
+              width: 'auto',
+              padding: '5px',
+              paddingLeft: '20px',
+              paddingRight: '20px',
+              minWidth: '100%',
             }}
-          >
-            <FieldLabel title={t('Amount')} flush style={{ marginBottom: 0 }} />
-            <FocusableAmountInput
-              value={transaction.amount}
-              zeroSign="-"
-              focused={totalAmountFocused}
-              onFocus={onTotalAmountEdit}
-              onBlur={() => onClearActiveEdit()}
-              onUpdateAmount={onTotalAmountUpdate}
-              focusedStyle={{
-                width: 'auto',
-                padding: '5px',
-                paddingLeft: '20px',
-                paddingRight: '20px',
-                minWidth: '100%',
-              }}
-              textStyle={{ ...styles.veryLargeText, textAlign: 'center' }}
-            />
-          </View>
+            textStyle={{ ...styles.veryLargeText, textAlign: 'center' }}
+          />
+        </View>
 
+        <View>
+          <FieldLabel title={t('Payee')} />
+          <TapField
+            textStyle={{
+              ...(transaction.is_parent && {
+                fontStyle: 'italic',
+                fontWeight: 300,
+              }),
+            }}
+            value={title}
+            isDisabled={
+              !!editingField &&
+              editingField !== getFieldName(transaction.id, 'payee')
+            }
+            onPress={() => onEditFieldInner(transaction.id, 'payee')}
+            data-testid="payee-field"
+          />
+        </View>
+
+        {!transaction.is_parent && (
           <View>
-            <FieldLabel title={t('Payee')} />
+            <FieldLabel title={t('Category')} />
             <TapField
-              textStyle={{
-                ...(transaction.is_parent && {
+              style={{
+                ...((isOffBudget || isBudgetTransfer(transaction)) && {
                   fontStyle: 'italic',
+                  color: theme.pageTextSubdued,
                   fontWeight: 300,
                 }),
               }}
-              value={title}
+              value={getCategory(transaction, isOffBudget)}
               isDisabled={
-                !!editingField &&
-                editingField !== getFieldName(transaction.id, 'payee')
+                (!!editingField &&
+                  editingField !== getFieldName(transaction.id, 'category')) ||
+                isOffBudget ||
+                isBudgetTransfer(transaction)
               }
-              onPress={() => onEditFieldInner(transaction.id, 'payee')}
-              data-testid="payee-field"
+              onPress={() => onEditFieldInner(transaction.id, 'category')}
+              data-testid="category-field"
             />
           </View>
+        )}
 
-          {!transaction.is_parent && (
-            <View>
-              <FieldLabel title={t('Category')} />
-              <TapField
-                style={{
-                  ...((isOffBudget || isBudgetTransfer(transaction)) && {
-                    fontStyle: 'italic',
-                    color: theme.pageTextSubdued,
-                    fontWeight: 300,
-                  }),
-                }}
-                value={getCategory(transaction, isOffBudget)}
-                isDisabled={
-                  (!!editingField &&
-                    editingField !==
-                      getFieldName(transaction.id, 'category')) ||
-                  isOffBudget ||
-                  isBudgetTransfer(transaction)
-                }
-                onPress={() => onEditFieldInner(transaction.id, 'category')}
-                data-testid="category-field"
-              />
-            </View>
-          )}
+        {childTransactions.map((childTrans, i, arr) => (
+          <ChildTransactionEdit
+            key={childTrans.id}
+            transaction={childTrans}
+            amountFocused={arr.findIndex(c => c.amount === 0) === i}
+            amountSign={childAmountSign}
+            ref={r => {
+              childTransactionElementRefMap.current = {
+                ...childTransactionElementRefMap.current,
+                [childTrans.id]: r,
+              };
+            }}
+            isOffBudget={isOffBudget}
+            getCategory={getCategory}
+            getPayee={getPayee}
+            getTransferAccount={getTransferAccount}
+            isBudgetTransfer={isBudgetTransfer}
+            onUpdate={onUpdateInner}
+            onEditField={onEditFieldInner}
+            onDelete={onDeleteInner}
+          />
+        ))}
 
-          {childTransactions.map((childTrans, i, arr) => (
-            <ChildTransactionEdit
-              key={childTrans.id}
-              transaction={childTrans}
-              amountFocused={arr.findIndex(c => c.amount === 0) === i}
-              amountSign={childAmountSign}
-              ref={r => {
-                childTransactionElementRefMap.current = {
-                  ...childTransactionElementRefMap.current,
-                  [childTrans.id]: r,
-                };
+        {transaction.amount !== 0 && childTransactions.length === 0 && (
+          <View style={{ alignItems: 'center' }}>
+            <Button
+              variant="bare"
+              isDisabled={!!editingField}
+              style={{
+                height: 40,
+                borderWidth: 0,
+                marginLeft: styles.mobileEditingPadding,
+                marginRight: styles.mobileEditingPadding,
+                marginTop: 10,
+                backgroundColor: 'transparent',
               }}
-              isOffBudget={isOffBudget}
-              getCategory={getCategory}
-              getPayee={getPayee}
-              getTransferAccount={getTransferAccount}
-              isBudgetTransfer={isBudgetTransfer}
-              onUpdate={onUpdateInner}
-              onEditField={onEditFieldInner}
-              onDelete={onDeleteInner}
-            />
-          ))}
-
-          {transaction.amount !== 0 && childTransactions.length === 0 && (
-            <View style={{ alignItems: 'center' }}>
-              <Button
-                variant="bare"
-                isDisabled={!!editingField}
-                style={{
-                  height: 40,
-                  borderWidth: 0,
-                  marginLeft: styles.mobileEditingPadding,
-                  marginRight: styles.mobileEditingPadding,
-                  marginTop: 10,
-                  backgroundColor: 'transparent',
-                }}
-                onPress={() => onSplit(transaction.id)}
-              >
-                <SvgSplit
-                  width={17}
-                  height={17}
-                  style={{ color: theme.formLabelText }}
-                />
-                <Text
-                  style={{
-                    marginLeft: 5,
-                    userSelect: 'none',
-                    color: theme.formLabelText,
-                  }}
-                >
-                  <Trans>Split</Trans>
-                </Text>
-              </Button>
-            </View>
-          )}
-
-          <View>
-            <FieldLabel title={t('Account')} />
-            <TapField
-              isDisabled={
-                !!editingField &&
-                editingField !== getFieldName(transaction.id, 'account')
-              }
-              value={account?.name}
-              onPress={() => onEditFieldInner(transaction.id, 'account')}
-              data-testid="account-field"
-            />
-          </View>
-
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ flex: 1 }}>
-              <FieldLabel title={t('Date')} />
-              <InputField
-                type="date"
-                disabled={
-                  !!editingField &&
-                  editingField !== getFieldName(transaction.id, 'date')
-                }
-                required
-                style={{
-                  color: theme.tableText,
-                  minWidth: '150px',
-                  appearance: 'none',
-                }}
-                defaultValue={dateDefaultValue}
-                onBlur={() => onClearActiveEdit()}
-                onFocus={() =>
-                  onRequestActiveEdit(getFieldName(transaction.id, 'date'))
-                }
-                onChange={event =>
-                  onUpdateInner(
-                    transaction,
-                    'date',
-                    formatDate(parseISO(event.target.value), dateFormat),
-                  )
-                }
+              onPress={() => onSplit(transaction.id)}
+            >
+              <SvgSplit
+                width={17}
+                height={17}
+                style={{ color: theme.formLabelText }}
               />
-            </View>
-            {transaction.reconciled ? (
-              <View style={{ alignItems: 'center' }}>
-                <FieldLabel title={t('Reconciled')} />
-                <Toggle id="Reconciled" isOn isDisabled />
-              </View>
-            ) : (
-              <View style={{ alignItems: 'center' }}>
-                <FieldLabel title={t('Cleared')} />
-                <ToggleField
-                  id="cleared"
-                  isOn={!!transaction.cleared}
-                  onToggle={on => onUpdateInner(transaction, 'cleared', on)}
-                />
-              </View>
-            )}
+              <Text
+                style={{
+                  marginLeft: 5,
+                  userSelect: 'none',
+                  color: theme.formLabelText,
+                }}
+              >
+                <Trans>Split</Trans>
+              </Text>
+            </Button>
           </View>
+        )}
 
-          <View>
-            <FieldLabel title={t('Notes')} />
+        <View>
+          <FieldLabel title={t('Account')} />
+          <TapField
+            isDisabled={
+              !!editingField &&
+              editingField !== getFieldName(transaction.id, 'account')
+            }
+            value={account?.name}
+            onPress={() => onEditFieldInner(transaction.id, 'account')}
+            data-testid="account-field"
+          />
+        </View>
+
+        <View style={{ flexDirection: 'row' }}>
+          <View style={{ flex: 1 }}>
+            <FieldLabel title={t('Date')} />
             <InputField
+              type="date"
               disabled={
                 !!editingField &&
-                editingField !== getFieldName(transaction.id, 'notes')
+                editingField !== getFieldName(transaction.id, 'date')
               }
-              defaultValue={transaction.notes}
-              onFocus={() => {
-                onRequestActiveEdit(getFieldName(transaction.id, 'notes'));
+              required
+              style={{
+                color: theme.tableText,
+                minWidth: '150px',
+                appearance: 'none',
               }}
+              defaultValue={dateDefaultValue}
               onBlur={() => onClearActiveEdit()}
+              onFocus={() =>
+                onRequestActiveEdit(getFieldName(transaction.id, 'date'))
+              }
               onChange={event =>
-                onUpdateInner(transaction, 'notes', event.target.value)
+                onUpdateInner(
+                  transaction,
+                  'date',
+                  formatDate(parseISO(event.target.value), dateFormat),
+                )
               }
             />
           </View>
+          {transaction.reconciled ? (
+            <View style={{ alignItems: 'center' }}>
+              <FieldLabel title={t('Reconciled')} />
+              <Toggle id="Reconciled" isOn isDisabled />
+            </View>
+          ) : (
+            <View style={{ alignItems: 'center' }}>
+              <FieldLabel title={t('Cleared')} />
+              <ToggleField
+                id="cleared"
+                isOn={!!transaction.cleared}
+                onToggle={on => onUpdateInner(transaction, 'cleared', on)}
+              />
+            </View>
+          )}
+        </View>
 
-          {!isAdding && (
-            <>
-              {randomStuffEnabled && (
-                <View style={{ alignItems: 'center' }}>
-                  <Button
-                    variant="bare"
-                    onPress={() => onCreateRule()}
-                    style={{
-                      height: 40,
-                      borderWidth: 0,
-                      marginLeft: styles.mobileEditingPadding,
-                      marginRight: styles.mobileEditingPadding,
-                      marginTop: 10,
-                      backgroundColor: 'transparent',
-                    }}
-                  >
-                    <SvgLightBulb
-                      width={17}
-                      height={17}
-                      style={{ color: theme.pageText }}
-                    />
-                    <Text
-                      style={{
-                        color: theme.pageText,
-                        marginLeft: 5,
-                        userSelect: 'none',
-                      }}
-                    >
-                      <Trans>Create rule</Trans>
-                    </Text>
-                  </Button>
-                </View>
-              )}
+        <View>
+          <FieldLabel title={t('Notes')} />
+          <InputField
+            disabled={
+              !!editingField &&
+              editingField !== getFieldName(transaction.id, 'notes')
+            }
+            defaultValue={transaction.notes}
+            onFocus={() => {
+              onRequestActiveEdit(getFieldName(transaction.id, 'notes'));
+            }}
+            onBlur={() => onClearActiveEdit()}
+            onChange={event =>
+              onUpdateInner(transaction, 'notes', event.target.value)
+            }
+          />
+        </View>
 
+        {!isAdding && (
+          <>
+            {randomStuffEnabled && (
               <View style={{ alignItems: 'center' }}>
                 <Button
                   variant="bare"
-                  onPress={() => onDeleteInner(transaction.id)}
+                  onPress={() => onCreateRule()}
                   style={{
                     height: 40,
                     borderWidth: 0,
@@ -1365,27 +1326,58 @@ function TransactionEditInner({
                     backgroundColor: 'transparent',
                   }}
                 >
-                  <SvgTrash
+                  <SvgLightBulb
                     width={17}
                     height={17}
-                    style={{ color: theme.errorText }}
+                    style={{ color: theme.pageText }}
                   />
                   <Text
                     style={{
-                      color: theme.errorText,
+                      color: theme.pageText,
                       marginLeft: 5,
                       userSelect: 'none',
                     }}
                   >
-                    <Trans>Delete transaction</Trans>
+                    <Trans>Create rule</Trans>
                   </Text>
                 </Button>
               </View>
-            </>
-          )}
-        </View>
-      </Page>
-    );
+            )}
+
+            <View style={{ alignItems: 'center' }}>
+              <Button
+                variant="bare"
+                onPress={() => onDeleteInner(transaction.id)}
+                style={{
+                  height: 40,
+                  borderWidth: 0,
+                  marginLeft: styles.mobileEditingPadding,
+                  marginRight: styles.mobileEditingPadding,
+                  marginTop: 10,
+                  backgroundColor: 'transparent',
+                }}
+              >
+                <SvgTrash
+                  width={17}
+                  height={17}
+                  style={{ color: theme.errorText }}
+                />
+                <Text
+                  style={{
+                    color: theme.errorText,
+                    marginLeft: 5,
+                    userSelect: 'none',
+                  }}
+                >
+                  <Trans>Delete transaction</Trans>
+                </Text>
+              </Button>
+            </View>
+          </>
+        )}
+      </View>
+    </Page>
+  );
 }
 
 function isTemporary(transaction: TransactionEntity) {

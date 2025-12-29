@@ -221,6 +221,9 @@ export function ExperimentalFeatures() {
             <FeatureToggle flag="ynabStyleMobilePills">
               <Trans>YNAB-style pill styling (mobile budget)</Trans>
             </FeatureToggle>
+            <FeatureToggle flag="enableMobileSummary">
+              <Trans>Mobile summary/home page (new default landing page)</Trans>
+            </FeatureToggle>
             <FeatureToggle flag="randomStuff">
               <Trans>Random stuff (experimental mobile features)</Trans>
             </FeatureToggle>

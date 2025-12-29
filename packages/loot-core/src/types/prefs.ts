@@ -12,6 +12,7 @@ export type FeatureFlag =
   | 'resetBudgetTemplates'
   | 'budget-detailed-view'
   | 'ynabStyleMobilePills'
+  | 'enableMobileSummary'
   | 'randomStuff';
 
 /**
@@ -31,6 +32,7 @@ export type SyncedPrefs = Partial<
     | 'defaultCurrencyCode'
     | 'plugins'
     | 'mobileBudgetTableFontSize'
+    | 'pinnedCategories'
     | `show-account-${string}-net-worth-chart`
     | `side-nav.show-balance-history-${string}`
     | `show-balances-${string}`

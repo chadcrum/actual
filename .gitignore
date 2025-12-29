@@ -76,3 +76,6 @@ build/
 
 # Chad forked integration
 .env
+
+# Git worktrees
+.worktrees

@@ -31,6 +31,7 @@ import { getLatestAppVersion, sync } from '@desktop-client/app/appSlice';
 import { ProtectedRoute } from '@desktop-client/auth/ProtectedRoute';
 import { Permissions } from '@desktop-client/auth/types';
 import { useAccounts } from '@desktop-client/hooks/useAccounts';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useGlobalPref } from '@desktop-client/hooks/useGlobalPref';
 import { useLocalPref } from '@desktop-client/hooks/useLocalPref';
 import { useMetaThemeColor } from '@desktop-client/hooks/useMetaThemeColor';
@@ -86,6 +87,7 @@ export function FinancesApp() {
 
   const accounts = useAccounts();
   const isAccountsLoaded = useSelector(state => state.account.isAccountsLoaded);
+  const enableMobileSummary = useFeatureFlag('enableMobileSummary');
 
   const versionInfo = useSelector(state => state.app.versionInfo);
   const [notifyWhenUpdateIsAvailable] = useGlobalPref(
@@ -238,7 +240,10 @@ export function FinancesApp() {
                   element={
                     isAccountsLoaded ? (
                       accounts.length > 0 ? (
-                        <Navigate to="/budget" replace />
+                        <Navigate
+                          to={enableMobileSummary ? '/summary' : '/budget'}
+                          replace
+                        />
                       ) : (
                         // If there are no accounts, we want to redirect the user to
                         // the All Accounts screen which will prompt them to add an account
@@ -251,6 +256,11 @@ export function FinancesApp() {
                 />
 
                 <Route path="/reports/*" element={<Reports />} />
+
+                <Route
+                  path="/summary"
+                  element={<NarrowAlternate name="Summary" />}
+                />
 
                 <Route
                   path="/budget"
@@ -360,12 +370,21 @@ export function FinancesApp() {
                     }
                   />
                 )}
-                {/* redirect all other traffic to the budget page */}
-                <Route path="/*" element={<Navigate to="/budget" replace />} />
+                {/* redirect all other traffic to the appropriate default page */}
+                <Route
+                  path="/*"
+                  element={
+                    <Navigate
+                      to={enableMobileSummary ? '/summary' : '/budget'}
+                      replace
+                    />
+                  }
+                />
               </Routes>
             </View>
 
             <Routes>
+              <Route path="/summary" element={<MobileNavTabs />} />
               <Route path="/budget" element={<MobileNavTabs />} />
               <Route path="/accounts" element={<MobileNavTabs />} />
               <Route path="/settings" element={<MobileNavTabs />} />

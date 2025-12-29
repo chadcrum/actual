@@ -63,6 +63,7 @@
     "@octokit/rest": "^22.0.1",
     "@types/node": "^22.19.1",
     "@types/prompts": "^2.4.9",
+    "@types/react-beautiful-dnd": "^13",
     "@typescript-eslint/parser": "^8.46.4",
     "cross-env": "^10.1.0",
     "eslint": "^9.39.2",
@@ -110,5 +111,8 @@
   "browserslist": [
     "electron >= 35.0",
     "defaults"
-  ]
+  ],
+  "dependencies": {
+    "react-beautiful-dnd": "^13.1.1"
+  }
 }

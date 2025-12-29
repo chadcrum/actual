@@ -17,6 +17,7 @@ const DEFAULT_FEATURE_FLAG_STATE: Record<FeatureFlag, boolean> = {
   'budget-detailed-view': false,
   ynabStyleMobilePills: false,
   randomStuff: false,
+  enableMobileSummary: false,
 };
 
 export function useFeatureFlag(name: FeatureFlag): boolean {

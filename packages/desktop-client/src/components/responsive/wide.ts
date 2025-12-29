@@ -1,4 +1,5 @@
 export { Budget } from '../budget';
+export { MobileSummaryPage as Summary } from '../mobile/summary/MobileSummaryPage';
 
 export { Schedules } from '../schedules';
 export { Schedules as ScheduleEdit } from '../schedules';

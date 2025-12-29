@@ -14,6 +14,7 @@ import {
   SvgAdd,
   SvgCog,
   SvgCreditCard,
+  SvgHome,
   SvgPiggyBank,
   SvgReports,
   SvgStoreFront,
@@ -26,11 +27,12 @@ import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import { useDrag } from '@use-gesture/react';
 
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useIsTestEnv } from '@desktop-client/hooks/useIsTestEnv';
 import { useScrollListener } from '@desktop-client/hooks/useScrollListener';
 import { useSyncServerStatus } from '@desktop-client/hooks/useSyncServerStatus';
 
-const COLUMN_COUNT = 3;
+const COLUMN_COUNT = 4;
 const PILL_HEIGHT = 15;
 const ROW_HEIGHT = 70;
 const TOTAL_HEIGHT = ROW_HEIGHT * COLUMN_COUNT;
@@ -97,7 +99,21 @@ export function MobileNavTabs() {
     [api],
   );
 
+  const enableMobileSummary = useFeatureFlag('enableMobileSummary');
+
+  const mobileNavExtensions = enableMobileSummary
+    ? [
+        {
+          name: t('Home'),
+          path: '/summary',
+          style: navTabStyle,
+          Icon: SvgHome,
+        },
+      ]
+    : [];
+
   const navTabs = [
+    ...mobileNavExtensions,
     {
       name: t('Budget'),
       path: '/budget',

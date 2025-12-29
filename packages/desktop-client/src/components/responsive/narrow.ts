@@ -1,4 +1,5 @@
 export { BudgetPage as Budget } from '../mobile/budget/BudgetPage';
+export { MobileSummaryPage as Summary } from '../mobile/summary/MobileSummaryPage';
 
 export { AccountsPage as Accounts } from '../mobile/accounts/AccountsPage';
 export { AccountPage as Account } from '../mobile/accounts/AccountPage';

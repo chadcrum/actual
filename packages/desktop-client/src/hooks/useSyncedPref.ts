@@ -11,10 +11,11 @@ type SetSyncedPrefAction<K extends keyof SyncedPrefs> = (
 
 export function useSyncedPref<K extends keyof SyncedPrefs>(
   prefName: K,
-): [SyncedPrefs[K], SetSyncedPrefAction<K>] {
+  defaultValue?: SyncedPrefs[K] | { ids: string[]; order: string[] },
+): any {
   const dispatch = useDispatch();
-  const setPref = useCallback<SetSyncedPrefAction<K>>(
-    value => {
+  const setPref = useCallback<any>(
+    (value: any) => {
       dispatch(
         saveSyncedPrefs({
           prefs: { [prefName]: value },
@@ -25,5 +26,5 @@ export function useSyncedPref<K extends keyof SyncedPrefs>(
   );
   const pref = useSelector(state => state.prefs.synced[prefName]);
 
-  return [pref, setPref];
+  return [pref ?? defaultValue, setPref];
 }

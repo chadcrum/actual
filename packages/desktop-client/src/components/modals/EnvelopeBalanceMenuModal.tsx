@@ -1,6 +1,7 @@
 import React, { type CSSProperties } from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
+import { Button } from '@actual-app/components/button';
 import { styles } from '@actual-app/components/styles';
 import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
@@ -19,6 +20,8 @@ import {
 } from '@desktop-client/components/common/Modal';
 import { CellValueText } from '@desktop-client/components/spreadsheet/CellValue';
 import { useCategory } from '@desktop-client/hooks/useCategory';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
+import { usePinnedCategories } from '@desktop-client/hooks/usePinnedCategories';
 import { type Modal as ModalType } from '@desktop-client/modals/modalsSlice';
 import { envelopeBudget } from '@desktop-client/spreadsheet/bindings';
 
@@ -41,6 +44,9 @@ export function EnvelopeBalanceMenuModal({
   };
 
   const category = useCategory(categoryId);
+  const { t } = useTranslation();
+  const pinnedCategoriesEnabled = useFeatureFlag('enableMobileSummary');
+  const { isPinned, togglePin } = usePinnedCategories();
 
   if (!category) {
     return null;
@@ -107,6 +113,26 @@ export function EnvelopeBalanceMenuModal({
             onTransfer={onTransfer}
             onCover={onCover}
           />
+          {pinnedCategoriesEnabled && (
+            <View
+              style={{
+                ...defaultMenuItemStyle,
+                marginTop: 10,
+              }}
+            >
+              <Button
+                variant="menu"
+                style={{
+                  color: theme.menuItemText,
+                }}
+                onPress={() => {
+                  togglePin(categoryId);
+                }}
+              >
+                {isPinned(categoryId) ? t('Unpin') : t('Pin')}
+              </Button>
+            </View>
+          )}
         </>
       )}
     </Modal>
