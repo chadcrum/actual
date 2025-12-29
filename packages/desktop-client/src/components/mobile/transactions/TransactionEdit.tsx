@@ -574,6 +574,7 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
   }) {
     const { t } = useTranslation();
     const randomStuffEnabled = useFeatureFlag('randomStuff');
+    console.log('[TransactionEditInner] randomStuffEnabled:', randomStuffEnabled);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [showHiddenCategories] = useLocalPref('budget.showHiddenCategories');
@@ -1320,7 +1321,7 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
 
           {!isAdding && (
             <>
-              {randomStuffEnabled && (
+              {console.log('[TransactionEditInner] rendering buttons, randomStuffEnabled:', randomStuffEnabled, 'isAdding:', isAdding) || randomStuffEnabled && (
                 <View style={{ alignItems: 'center' }}>
                   <Button
                     variant="bare"
