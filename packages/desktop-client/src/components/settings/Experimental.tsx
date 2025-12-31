@@ -174,6 +174,9 @@ export function ExperimentalFeatures() {
             <FeatureToggle flag="forceReload">
               <Trans>Force reload app button</Trans>
             </FeatureToggle>
+            <FeatureToggle flag="enableOverviewPage">
+              <Trans>Mobile overview page</Trans>
+            </FeatureToggle>
             <GlobalFeatureToggle
               prefName="plugins"
               disableToggle
