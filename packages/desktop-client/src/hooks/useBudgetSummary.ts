@@ -25,13 +25,15 @@ export function useBudgetSummary(): BudgetSummary {
   const [budgetTypePref] = useSyncedPref('budgetType');
   const budgetType = isBudgetType(budgetTypePref) ? budgetTypePref : 'envelope';
   const spreadsheet = useSpreadsheet();
-  const { sheetName } = useSheetName();
   const [goalTarget, setGoalTarget] = useState(0);
 
   // Get totals from the spreadsheet
   const bindings = budgetType === 'envelope' ? envelopeBudget : trackingBudget;
   const totalSpent = useSheetValue(bindings.totalSpent) ?? 0;
   const totalBudgeted = useSheetValue(bindings.totalBudgeted) ?? 0;
+
+  // Get sheet name from the binding
+  const { sheetName } = useSheetName(bindings.totalSpent);
 
   // Fetch goal values from spreadsheet for all categories
   useEffect(() => {
