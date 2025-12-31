@@ -14,13 +14,14 @@ import {
   SvgAdd,
   SvgCog,
   SvgCreditCard,
+  SvgHome,
   SvgPiggyBank,
   SvgReports,
   SvgStoreFront,
   SvgTuning,
   SvgWallet,
 } from '@actual-app/components/icons/v1';
-import { SvgCalendar3, SvgHome } from '@actual-app/components/icons/v2';
+import { SvgCalendar3 } from '@actual-app/components/icons/v2';
 import { styles } from '@actual-app/components/styles';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
