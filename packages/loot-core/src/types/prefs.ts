@@ -7,10 +7,13 @@ export type FeatureFlag =
   | 'crossoverReport'
   | 'plugins'
   | 'forceReload'
-  | 'increaseMobileBudgetTableFontSize';
+  | 'increaseMobileBudgetTableFontSize'
+  | 'enableOverviewPage';
 
 /**
  * Cross-device preferences. These sync across devices when they are changed.
+ * All values are stored as strings in the database. Complex types like arrays
+ * are serialized as JSON strings and must be parsed at usage sites.
  */
 export type SyncedPrefs = Partial<
   Record<
@@ -26,6 +29,7 @@ export type SyncedPrefs = Partial<
     | 'defaultCurrencyCode'
     | 'plugins'
     | 'mobileBudgetTableFontSize'
+    | 'pinnedCategoryIds'
     | `show-account-${string}-net-worth-chart`
     | `side-nav.show-balance-history-${string}`
     | `show-balances-${string}`

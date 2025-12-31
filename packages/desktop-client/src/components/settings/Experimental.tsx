@@ -238,6 +238,9 @@ export function ExperimentalFeatures() {
                 </View>
               </View>
             )}
+            <FeatureToggle flag="enableOverviewPage">
+              <Trans>Mobile overview page</Trans>
+            </FeatureToggle>
             {showServerPrefs && (
               <ServerFeatureToggle
                 prefName="flags.plugins"

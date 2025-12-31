@@ -6,6 +6,8 @@ import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
+import { PinToOverviewCheckbox } from './PinToOverviewCheckbox';
+
 import {
   BalanceWithCarryover,
   CarryoverIndicator,
@@ -19,6 +21,7 @@ import {
 } from '@desktop-client/components/common/Modal';
 import { CellValueText } from '@desktop-client/components/spreadsheet/CellValue';
 import { useCategory } from '@desktop-client/hooks/useCategory';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { type Modal as ModalType } from '@desktop-client/modals/modalsSlice';
 import { trackingBudget } from '@desktop-client/spreadsheet/bindings';
 
@@ -39,6 +42,7 @@ export function TrackingBalanceMenuModal({
   };
 
   const category = useCategory(categoryId);
+  const overviewEnabled = useFeatureFlag('enableOverviewPage');
 
   if (!category) {
     return null;
@@ -102,6 +106,9 @@ export function TrackingBalanceMenuModal({
             getItemStyle={() => defaultMenuItemStyle}
             onCarryover={onCarryover}
           />
+          {overviewEnabled && (
+            <PinToOverviewCheckbox categoryId={categoryId} theme={theme} />
+          )}
         </>
       )}
     </Modal>

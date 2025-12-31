@@ -11,6 +11,8 @@ const DEFAULT_FEATURE_FLAG_STATE: Record<FeatureFlag, boolean> = {
   crossoverReport: false,
   forceReload: false,
   increaseMobileBudgetTableFontSize: false,
+  enableOverviewPage: false,
+  plugins: false,
 };
 
 export function useFeatureFlag(name: FeatureFlag): boolean {
