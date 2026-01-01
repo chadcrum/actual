@@ -12,9 +12,10 @@ describe('PinnedCategoriesTable', () => {
   });
 
   test('displays empty state when no categories pinned', () => {
+    // @ts-ignore - vi.mocked returns a type that's compatible with the hook
     vi.mocked(usePinnedCategories).mockReturnValue({
       getPinnedCategories: () => [],
-    } as unknown);
+    });
 
     render(<PinnedCategoriesTable onCategoryClick={vi.fn()} />);
 
@@ -24,13 +25,14 @@ describe('PinnedCategoriesTable', () => {
 
   test('displays pinned categories in table format', () => {
     const mockCategories = [
-      { id: 'cat-1', name: 'Groceries' },
-      { id: 'cat-2', name: 'Utilities' },
+      { id: 'cat-1', name: 'Groceries', group: 'group-1' },
+      { id: 'cat-2', name: 'Utilities', group: 'group-1' },
     ];
 
+    // @ts-ignore - vi.mocked returns a type that's compatible with the hook
     vi.mocked(usePinnedCategories).mockReturnValue({
       getPinnedCategories: () => mockCategories,
-    } as unknown);
+    });
 
     render(<PinnedCategoriesTable onCategoryClick={vi.fn()} />);
 
@@ -40,11 +42,14 @@ describe('PinnedCategoriesTable', () => {
 
   test('calls onCategoryClick when category row is clicked', () => {
     const mockOnClick = vi.fn();
-    const mockCategories = [{ id: 'cat-1', name: 'Groceries' }];
+    const mockCategories = [
+      { id: 'cat-1', name: 'Groceries', group: 'group-1' },
+    ];
 
+    // @ts-ignore - vi.mocked returns a type that's compatible with the hook
     vi.mocked(usePinnedCategories).mockReturnValue({
       getPinnedCategories: () => mockCategories,
-    } as unknown);
+    });
 
     const { container } = render(
       <PinnedCategoriesTable onCategoryClick={mockOnClick} />,

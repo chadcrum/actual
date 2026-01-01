@@ -15,8 +15,10 @@ describe('usePinnedCategories', () => {
   });
 
   test('returns empty array when no categories pinned', () => {
-    (useSyncedPref as unknown).mockReturnValue([undefined, vi.fn()]);
-    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useSyncedPref).mockReturnValue([undefined, vi.fn()]);
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useCategories).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -25,11 +27,13 @@ describe('usePinnedCategories', () => {
 
   test('deserializes and returns pinned category IDs', () => {
     const categoryIds = ['cat-1', 'cat-2'];
-    (useSyncedPref as unknown).mockReturnValue([
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useSyncedPref).mockReturnValue([
       JSON.stringify(categoryIds),
       vi.fn(),
     ]);
-    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useCategories).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -37,11 +41,13 @@ describe('usePinnedCategories', () => {
   });
 
   test('isPinned returns true for pinned category', () => {
-    (useSyncedPref as unknown).mockReturnValue([
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useSyncedPref).mockReturnValue([
       JSON.stringify(['cat-1', 'cat-2']),
       vi.fn(),
     ]);
-    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useCategories).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -51,11 +57,13 @@ describe('usePinnedCategories', () => {
 
   test('togglePin adds category to pinned list', () => {
     const mockSavePref = vi.fn();
-    (useSyncedPref as unknown).mockReturnValue([
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useSyncedPref).mockReturnValue([
       JSON.stringify(['cat-1']),
       mockSavePref,
     ]);
-    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useCategories).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -70,11 +78,13 @@ describe('usePinnedCategories', () => {
 
   test('togglePin removes category from pinned list', () => {
     const mockSavePref = vi.fn();
-    (useSyncedPref as unknown).mockReturnValue([
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useSyncedPref).mockReturnValue([
       JSON.stringify(['cat-1', 'cat-2']),
       mockSavePref,
     ]);
-    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useCategories).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -87,11 +97,13 @@ describe('usePinnedCategories', () => {
 
   test('togglePin does nothing with empty categoryId', () => {
     const mockSavePref = vi.fn();
-    (useSyncedPref as unknown).mockReturnValue([
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useSyncedPref).mockReturnValue([
       JSON.stringify(['cat-1']),
       mockSavePref,
     ]);
-    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useCategories).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -104,16 +116,18 @@ describe('usePinnedCategories', () => {
 
   test('getPinnedCategories returns category objects in budget order', () => {
     const mockCategoryList = [
-      { id: 'cat-1', name: 'Groceries' },
-      { id: 'cat-2', name: 'Utilities' },
-      { id: 'cat-3', name: 'Entertainment' },
+      { id: 'cat-1', name: 'Groceries', group: 'group-1' },
+      { id: 'cat-2', name: 'Utilities', group: 'group-1' },
+      { id: 'cat-3', name: 'Entertainment', group: 'group-1' },
     ];
 
-    (useSyncedPref as unknown).mockReturnValue([
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useSyncedPref).mockReturnValue([
       JSON.stringify(['cat-2', 'cat-1']),
       vi.fn(),
     ]);
-    (useCategories as unknown).mockReturnValue({
+    // @ts-ignore - Mock type compatibility
+    vi.mocked(useCategories).mockReturnValue({
       list: mockCategoryList,
       grouped: [],
     });

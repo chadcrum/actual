@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 
@@ -24,7 +25,7 @@ vi.mock('@desktop-client/hooks/useSyncedPref', () => ({
   },
 }));
 vi.mock('@desktop-client/hooks/useSheetName', () => ({
-  SheetNameProvider: ({ children }: { children: JSX.Element }) => children,
+  SheetNameProvider: ({ children }: { children: React.ReactNode }) => children,
   useSheetName: () => 'March 2024',
 }));
 vi.mock('@desktop-client/hooks/useCategories', () => ({
@@ -68,22 +69,43 @@ describe('Pinned Categories Integration', () => {
 
     mockGetPinnedCategories = vi.fn(() => {
       const allCategories = [
-        { id: 'cat-1', name: 'Groceries', balance: 150.5, goal_target: 200 },
-        { id: 'cat-2', name: 'Utilities', balance: 45.0, goal_target: 100 },
-        { id: 'cat-3', name: 'Entertainment', balance: 75.0, goal_target: 50 },
+        {
+          id: 'cat-1',
+          name: 'Groceries',
+          group: 'group-1',
+          balance: 150.5,
+          goal_target: 200,
+        },
+        {
+          id: 'cat-2',
+          name: 'Utilities',
+          group: 'group-1',
+          balance: 45.0,
+          goal_target: 100,
+        },
+        {
+          id: 'cat-3',
+          name: 'Entertainment',
+          group: 'group-1',
+          balance: 75.0,
+          goal_target: 50,
+        },
       ];
-      return allCategories.filter(cat => pinnedCategoryIds.includes(cat.id));
+      return allCategories.filter((cat: any) =>
+        pinnedCategoryIds.includes(cat.id),
+      ) as any;
     });
 
     mockIsPinned = vi.fn((categoryId: string) =>
       pinnedCategoryIds.includes(categoryId),
     );
 
-    (usePinnedCategories as unknown).mockReturnValue({
+    // @ts-ignore - Mock type compatibility with hook
+    vi.mocked(usePinnedCategories).mockReturnValue({
       pinnedCategoryIds,
-      isPinned: mockIsPinned,
-      togglePin: mockTogglePin,
-      getPinnedCategories: mockGetPinnedCategories,
+      isPinned: mockIsPinned as any,
+      togglePin: mockTogglePin as any,
+      getPinnedCategories: mockGetPinnedCategories as any,
     });
   };
 
@@ -106,7 +128,7 @@ describe('Pinned Categories Integration', () => {
       );
 
       // Initially, the checkbox should be unchecked
-      expect(mockIsPinned('cat-1')).toBe(false);
+      expect((mockIsPinned as any)('cat-1')).toBe(false);
 
       // Find and click the checkbox
       const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
