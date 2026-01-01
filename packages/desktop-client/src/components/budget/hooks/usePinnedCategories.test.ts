@@ -83,6 +83,23 @@ describe('usePinnedCategories', () => {
     expect(mockSavePref).toHaveBeenCalledWith(JSON.stringify(['cat-2']));
   });
 
+  test('togglePin does nothing with empty categoryId', () => {
+    const mockSavePref = vi.fn();
+    (useSyncedPref as any).mockReturnValue([
+      JSON.stringify(['cat-1']),
+      mockSavePref,
+    ]);
+    (useCategories as any).mockReturnValue({ list: [], grouped: [] });
+
+    const { result } = renderHook(() => usePinnedCategories());
+
+    act(() => {
+      result.current.togglePin('');
+    });
+
+    expect(mockSavePref).not.toHaveBeenCalled();
+  });
+
   test('getPinnedCategories returns category objects in budget order', () => {
     const mockCategoryList = [
       { id: 'cat-1', name: 'Groceries' },
@@ -103,7 +120,9 @@ describe('usePinnedCategories', () => {
     const pinned = result.current.getPinnedCategories();
 
     expect(pinned).toHaveLength(2);
-    expect(pinned[0].id).toBe('cat-2');
-    expect(pinned[1].id).toBe('cat-1');
+    // Even though pinnedCategoryIds is ['cat-2', 'cat-1'], the result
+    // should be in budget page order (cat-1, cat-2) as they appear in categoryList
+    expect(pinned[0].id).toBe('cat-1');
+    expect(pinned[1].id).toBe('cat-2');
   });
 });
