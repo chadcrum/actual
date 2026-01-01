@@ -7,7 +7,6 @@ import { View } from '@actual-app/components/view';
 
 import { usePinnedCategories } from '@desktop-client/components/budget/hooks/usePinnedCategories';
 import { useFormat } from '@desktop-client/hooks/useFormat';
-import { getCategoryColor } from '@desktop-client/util/budgetColors';
 
 type PinnedCategoriesTableProps = {
   onCategoryClick: (categoryId: string) => void;
@@ -111,7 +110,7 @@ export function PinnedCategoriesTable({
                   fontWeight: 500,
                   textAlign: 'right',
                   minWidth: '80px',
-                  color: getCategoryColor(category),
+                  color: theme.tableText,
                 }}
               >
                 {format(category.balance || 0, 'financial')}
