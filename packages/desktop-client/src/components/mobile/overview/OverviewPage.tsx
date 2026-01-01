@@ -20,7 +20,9 @@ export function OverviewPage() {
 
   return (
     <Page
-      header={<MobilePageHeader title={t('{{monthName}} Overview', { monthName })} />}
+      header={
+        <MobilePageHeader title={t('{{monthName}} Overview', { monthName })} />
+      }
       padding={0}
     >
       <SheetNameProvider name={monthUtils.sheetForMonth(currentMonth)}>

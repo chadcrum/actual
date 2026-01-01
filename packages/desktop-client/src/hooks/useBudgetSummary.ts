@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
+
 import { useCategories } from './useCategories';
-import { useSheetValue } from './useSheetValue';
 import { useSheetName } from './useSheetName';
+import { useSheetValue } from './useSheetValue';
 import { useSpreadsheet } from './useSpreadsheet';
 import { useSyncedPref } from './useSyncedPref';
-import { envelopeBudget, trackingBudget } from '@desktop-client/spreadsheet/bindings';
+
+import {
+  envelopeBudget,
+  trackingBudget,
+} from '@desktop-client/spreadsheet/bindings';
 
 type BudgetSummary = {
   spent: number;
@@ -30,18 +35,20 @@ export function useBudgetSummary(): BudgetSummary {
       ? envelopeBudget.totalSpent
       : trackingBudget.totalSpent;
   const totalSpent =
-    useSheetValue<'envelope-budget' | 'tracking-budget', typeof totalSpentBinding>(
-      totalSpentBinding,
-    ) ?? 0;
+    useSheetValue<
+      'envelope-budget' | 'tracking-budget',
+      typeof totalSpentBinding
+    >(totalSpentBinding) ?? 0;
 
   const totalBudgetedBinding =
     budgetType === 'envelope'
       ? envelopeBudget.totalBudgeted
       : trackingBudget.totalBudgetedExpense;
   const totalBudgeted =
-    useSheetValue<'envelope-budget' | 'tracking-budget', typeof totalBudgetedBinding>(
-      totalBudgetedBinding,
-    ) ?? 0;
+    useSheetValue<
+      'envelope-budget' | 'tracking-budget',
+      typeof totalBudgetedBinding
+    >(totalBudgetedBinding) ?? 0;
 
   // Get sheet name from the binding
   const { sheetName } = useSheetName<
@@ -64,7 +71,8 @@ export function useBudgetSummary(): BudgetSummary {
       let totalUnderfunded = 0;
       let totalOverfunded = 0;
 
-      const bindings = budgetType === 'envelope' ? envelopeBudget : trackingBudget;
+      const bindings =
+        budgetType === 'envelope' ? envelopeBudget : trackingBudget;
 
       // Get goal and budgeted values for each category from the spreadsheet
       for (const category of categories) {
@@ -83,8 +91,14 @@ export function useBudgetSummary(): BudgetSummary {
           if (typeof goalValue === 'number' && goalValue !== 0) {
             totalGoal += goalValue;
 
-            const budgetedResult = await spreadsheet.get(sheetName, budgetedBinding);
-            const budgetedValue = typeof budgetedResult.value === 'number' ? budgetedResult.value : 0;
+            const budgetedResult = await spreadsheet.get(
+              sheetName,
+              budgetedBinding,
+            );
+            const budgetedValue =
+              typeof budgetedResult.value === 'number'
+                ? budgetedResult.value
+                : 0;
 
             // Calculate difference: budgeted - goal
             const difference = budgetedValue - goalValue;
@@ -97,7 +111,10 @@ export function useBudgetSummary(): BudgetSummary {
           }
         } catch (error) {
           // Skip categories that don't have goals set
-          console.warn(`Failed to fetch goal data for category ${category.id}:`, error);
+          console.warn(
+            `Failed to fetch goal data for category ${category.id}:`,
+            error,
+          );
         }
       }
 
@@ -113,7 +130,14 @@ export function useBudgetSummary(): BudgetSummary {
     if (categories.length > 0 && sheetName) {
       fetchGoalData();
     }
-  }, [categories, sheetName, spreadsheet, budgetType, totalSpent, totalBudgeted]);
+  }, [
+    categories,
+    sheetName,
+    spreadsheet,
+    budgetType,
+    totalSpent,
+    totalBudgeted,
+  ]);
 
   return summary;
 }

@@ -5,6 +5,7 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 ## Added Feature Flags
 
 ### enableOverviewPage
+
 - **Type:** boolean (default: false)
 - **Location:** `packages/loot-core/src/types/prefs.ts`
 - **Default State:** `packages/desktop-client/src/hooks/useFeatureFlag.ts`
@@ -15,6 +16,7 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 ## Added Seams
 
 ### Mobile Navigation Extension Point
+
 - **Location:** `packages/desktop-client/src/components/mobile/MobileNavTabs.tsx`
 - **Type:** Conditional rendering based on feature flag
 - **Implementation:**
@@ -24,12 +26,14 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 - **Rationale:** Allows adding navigation buttons without modifying core navigation structure
 
 ### Default Route Seam
+
 - **Location:** `packages/desktop-client/src/components/FinancesApp.tsx`
 - **Type:** Conditional route based on feature flag
 - **Implementation:** Default route (`/`) redirects to `/overview` on mobile when flag enabled
 - **Rationale:** Makes overview page default landing experience for mobile users
 
 ### Overview Page Route
+
 - **Location:** `packages/desktop-client/src/components/FinancesApp.tsx`
 - **Type:** New mobile-only route
 - **Path:** `/overview`
@@ -39,6 +43,7 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 ## Core Changes
 
 ### New Hook: useBudgetSummary
+
 - **Location:** `packages/desktop-client/src/hooks/useBudgetSummary.ts`
 - **Type:** Additive
 - **Purpose:** Aggregates budget data for current month across all categories
@@ -56,6 +61,7 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 - **Rationale:** Provides single source of budget summary data; reuses existing calculation logic
 
 ### New Component: OverviewPage
+
 - **Location:** `packages/desktop-client/src/components/mobile/overview/OverviewPage.tsx`
 - **Type:** Additive (mobile-only)
 - **Purpose:** Container for dashboard widgets
@@ -67,6 +73,7 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 - **Rationale:** Extensible dashboard framework for future widgets
 
 ### New Component: BudgetSummaryTable
+
 - **Location:** `packages/desktop-client/src/components/mobile/overview/BudgetSummaryTable.tsx`
 - **Type:** Additive
 - **Purpose:** Displays budget summary metrics in 2-column table
@@ -78,6 +85,7 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 - **Rationale:** First widget in overview dashboard; simple presentation of aggregated data
 
 ### Export Module: overview/index.ts
+
 - **Location:** `packages/desktop-client/src/components/mobile/overview/index.ts`
 - **Type:** Additive
 - **Purpose:** Centralized exports for overview components
@@ -86,36 +94,42 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 ## Design Decisions
 
 ### Why Feature Flag Instead of Permanent Addition?
+
 - Allows testing and iteration before upstreaming consideration
 - Easy rollback if issues arise
 - Follows AGENTS.md principle of flags gating extensions
 - No impact on users until explicitly enabled
 
 ### Why Mobile-Only?
+
 - Mobile users benefit most from quick overview screen
 - Desktop has more screen space for detailed budget view
 - Can extend to desktop later if valuable (flag name supports this)
 - WideNotSupported wrapper prevents desktop rendering
 
 ### Why Reuse Existing Budget Calculations?
+
 - DRY principle - single source of truth for budget data
 - Reduces maintenance burden
 - Ensures consistency with budget page
 - Leverages battle-tested spreadsheet formulas
 
 ### Why Make Overview Default Landing Page?
+
 - Overview provides best first impression of budget status
 - Users can quickly see financial health without navigation
 - Budget page still easily accessible via nav
 - Only applies when flag is enabled and on mobile
 
 ### Why useSheetValue for Totals?
+
 - Direct access to spreadsheet calculated values
 - Respects both envelope and tracking budget types
 - Always current (reactive to changes)
 - Follows existing patterns in BudgetTable
 
 ### Why Sum Category Goals for Goal Target?
+
 - Categories contain goal information
 - Simple aggregation at component level
 - Avoids complex spreadsheet cell references
@@ -124,6 +138,7 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 ## File Changes Summary
 
 ### Modified Files
+
 1. `packages/loot-core/src/types/prefs.ts` - Added 'enableOverviewPage' to FeatureFlag type
 2. `packages/desktop-client/src/hooks/useFeatureFlag.ts` - Added default state
 3. `packages/desktop-client/src/components/FinancesApp.tsx` - Added route and imports
@@ -131,6 +146,7 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 5. `packages/desktop-client/src/components/settings/Experimental.tsx` - Added feature toggle
 
 ### Created Files
+
 1. `packages/desktop-client/src/hooks/useBudgetSummary.ts` - Budget data aggregation
 2. `packages/desktop-client/src/components/mobile/overview/OverviewPage.tsx` - Main page component
 3. `packages/desktop-client/src/components/mobile/overview/BudgetSummaryTable.tsx` - Budget summary table
@@ -141,7 +157,9 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 ## Future Considerations
 
 ### Additional Widgets
+
 Framework supports adding:
+
 - Account balances overview
 - Recent transactions
 - Savings goals progress
@@ -149,22 +167,28 @@ Framework supports adding:
 - Spending trends
 
 ### Desktop Support
+
 Flag name (`enableOverviewPage`) allows extending to desktop web client if valuable.
 
 ### Enhanced Calculations
+
 More precise budget tracking could include:
+
 - Per-category goal tracking
 - Time-series data for trends
 - Forecast calculations
 - Custom metric definitions
 
 ### Performance Optimization
+
 If many widgets added:
+
 - Memoization of expensive calculations
 - Lazy loading of widget data
 - Pagination for transaction lists
 
 ### Upstreaming Potential
+
 Navigation seam pattern could be useful to upstream Actual for plugin/extension support.
 
 ## Known Limitations
@@ -194,6 +218,7 @@ Navigation seam pattern could be useful to upstream Actual for plugin/extension 
 ## Warning Signs
 
 If any of these occur, re-evaluate approach:
+
 - Merge conflicts in MobileNavTabs or FinancesApp on upstream sync
 - Feature flag causes deep branching in budget calculation code
 - Removing flag requires large refactor

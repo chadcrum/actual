@@ -5,8 +5,8 @@ import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
-import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useBudgetSummary } from '@desktop-client/hooks/useBudgetSummary';
+import { useFormat } from '@desktop-client/hooks/useFormat';
 
 type SummaryRowProps = {
   label: string;

@@ -18,12 +18,14 @@ Add an experimental mobile overview page to Actual Budget that serves as a dashb
 ## Feature Scope
 
 ### Phase 1 (Current)
+
 - Mobile overview page with Budget Summary table
 - Expanded mobile navigation (4 buttons per row instead of 3)
 - Home button positioned far left
 - Overview page as default landing page
 
 ### Future Phases
+
 - Additional dashboard widgets (accounts, transactions, goals, etc.)
 - Desktop web client support (flag name allows for this)
 
@@ -59,6 +61,7 @@ packages/desktop-client/src/components/
 **Location:** `packages/loot-core/src/types/prefs.ts`
 
 Add to FeatureFlag type:
+
 ```ts
 export type FeatureFlag =
   | 'goalTemplatesEnabled'
@@ -74,6 +77,7 @@ export type FeatureFlag =
 ```
 
 Add to default state in `packages/desktop-client/src/hooks/useFeatureFlag.ts`:
+
 ```ts
 const DEFAULT_FEATURE_FLAG_STATE: Record<FeatureFlag, boolean> = {
   // ... existing flags
@@ -88,6 +92,7 @@ const DEFAULT_FEATURE_FLAG_STATE: Record<FeatureFlag, boolean> = {
 **Function:** `useBudgetSummary()`
 
 **Returns:**
+
 ```ts
 {
   spent: number;        // Total spent for current month
@@ -99,6 +104,7 @@ const DEFAULT_FEATURE_FLAG_STATE: Record<FeatureFlag, boolean> = {
 ```
 
 **Implementation approach:**
+
 - Reuse existing `useBudgetMonthCount()`, `useCategories()`, and budget calculation hooks
 - Aggregate category-level data into totals
 - Always use current month
@@ -107,6 +113,7 @@ const DEFAULT_FEATURE_FLAG_STATE: Record<FeatureFlag, boolean> = {
 ## Mobile Navigation Changes
 
 ### Current State
+
 - 3 buttons per row
 - Icon size: ~22px
 
@@ -133,6 +140,7 @@ function MobileNavigation() {
 ```
 
 **Button order (when enabled):**
+
 1. Overview (home icon)
 2. Budget
 3. [Existing buttons continue...]
@@ -142,6 +150,7 @@ function MobileNavigation() {
 ### OverviewPage.tsx
 
 **Responsibilities:**
+
 - Main page container
 - Renders page title
 - Contains widget components (starting with BudgetSummaryTable)
@@ -150,11 +159,13 @@ function MobileNavigation() {
 ### BudgetSummaryTable.tsx
 
 **Responsibilities:**
+
 - Fetch data via `useBudgetSummary()` hook
 - Render 2-column table with title
 - Format currency values
 
 **Table structure:**
+
 - **Title:** "Budget Summary" (above table)
 - **Columns:** Label (left-aligned) | Value (right-aligned)
 - **Rows:**
@@ -165,6 +176,7 @@ function MobileNavigation() {
   5. Overfunded | $X,XXX.XX
 
 **Styling:**
+
 - Reuse existing mobile table components
 - Match visual style of existing budget tables
 - Basic padding, borders, typography
@@ -176,11 +188,13 @@ function MobileNavigation() {
 ### Changes to FinancesApp.tsx
 
 **New route:**
+
 ```tsx
 <Route path="/overview" element={<OverviewPage />} />
 ```
 
 **Default route logic:**
+
 ```tsx
 function DefaultRoute() {
   const overviewEnabled = useFeatureFlag('enableOverviewPage');

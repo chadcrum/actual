@@ -13,6 +13,7 @@
 ## Task 1: Add Feature Flag Type Definition
 
 **Files:**
+
 - Modify: `packages/loot-core/src/types/prefs.ts:1-10`
 
 **Step 1: Add enableOverviewPage to FeatureFlag type**
@@ -45,6 +46,7 @@ git commit -m "feat: add enableOverviewPage feature flag type"
 ## Task 2: Add Feature Flag Default State
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/hooks/useFeatureFlag.ts:5-15`
 
 **Step 1: Add default state for enableOverviewPage**
@@ -78,6 +80,7 @@ git commit -m "feat: add enableOverviewPage default state"
 ## Task 3: Create useBudgetSummary Hook
 
 **Files:**
+
 - Create: `packages/desktop-client/src/hooks/useBudgetSummary.ts`
 
 **Step 1: Write the implementation**
@@ -145,6 +148,7 @@ git commit -m "feat: add useBudgetSummary hook (placeholder calculations)"
 ## Task 4: Create BudgetSummaryTable Component
 
 **Files:**
+
 - Create: `packages/desktop-client/src/components/mobile/overview/BudgetSummaryTable.tsx`
 
 **Step 1: Write the component**
@@ -233,6 +237,7 @@ git commit -m "feat: add BudgetSummaryTable component"
 ## Task 5: Create OverviewPage Component
 
 **Files:**
+
 - Create: `packages/desktop-client/src/components/mobile/overview/OverviewPage.tsx`
 - Create: `packages/desktop-client/src/components/mobile/overview/index.ts`
 
@@ -299,6 +304,7 @@ git commit -m "feat: add OverviewPage component"
 ## Task 6: Add Overview Route
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/components/FinancesApp.tsx`
 
 **Step 1: Import OverviewPage and useFeatureFlag**
@@ -368,6 +374,7 @@ git commit -m "feat: add /overview route with feature flag"
 ## Task 7: Update Mobile Navigation - Add Home Button
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/components/mobile/MobileNavTabs.tsx`
 
 **Step 1: Import Home icon and useFeatureFlag**
@@ -443,6 +450,7 @@ git commit -m "feat: add home button to mobile navigation when flag enabled"
 ## Task 8: Add Feature Flag to Experimental Settings
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/components/settings/Experimental.tsx`
 
 **Step 1: Add OverviewPage toggle**
@@ -478,11 +486,13 @@ git commit -m "feat: add enableOverviewPage toggle to experimental settings"
 ## Task 9: Implement Real Budget Calculations
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/hooks/useBudgetSummary.ts`
 
 **Step 1: Research existing budget calculations**
 
 Read:
+
 - `packages/desktop-client/src/components/mobile/budget/BudgetTable.tsx`
 - `packages/desktop-client/src/components/budget/util.ts`
 - `packages/desktop-client/src/spreadsheet/bindings.ts`
@@ -507,6 +517,7 @@ git commit -m "feat: implement real budget calculations in useBudgetSummary"
 ## Task 10: Update FORK_NOTES Documentation
 
 **Files:**
+
 - Create: `FORK_NOTES.md`
 
 Document all changes following AGENTS.md principles.
@@ -521,6 +532,7 @@ git commit -m "docs: add FORK_NOTES documenting overview page changes"
 ## Task 11-15: Testing, Cleanup, and Polish
 
 Tasks 11-15 cover:
+
 - Integration testing
 - Manual testing
 - Code cleanup and linting

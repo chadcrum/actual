@@ -49,7 +49,9 @@ export function MobileNavTabs() {
     'default',
   );
 
-  const COLUMN_COUNT = overviewEnabled ? 4 : 3;
+  // Always use 4-column layout (seam exists independently of feature flags)
+  // The flag only controls which tabs are visible, not the grid structure
+  const COLUMN_COUNT = 4;
   const TOTAL_HEIGHT = ROW_HEIGHT * COLUMN_COUNT;
   const OPEN_DEFAULT_Y = TOTAL_HEIGHT - ROW_HEIGHT;
   const HIDDEN_Y = TOTAL_HEIGHT;
