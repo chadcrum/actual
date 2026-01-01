@@ -1,22 +1,49 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
+import { type BudgetType } from 'loot-core/server/prefs';
 import * as monthUtils from 'loot-core/shared/months';
 
 import { BudgetSummaryTable } from './BudgetSummaryTable';
+import { PinnedCategoriesTable } from './PinnedCategoriesTable';
 
 import { MobilePageHeader, Page } from '@desktop-client/components/Page';
 import { useLocale } from '@desktop-client/hooks/useLocale';
 import { SheetNameProvider } from '@desktop-client/hooks/useSheetName';
+import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
+import { pushModal } from '@desktop-client/modals/modalsSlice';
+import { useDispatch } from '@desktop-client/redux';
 
 export function OverviewPage() {
   const { t } = useTranslation();
   const locale = useLocale();
+  const dispatch = useDispatch();
+  const [budgetType = 'envelope'] = useSyncedPref('budgetType');
   const currentMonth = monthUtils.currentMonth();
   const monthName = monthUtils.format(currentMonth, "MMMM ''yy", locale);
+
+  const handlePinnedCategoryClick = useCallback(
+    (categoryId: string) => {
+      const balanceMenuModalName =
+        `${budgetType as BudgetType}-balance-menu` as const;
+
+      dispatch(
+        pushModal({
+          modal: {
+            name: balanceMenuModalName,
+            options: {
+              month: currentMonth,
+              categoryId,
+            },
+          },
+        }),
+      );
+    },
+    [budgetType, currentMonth, dispatch],
+  );
 
   return (
     <Page
@@ -34,7 +61,7 @@ export function OverviewPage() {
           }}
         >
           <BudgetSummaryTable />
-          {/* Future widgets will be added here */}
+          <PinnedCategoriesTable onCategoryClick={handlePinnedCategoryClick} />
         </View>
       </SheetNameProvider>
     </Page>
