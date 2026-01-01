@@ -25,7 +25,6 @@ export type SyncedPrefs = Partial<
     | 'currencySpaceBetweenAmountAndSymbol'
     | 'defaultCurrencyCode'
     | 'plugins'
-    | 'pinnedCategoryIds'
     | `show-account-${string}-net-worth-chart`
     | `side-nav.show-balance-history-${string}`
     | `show-balances-${string}`
@@ -52,7 +51,9 @@ export type SyncedPrefs = Partial<
     | `learn-categories`,
     string
   >
->;
+> & {
+  pinnedCategoryIds?: string[];
+};
 
 /**
  * Preferences that are stored in the `metadata.json` file along with the
