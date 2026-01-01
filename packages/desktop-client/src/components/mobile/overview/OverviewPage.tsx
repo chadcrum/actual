@@ -9,26 +9,25 @@ import * as monthUtils from 'loot-core/shared/months';
 import { BudgetSummaryTable } from './BudgetSummaryTable';
 
 import { MobilePageHeader, Page } from '@desktop-client/components/Page';
-import { MOBILE_NAV_HEIGHT } from '@desktop-client/components/mobile/MobileNavTabs';
+import { useLocale } from '@desktop-client/hooks/useLocale';
 import { SheetNameProvider } from '@desktop-client/hooks/useSheetName';
 
 export function OverviewPage() {
   const { t } = useTranslation();
+  const locale = useLocale();
   const currentMonth = monthUtils.currentMonth();
+  const monthName = monthUtils.format(currentMonth, "MMMM ''yy", locale);
 
   return (
     <Page
-      header={<MobilePageHeader title={t('Overview')} />}
+      header={<MobilePageHeader title={t('{{monthName}} Overview', { monthName })} />}
       padding={0}
-      style={{
-        paddingBottom: MOBILE_NAV_HEIGHT,
-      }}
     >
       <SheetNameProvider name={monthUtils.sheetForMonth(currentMonth)}>
         <View
           style={{
             padding: 15,
-            backgroundColor: theme.mobileViewTheme,
+            backgroundColor: theme.mobilePageBackground,
             minHeight: '100%',
           }}
         >
