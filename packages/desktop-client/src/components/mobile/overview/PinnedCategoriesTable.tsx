@@ -6,6 +6,8 @@ import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
 import { usePinnedCategories } from '@desktop-client/components/budget/hooks/usePinnedCategories';
+import { useFormat } from '@desktop-client/hooks/useFormat';
+import { getCategoryColor } from '@desktop-client/util/budgetColors';
 
 type PinnedCategoriesTableProps = {
   onCategoryClick: (categoryId: string) => void;
@@ -16,6 +18,7 @@ export function PinnedCategoriesTable({
 }: PinnedCategoriesTableProps) {
   const { getPinnedCategories } = usePinnedCategories();
   const pinnedCategories = getPinnedCategories();
+  const format = useFormat();
 
   if (pinnedCategories.length === 0) {
     return (
@@ -101,6 +104,17 @@ export function PinnedCategoriesTable({
             >
               <Text style={{ flex: 1, fontSize: 14, color: theme.tableText }}>
                 {category.name}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  textAlign: 'right',
+                  minWidth: '80px',
+                  color: getCategoryColor(category),
+                }}
+              >
+                {format(category.balance || 0, 'financial')}
               </Text>
             </View>
           );
