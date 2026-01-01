@@ -4,7 +4,6 @@ import { useFormat } from '../../../hooks/useFormat';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 import { Text } from '@actual-app/components/text';
-import s from './PinnedCategoriesTable.module.css';
 
 interface PinnedCategoriesTableProps {
   onCategoryClick: (categoryId: string) => void;
