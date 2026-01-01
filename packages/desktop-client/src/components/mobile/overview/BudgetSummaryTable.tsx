@@ -57,7 +57,7 @@ export function BudgetSummaryTable() {
         }}
       >
         <SummaryRow label={t('Spent')} value={summary.spent} />
-        <SummaryRow label={t('Budgeted')} value={summary.budgeted} />
+        <SummaryRow label={t('Budgeted')} value={Math.abs(summary.budgeted)} />
         <SummaryRow label={t('Goal Target')} value={summary.goalTarget} />
         <SummaryRow label={t('Underfunded')} value={summary.underfunded} />
         <SummaryRow label={t('Overfunded')} value={summary.overfunded} />
