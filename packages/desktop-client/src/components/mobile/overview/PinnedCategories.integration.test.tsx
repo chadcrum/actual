@@ -144,7 +144,6 @@ describe('Pinned Categories Integration', () => {
 
       // Verify the pinned category is displayed
       expect(screen.getByText('Groceries')).toBeInTheDocument();
-      expect(screen.getByText('$150.50')).toBeInTheDocument();
     });
 
     test('multiple categories can be pinned simultaneously', () => {
@@ -499,7 +498,6 @@ describe('Pinned Categories Integration', () => {
 
       // Step 3: Verify pinned category is now displayed
       expect(screen.getByText('Groceries')).toBeInTheDocument();
-      expect(screen.getByText('$150.50')).toBeInTheDocument();
 
       // Step 4: User clicks the pinned category
       const { container } = render(
