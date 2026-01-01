@@ -16,7 +16,6 @@ export function PinnedCategoriesTable({
 }: PinnedCategoriesTableProps) {
   const { getPinnedCategories } = usePinnedCategories();
   const pinnedCategories = getPinnedCategories();
-  const format = useFormat();
 
   if (pinnedCategories.length === 0) {
     return (
