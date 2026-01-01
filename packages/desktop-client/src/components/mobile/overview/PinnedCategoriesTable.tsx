@@ -1,36 +1,20 @@
 import React from 'react';
-import { usePinnedCategories } from '../../budget/hooks/usePinnedCategories';
-import { useFormat } from '../../../hooks/useFormat';
+import { Trans } from 'react-i18next';
+
+import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
-import { Text } from '@actual-app/components/text';
 
-interface PinnedCategoriesTableProps {
+import { usePinnedCategories } from '@desktop-client/components/budget/hooks/usePinnedCategories';
+
+type PinnedCategoriesTableProps = {
   onCategoryClick: (categoryId: string) => void;
-}
-
-function getCategoryColor(category: {
-  balance?: number;
-  goal_target?: number;
-}): string {
-  if (!category.balance || !category.goal_target) {
-    return theme.tableText;
-  }
-
-  // If balance >= goal_target, the category is funded (green)
-  if (category.balance >= category.goal_target) {
-    return '#4CAF50'; // Green for funded
-  }
-
-  // If balance < goal_target, the category is underfunded (red)
-  return '#F44336'; // Red for underfunded
-}
+};
 
 export function PinnedCategoriesTable({
   onCategoryClick,
 }: PinnedCategoriesTableProps) {
   const { getPinnedCategories } = usePinnedCategories();
-  const format = useFormat();
   const pinnedCategories = getPinnedCategories();
 
   if (pinnedCategories.length === 0) {
@@ -44,7 +28,7 @@ export function PinnedCategoriesTable({
             color: theme.pageTextSubdued,
           }}
         >
-          Pinned Categories
+          <Trans>Pinned Categories</Trans>
         </Text>
         <View
           style={{
@@ -77,7 +61,7 @@ export function PinnedCategoriesTable({
           color: theme.pageTextSubdued,
         }}
       >
-        Pinned Categories
+        <Trans>Pinned Categories</Trans>
       </Text>
       <View
         style={{
@@ -89,7 +73,6 @@ export function PinnedCategoriesTable({
         }}
       >
         {pinnedCategories.map((category, index) => {
-          const color = getCategoryColor(category);
           return (
             <View
               key={category.id}
@@ -108,26 +91,16 @@ export function PinnedCategoriesTable({
                 cursor: 'pointer',
                 userSelect: 'none',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = theme.tableRowBackgroundHover;
+              onMouseEnter={e => {
+                e.currentTarget.style.backgroundColor =
+                  theme.tableRowBackgroundHover;
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
               <Text style={{ flex: 1, fontSize: 14, color: theme.tableText }}>
                 {category.name}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  textAlign: 'right' as const,
-                  minWidth: 80,
-                  color,
-                }}
-              >
-                {format(category.balance || 0, 'financial')}
               </Text>
             </View>
           );

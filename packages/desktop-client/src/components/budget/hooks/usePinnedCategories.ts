@@ -1,7 +1,9 @@
 import { useCallback, useMemo } from 'react';
-import { useSyncedPref } from '../../../hooks/useSyncedPref';
-import { useCategories } from '../../../hooks/useCategories';
+
 import type { CategoryEntity } from 'loot-core/types/models/category';
+
+import { useCategories } from '@desktop-client/hooks/useCategories';
+import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 
 /**
  * Hook for managing pinned categories in the budget overview.
@@ -25,9 +27,7 @@ export function usePinnedCategories() {
   // here for type safety and filtering operations.
   const pinnedCategoryIds = useMemo(() => {
     try {
-      return pinnedCategoryIdsStr
-        ? JSON.parse(pinnedCategoryIdsStr)
-        : [];
+      return pinnedCategoryIdsStr ? JSON.parse(pinnedCategoryIdsStr) : [];
     } catch (e) {
       console.error('Failed to parse pinnedCategoryIds preference:', e);
       return [];
@@ -38,7 +38,7 @@ export function usePinnedCategories() {
     (categoryId: string) => {
       return pinnedCategoryIds.includes(categoryId);
     },
-    [pinnedCategoryIds]
+    [pinnedCategoryIds],
   );
 
   const togglePin = useCallback(
@@ -55,7 +55,7 @@ export function usePinnedCategories() {
 
       savePinnedCategoryIds(JSON.stringify(newPinnedIds));
     },
-    [pinnedCategoryIds, savePinnedCategoryIds]
+    [pinnedCategoryIds, savePinnedCategoryIds],
   );
 
   const getPinnedCategories = useCallback(() => {
@@ -64,7 +64,7 @@ export function usePinnedCategories() {
 
     // Filter to pinned categories, maintaining budget page order
     return categoryList.filter((cat: CategoryEntity) =>
-      pinnedCategoryIds.includes(cat.id)
+      pinnedCategoryIds.includes(cat.id),
     );
   }, [categoryViews, pinnedCategoryIds]);
 

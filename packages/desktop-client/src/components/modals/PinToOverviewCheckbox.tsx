@@ -5,13 +5,13 @@ import { View } from '@actual-app/components/view';
 
 import { usePinnedCategories } from '@desktop-client/components/budget/hooks/usePinnedCategories';
 
-interface PinToOverviewCheckboxProps {
+type PinToOverviewCheckboxProps = {
   categoryId: string;
   theme: {
     pillBorder: string;
     menuItemText: string;
   };
-}
+};
 
 export function PinToOverviewCheckbox({
   categoryId,

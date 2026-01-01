@@ -1,8 +1,10 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useSyncedPref } from '../../../hooks/useSyncedPref';
-import { useCategories } from '../../../hooks/useCategories';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
+
 import { usePinnedCategories } from './usePinnedCategories';
+
+import { useCategories } from '@desktop-client/hooks/useCategories';
+import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
 
 vi.mock('../../../hooks/useSyncedPref');
 vi.mock('../../../hooks/useCategories');
@@ -13,8 +15,8 @@ describe('usePinnedCategories', () => {
   });
 
   test('returns empty array when no categories pinned', () => {
-    (useSyncedPref as any).mockReturnValue([undefined, vi.fn()]);
-    (useCategories as any).mockReturnValue({ list: [], grouped: [] });
+    (useSyncedPref as unknown).mockReturnValue([undefined, vi.fn()]);
+    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -23,11 +25,11 @@ describe('usePinnedCategories', () => {
 
   test('deserializes and returns pinned category IDs', () => {
     const categoryIds = ['cat-1', 'cat-2'];
-    (useSyncedPref as any).mockReturnValue([
+    (useSyncedPref as unknown).mockReturnValue([
       JSON.stringify(categoryIds),
       vi.fn(),
     ]);
-    (useCategories as any).mockReturnValue({ list: [], grouped: [] });
+    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -35,11 +37,11 @@ describe('usePinnedCategories', () => {
   });
 
   test('isPinned returns true for pinned category', () => {
-    (useSyncedPref as any).mockReturnValue([
+    (useSyncedPref as unknown).mockReturnValue([
       JSON.stringify(['cat-1', 'cat-2']),
       vi.fn(),
     ]);
-    (useCategories as any).mockReturnValue({ list: [], grouped: [] });
+    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -49,11 +51,11 @@ describe('usePinnedCategories', () => {
 
   test('togglePin adds category to pinned list', () => {
     const mockSavePref = vi.fn();
-    (useSyncedPref as any).mockReturnValue([
+    (useSyncedPref as unknown).mockReturnValue([
       JSON.stringify(['cat-1']),
       mockSavePref,
     ]);
-    (useCategories as any).mockReturnValue({ list: [], grouped: [] });
+    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -68,11 +70,11 @@ describe('usePinnedCategories', () => {
 
   test('togglePin removes category from pinned list', () => {
     const mockSavePref = vi.fn();
-    (useSyncedPref as any).mockReturnValue([
+    (useSyncedPref as unknown).mockReturnValue([
       JSON.stringify(['cat-1', 'cat-2']),
       mockSavePref,
     ]);
-    (useCategories as any).mockReturnValue({ list: [], grouped: [] });
+    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -85,11 +87,11 @@ describe('usePinnedCategories', () => {
 
   test('togglePin does nothing with empty categoryId', () => {
     const mockSavePref = vi.fn();
-    (useSyncedPref as any).mockReturnValue([
+    (useSyncedPref as unknown).mockReturnValue([
       JSON.stringify(['cat-1']),
       mockSavePref,
     ]);
-    (useCategories as any).mockReturnValue({ list: [], grouped: [] });
+    (useCategories as unknown).mockReturnValue({ list: [], grouped: [] });
 
     const { result } = renderHook(() => usePinnedCategories());
 
@@ -107,11 +109,11 @@ describe('usePinnedCategories', () => {
       { id: 'cat-3', name: 'Entertainment' },
     ];
 
-    (useSyncedPref as any).mockReturnValue([
+    (useSyncedPref as unknown).mockReturnValue([
       JSON.stringify(['cat-2', 'cat-1']),
       vi.fn(),
     ]);
-    (useCategories as any).mockReturnValue({
+    (useCategories as unknown).mockReturnValue({
       list: mockCategoryList,
       grouped: [],
     });

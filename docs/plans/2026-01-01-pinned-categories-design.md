@@ -90,6 +90,7 @@ packages/desktop-client/src/components/
 **Location**: `packages/loot-core/src/types/prefs.ts`
 
 Add to the preferences type definition:
+
 ```ts
 pinnedCategoryIds?: string[];
 ```
@@ -101,6 +102,7 @@ pinnedCategoryIds?: string[];
 **Purpose**: Manage pinned category state and provide helper functions
 
 **Returns**:
+
 ```ts
 {
   pinnedCategoryIds: string[];                    // Array of pinned category IDs
@@ -111,6 +113,7 @@ pinnedCategoryIds?: string[];
 ```
 
 **Implementation approach**:
+
 - Read `pinnedCategoryIds` from preferences using existing preference hooks
 - `togglePin()` updates the preference (adds or removes category ID)
 - `isPinned()` checks if category ID exists in pinned list
@@ -128,17 +131,20 @@ The hook will use the existing category list from `useCategories()` which alread
 **Location**: `packages/desktop-client/src/components/mobile/overview/PinnedCategoriesTable.tsx` (new file)
 
 **Responsibilities**:
+
 - Fetch pinned categories using `usePinnedCategories()` hook
 - Render 2-column table matching Budget Summary table style
 - Handle click events to open balance modal
 - Show empty state when no categories pinned
 
 **Table structure**:
+
 - **Title**: "Pinned Categories" (above table)
 - **Columns**: Category Name (left-aligned) | Balance (right-aligned)
 - **Rows**: One row per pinned category, ordered by budget page sequence
 
 **Styling**:
+
 - Reuse existing mobile table components from Budget Summary
 - Match padding, borders, typography of Budget Summary table
 - Balance values use `formatCurrency()` for formatting
@@ -146,12 +152,14 @@ The hook will use the existing category list from `useCategories()` which alread
 - Clickable rows with appropriate touch targets for mobile
 
 **Empty state**:
+
 ```
 Title: "Pinned Categories"
 Message: "No pinned categories. Pin categories from the budget page to see them here."
 ```
 
 **Click behavior**:
+
 - Tapping a row opens the balance modal for that category
 - Modal shows full category details with pin/unpin checkbox
 
@@ -164,6 +172,7 @@ Message: "No pinned categories. Pin categories from the budget page to see them 
 **Implementation**:
 
 **1. Add checkbox below existing action buttons**:
+
 ```tsx
 <Checkbox
   checked={isPinned(categoryId)}
@@ -173,17 +182,20 @@ Message: "No pinned categories. Pin categories from the budget page to see them 
 ```
 
 **2. Position**:
+
 - Below "Cover overspending" and "Rollover overspending" buttons
 - Above modal close/dismiss area
 - Consistent spacing with other modal elements
 
 **3. Behavior**:
+
 - Checkbox state reflects current pin status
 - Clicking toggles pin state immediately
 - No confirmation needed (simple toggle)
 - Modal remains open after toggling (user can continue interacting)
 
 **4. Conditional rendering**:
+
 ```tsx
 const overviewEnabled = useFeatureFlag('enableOverviewPage');
 
@@ -199,6 +211,7 @@ Only show the checkbox when the overview page feature is enabled.
 **Location**: `packages/desktop-client/src/components/mobile/overview/OverviewPage.tsx`
 
 **Modification**:
+
 ```tsx
 <OverviewPage>
   <BudgetSummaryTable />
@@ -211,29 +224,35 @@ Simply add the new widget below the existing Budget Summary table. The widget ha
 ## Edge Cases & Considerations
 
 ### 1. Deleted Categories
+
 - If a pinned category is deleted, the preference cleanup happens automatically
 - `getPinnedCategories()` filters out IDs that don't match existing categories
 - No stale data displayed
 
 ### 2. Category Reordering
+
 - Pinned categories automatically reflect new order when user reorders budget page
 - No special handling needed (uses live category list)
 
 ### 3. Modal Context
+
 - Balance modal needs category context to know which category is being viewed
 - Reuse existing modal state management from budget page
 - When opened from overview page, pass category ID to modal
 
 ### 4. Performance
+
 - Pinned categories list is typically small (no enforced limit, but users naturally keep it reasonable)
 - Standard React re-rendering optimization applies
 - No special memoization needed unless performance issues observed
 
 ### 5. Sync Conflicts
+
 - Preference syncing handled by existing Actual sync mechanism
 - Last-write-wins for `pinnedCategoryIds` preference (standard behavior)
 
 ### 6. No Limit on Pinned Categories
+
 - Users can pin unlimited categories
 - Provides maximum flexibility
 - Widget will grow vertically as needed (standard scrolling behavior)
@@ -241,6 +260,7 @@ Simply add the new widget below the existing Budget Summary table. The widget ha
 ## Testing Strategy
 
 ### Unit Tests
+
 - `usePinnedCategories()` hook:
   - Returns empty array when no categories pinned
   - `togglePin()` adds category ID to preferences
@@ -249,6 +269,7 @@ Simply add the new widget below the existing Budget Summary table. The widget ha
   - `getPinnedCategories()` filters and orders correctly
 
 ### Integration Tests
+
 - Pinning a category from budget page updates overview page
 - Unpinning from balance modal removes from overview
 - Clicking pinned category opens correct balance modal
@@ -256,6 +277,7 @@ Simply add the new widget below the existing Budget Summary table. The widget ha
 - Checkbox state reflects actual pin status
 
 ### Visual/Manual Tests
+
 - Table formatting matches Budget Summary style
 - Color coding matches budget page (fully funded = green, underfunded = red)
 - Touch targets are appropriately sized for mobile

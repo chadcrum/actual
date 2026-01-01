@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
-import { type BudgetType } from 'loot-core/server/prefs';
 import * as monthUtils from 'loot-core/shared/months';
 
 import { BudgetSummaryTable } from './BudgetSummaryTable';
@@ -27,20 +26,34 @@ export function OverviewPage() {
 
   const handlePinnedCategoryClick = useCallback(
     (categoryId: string) => {
-      const balanceMenuModalName =
-        `${budgetType as BudgetType}-balance-menu` as const;
-
-      dispatch(
-        pushModal({
-          modal: {
-            name: balanceMenuModalName,
-            options: {
-              month: currentMonth,
-              categoryId,
+      if (budgetType === 'envelope') {
+        dispatch(
+          pushModal({
+            modal: {
+              name: 'envelope-balance-menu',
+              options: {
+                month: currentMonth,
+                categoryId,
+              },
             },
-          },
-        }),
-      );
+          }),
+        );
+      } else if (budgetType === 'tracking') {
+        dispatch(
+          pushModal({
+            modal: {
+              name: 'tracking-balance-menu',
+              options: {
+                month: currentMonth,
+                categoryId,
+                onCarryover: (_carryover: boolean) => {
+                  // Handle carryover callback if needed
+                },
+              },
+            },
+          }),
+        );
+      }
     },
     [budgetType, currentMonth, dispatch],
   );

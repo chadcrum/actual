@@ -6,6 +6,8 @@ import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
+import { PinToOverviewCheckbox } from './PinToOverviewCheckbox';
+
 import {
   BalanceWithCarryover,
   CarryoverIndicator,
@@ -17,7 +19,6 @@ import {
   ModalHeader,
   ModalTitle,
 } from '@desktop-client/components/common/Modal';
-import { PinToOverviewCheckbox } from '@desktop-client/components/modals/PinToOverviewCheckbox';
 import { CellValueText } from '@desktop-client/components/spreadsheet/CellValue';
 import { useCategory } from '@desktop-client/hooks/useCategory';
 import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';

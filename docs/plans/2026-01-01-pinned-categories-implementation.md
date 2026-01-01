@@ -15,6 +15,7 @@
 ### Task 1: Add pinnedCategoryIds to Preference Types
 
 **Files:**
+
 - Modify: `packages/loot-core/src/types/prefs.ts`
 
 **Step 1: Examine current preference types**
@@ -52,6 +53,7 @@ git commit -m "feat: add pinnedCategoryIds preference type"
 ### Task 2: Create usePinnedCategories Hook
 
 **Files:**
+
 - Create: `packages/desktop-client/src/components/budget/hooks/usePinnedCategories.ts`
 - Test: `packages/desktop-client/src/components/budget/hooks/usePinnedCategories.test.ts`
 
@@ -207,6 +209,7 @@ git commit -m "feat: add usePinnedCategories hook for managing pinned category s
 ### Task 3: Create PinnedCategoriesTable Component
 
 **Files:**
+
 - Create: `packages/desktop-client/src/components/mobile/overview/PinnedCategoriesTable.tsx`
 - Test: `packages/desktop-client/src/components/mobile/overview/PinnedCategoriesTable.test.tsx`
 
@@ -428,6 +431,7 @@ git commit -m "feat: add PinnedCategoriesTable widget component with empty state
 ### Task 4: Modify Balance Modal to Add Pin Checkbox
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/components/mobile/budget/BalanceMenu.tsx` (or appropriate balance modal file)
 - Test: Update existing balance modal tests
 
@@ -444,6 +448,7 @@ Run: `head -50 packages/desktop-client/src/components/mobile/budget/<BalanceComp
 **Step 2: Understand current modal structure**
 
 Look for:
+
 - Where "Cover overspending" and "Rollover overspending" buttons are rendered
 - How the modal handles layout and sections
 - Existing imports and hook usage
@@ -536,6 +541,7 @@ git commit -m "feat: add pin checkbox to balance modal when overview page enable
 ### Task 5: Integrate PinnedCategoriesTable into Overview Page
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/components/mobile/overview/OverviewPage.tsx`
 - Modify: `packages/desktop-client/src/components/mobile/overview/MobileRoutes.tsx` (if balance modal is opened from overview)
 
@@ -603,6 +609,7 @@ git commit -m "feat: integrate PinnedCategoriesTable into overview page layout"
 ### Task 6: Cross-Component Integration Testing
 
 **Files:**
+
 - Create: `packages/desktop-client/src/components/mobile/overview/integration.test.tsx`
 
 **Step 1: Write end-to-end flow test**
@@ -679,6 +686,7 @@ git commit -m "test: add integration tests for pinned categories flow"
 ### Task 7: Update FORK_NOTES.md Documentation
 
 **Files:**
+
 - Modify: `FORK_NOTES.md` or `integration/FORK_NOTES.md`
 
 **Step 1: Examine current FORK_NOTES**

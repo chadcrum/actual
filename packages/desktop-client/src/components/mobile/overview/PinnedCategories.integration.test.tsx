@@ -1,10 +1,11 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
+
+import { PinnedCategoriesTable } from './PinnedCategoriesTable';
 
 // Import the components and hooks we're testing
-import { usePinnedCategories } from '../../budget/hooks/usePinnedCategories';
-import { PinnedCategoriesTable } from './PinnedCategoriesTable';
-import { PinToOverviewCheckbox } from '../../modals/PinToOverviewCheckbox';
+import { usePinnedCategories } from '@desktop-client/components/budget/hooks/usePinnedCategories';
+import { PinToOverviewCheckbox } from '@desktop-client/components/modals/PinToOverviewCheckbox';
 
 // Mock dependencies
 vi.mock('../../budget/hooks/usePinnedCategories');
@@ -23,7 +24,7 @@ vi.mock('@desktop-client/hooks/useSyncedPref', () => ({
   },
 }));
 vi.mock('@desktop-client/hooks/useSheetName', () => ({
-  SheetNameProvider: ({ children }: { children: React.ReactNode }) => children,
+  SheetNameProvider: ({ children }: { children: JSX.Element }) => children,
   useSheetName: () => 'March 2024',
 }));
 vi.mock('@desktop-client/hooks/useCategories', () => ({
@@ -51,15 +52,15 @@ vi.mock('@actual-app/components/theme', () => ({
 }));
 
 describe('Pinned Categories Integration', () => {
-  let mockTogglePin: any;
-  let mockGetPinnedCategories: any;
-  let mockIsPinned: any;
+  let mockTogglePin: ReturnType<typeof vi.fn>;
+  let mockGetPinnedCategories: ReturnType<typeof vi.fn>;
+  let mockIsPinned: ReturnType<typeof vi.fn>;
   let pinnedCategoryIds: string[] = [];
 
   const setupMocks = () => {
     mockTogglePin = vi.fn((categoryId: string) => {
       if (pinnedCategoryIds.includes(categoryId)) {
-        pinnedCategoryIds = pinnedCategoryIds.filter((id) => id !== categoryId);
+        pinnedCategoryIds = pinnedCategoryIds.filter(id => id !== categoryId);
       } else {
         pinnedCategoryIds = [...pinnedCategoryIds, categoryId];
       }
@@ -71,12 +72,14 @@ describe('Pinned Categories Integration', () => {
         { id: 'cat-2', name: 'Utilities', balance: 45.0, goal_target: 100 },
         { id: 'cat-3', name: 'Entertainment', balance: 75.0, goal_target: 50 },
       ];
-      return allCategories.filter((cat) => pinnedCategoryIds.includes(cat.id));
+      return allCategories.filter(cat => pinnedCategoryIds.includes(cat.id));
     });
 
-    mockIsPinned = vi.fn((categoryId: string) => pinnedCategoryIds.includes(categoryId));
+    mockIsPinned = vi.fn((categoryId: string) =>
+      pinnedCategoryIds.includes(categoryId),
+    );
 
-    (usePinnedCategories as any).mockReturnValue({
+    (usePinnedCategories as unknown).mockReturnValue({
       pinnedCategoryIds,
       isPinned: mockIsPinned,
       togglePin: mockTogglePin,
@@ -99,7 +102,7 @@ describe('Pinned Categories Integration', () => {
             pillBorder: '#ddd',
             menuItemText: '#000',
           }}
-        />
+        />,
       );
 
       // Initially, the checkbox should be unchecked
@@ -124,7 +127,7 @@ describe('Pinned Categories Integration', () => {
             pillBorder: '#ddd',
             menuItemText: '#000',
           }}
-        />
+        />,
       );
 
       // After rerender, the checkbox should reflect the pinned state
@@ -166,7 +169,7 @@ describe('Pinned Categories Integration', () => {
       setupMocks();
 
       const { container } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
 
       // Find and click the category row
@@ -185,16 +188,20 @@ describe('Pinned Categories Integration', () => {
       setupMocks();
 
       const { container } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
 
       // Click first category
-      const row1 = container.querySelector('[data-testid="category-row-cat-1"]');
+      const row1 = container.querySelector(
+        '[data-testid="category-row-cat-1"]',
+      );
       fireEvent.click(row1!);
       expect(mockOnClick).toHaveBeenCalledWith('cat-1');
 
       // Click second category
-      const row2 = container.querySelector('[data-testid="category-row-cat-2"]');
+      const row2 = container.querySelector(
+        '[data-testid="category-row-cat-2"]',
+      );
       fireEvent.click(row2!);
       expect(mockOnClick).toHaveBeenCalledWith('cat-2');
 
@@ -215,7 +222,7 @@ describe('Pinned Categories Integration', () => {
             pillBorder: '#ddd',
             menuItemText: '#000',
           }}
-        />
+        />,
       );
 
       // Verify checkbox is checked
@@ -237,7 +244,7 @@ describe('Pinned Categories Integration', () => {
             pillBorder: '#ddd',
             menuItemText: '#000',
           }}
-        />
+        />,
       );
 
       // Verify checkbox is now unchecked
@@ -253,7 +260,7 @@ describe('Pinned Categories Integration', () => {
       setupMocks();
 
       const { rerender } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
 
       // Verify pinned category is shown
@@ -279,7 +286,7 @@ describe('Pinned Categories Integration', () => {
       setupMocks();
 
       const { rerender } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
 
       // Both categories should be shown
@@ -307,7 +314,7 @@ describe('Pinned Categories Integration', () => {
       setupMocks();
 
       const { rerender } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
 
       // Verify pinned category is shown
@@ -334,7 +341,7 @@ describe('Pinned Categories Integration', () => {
       setupMocks();
 
       const { rerender } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
 
       // Initially empty
@@ -348,7 +355,9 @@ describe('Pinned Categories Integration', () => {
 
       // Category should now be visible
       expect(screen.getByText('Groceries')).toBeInTheDocument();
-      expect(screen.queryByText(/No pinned categories/)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/No pinned categories/),
+      ).not.toBeInTheDocument();
     });
 
     test('hook state updates propagate to both table and checkbox components', () => {
@@ -359,14 +368,14 @@ describe('Pinned Categories Integration', () => {
 
       // Render both components
       const { rerender: rerenderTable } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
 
       const { rerender: rerenderCheckbox } = render(
         <PinToOverviewCheckbox
           categoryId="cat-1"
           theme={{ pillBorder: '#ddd', menuItemText: '#000' }}
-        />
+        />,
       );
 
       // Both should reflect pinned state
@@ -384,7 +393,7 @@ describe('Pinned Categories Integration', () => {
         <PinToOverviewCheckbox
           categoryId="cat-1"
           theme={{ pillBorder: '#ddd', menuItemText: '#000' }}
-        />
+        />,
       );
 
       // Both should now reflect unpinned state
@@ -404,7 +413,9 @@ describe('Pinned Categories Integration', () => {
 
       expect(screen.getByText('Pinned Categories')).toBeInTheDocument();
       expect(screen.getByText(/No pinned categories/)).toBeInTheDocument();
-      expect(screen.getByText(/Pin categories from the budget page/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Pin categories from the budget page/),
+      ).toBeInTheDocument();
     });
 
     test('transitions from empty state to showing pinned categories', () => {
@@ -415,7 +426,7 @@ describe('Pinned Categories Integration', () => {
       setupMocks();
 
       const { rerender } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
 
       expect(screen.getByText(/No pinned categories/)).toBeInTheDocument();
@@ -427,7 +438,9 @@ describe('Pinned Categories Integration', () => {
       rerender(<PinnedCategoriesTable onCategoryClick={mockOnClick} />);
 
       // Empty state should be gone
-      expect(screen.queryByText(/No pinned categories/)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/No pinned categories/),
+      ).not.toBeInTheDocument();
 
       // Categories should be displayed
       expect(screen.getByText('Groceries')).toBeInTheDocument();
@@ -442,7 +455,7 @@ describe('Pinned Categories Integration', () => {
       setupMocks();
 
       const { rerender } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
 
       expect(screen.getByText('Groceries')).toBeInTheDocument();
@@ -472,7 +485,7 @@ describe('Pinned Categories Integration', () => {
       setupMocks();
 
       const { rerender, unmount } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
 
       // Verify empty state is shown
@@ -490,7 +503,7 @@ describe('Pinned Categories Integration', () => {
 
       // Step 4: User clicks the pinned category
       const { container } = render(
-        <PinnedCategoriesTable onCategoryClick={mockOnClick} />
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
       );
       const row = container.querySelector('[data-testid="category-row-cat-1"]');
       fireEvent.click(row!);
@@ -509,7 +522,7 @@ describe('Pinned Categories Integration', () => {
         <PinToOverviewCheckbox
           categoryId="cat-1"
           theme={{ pillBorder: '#ddd', menuItemText: '#000' }}
-        />
+        />,
       );
 
       const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
@@ -527,7 +540,7 @@ describe('Pinned Categories Integration', () => {
         <PinToOverviewCheckbox
           categoryId="cat-1"
           theme={{ pillBorder: '#ddd', menuItemText: '#000' }}
-        />
+        />,
       );
 
       // Step 4: Checkbox should now show checked

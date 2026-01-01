@@ -194,36 +194,42 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 ### Pinned Categories Feature Architecture
 
 **Why Synced Preference for Storage?**
+
 - Users want pinned categories to persist across devices
 - Synced preferences automatically sync via cloud
 - Fits existing Actual Budget preference system
 - No new storage mechanism required
 
 **Why JSON Serialization?**
+
 - Synced preference system stores all values as strings
 - JSON format is standard, human-readable if debugging
 - Parsed at hook level, not scattered across components
 - Type-safe through TypeScript and error handling
 
 **Why Hook-Based Pattern?**
+
 - `usePinnedCategories` centralizes all pin logic
 - Easy to reuse across multiple UI surfaces
 - Separates preference management from presentation
 - Testable independently from components
 
 **Why Checkbox in Balance Menu?**
+
 - Users naturally open balance menu to manage categories
 - Proximity to category details provides context
 - Minimal UI disruption (single checkbox)
 - Follows existing Actual Budget modal patterns
 
 **Why Color-Coded Balance in Table?**
+
 - Visual indicator helps users prioritize underfunded categories
 - Green (funded) vs Red (underfunded) is intuitive
 - No additional configuration needed
 - Motivates users to pin important goals
 
 **Why Maintain Budget Page Order?**
+
 - Consistency with main budget interface
 - Users already familiar with category organization
 - Avoids complexity of custom sorting
@@ -304,6 +310,7 @@ The `pinnedCategoryIds` preference demonstrates a pattern for storing complex da
 4. **Updating:** Changes trigger re-serialization and save via `savePinnedCategoryIds()`
 
 This pattern can be reused for any complex preference data:
+
 - Favorite accounts list
 - Custom sort orders
 - Widget configuration objects
@@ -345,6 +352,7 @@ If adding new pin-able items or user preferences:
 ## Testing Notes
 
 ### Overview Page
+
 - Verify overview page loads when flag is enabled on mobile
 - Confirm default route redirects to /overview (mobile only, flag enabled)
 - Check that navigation has 4 columns when flag enabled
@@ -353,6 +361,7 @@ If adding new pin-able items or user preferences:
 - Test on various mobile viewport sizes
 
 ### Pinned Categories
+
 - Open balance menu modal and verify "Pin to Overview" checkbox appears
 - Pin a category and verify it appears in PinnedCategoriesTable on overview
 - Unpin a category and verify it's removed from PinnedCategoriesTable
