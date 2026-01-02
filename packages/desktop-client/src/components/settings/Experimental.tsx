@@ -210,6 +210,9 @@ export function ExperimentalFeatures() {
             <FeatureToggle flag="enableOverviewPage">
               <Trans>Mobile overview page</Trans>
             </FeatureToggle>
+            <FeatureToggle flag="mobileParity">
+              <Trans>Mobile parity features</Trans>
+            </FeatureToggle>
             <GlobalFeatureToggle
               prefName="plugins"
               disableToggle

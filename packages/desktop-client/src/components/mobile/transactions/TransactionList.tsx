@@ -46,6 +46,7 @@ import { ROW_HEIGHT, TransactionListItem } from './TransactionListItem';
 import { FloatingActionBar } from '@desktop-client/components/mobile/FloatingActionBar';
 import { useAccounts } from '@desktop-client/hooks/useAccounts';
 import { useCategories } from '@desktop-client/hooks/useCategories';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useLocale } from '@desktop-client/hooks/useLocale';
 import { useNavigate } from '@desktop-client/hooks/useNavigate';
 import { usePayees } from '@desktop-client/hooks/usePayees';
@@ -93,6 +94,7 @@ type TransactionListProps = {
   isLoadingMore: boolean;
   onLoadMore: () => void;
   showMakeTransfer?: boolean;
+  onCreateRule?: (params: { ids: string[] }) => void;
 };
 
 export function TransactionList({
@@ -104,6 +106,7 @@ export function TransactionList({
   isLoadingMore,
   onLoadMore,
   showMakeTransfer = false,
+  onCreateRule,
 }: TransactionListProps) {
   const locale = useLocale();
   const { t } = useTranslation();
@@ -262,6 +265,7 @@ export function TransactionList({
         <SelectedTransactionsFloatingActionBar
           transactions={transactions}
           showMakeTransfer={showMakeTransfer}
+          onCreateRule={onCreateRule}
         />
       )}
     </>
@@ -272,14 +276,17 @@ type SelectedTransactionsFloatingActionBarProps = {
   transactions: readonly TransactionEntity[];
   style?: CSSProperties;
   showMakeTransfer: boolean;
+  onCreateRule?: (params: { ids: string[] }) => void;
 };
 
-function SelectedTransactionsFloatingActionBar({
+export function SelectedTransactionsFloatingActionBar({
   transactions,
   style = {},
   showMakeTransfer,
+  onCreateRule,
 }: SelectedTransactionsFloatingActionBarProps) {
   const { t } = useTranslation();
+  const mobileParity = useFeatureFlag('mobileParity');
   const editMenuTriggerRef = useRef(null);
   const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
   const moreOptionsMenuTriggerRef = useRef(null);
@@ -396,6 +403,9 @@ function SelectedTransactionsFloatingActionBar({
         ? t('Unlink schedule')
         : t('Link schedule'),
     },
+    ...(mobileParity ? [
+      { name: 'create-rule', text: t('Create rule') }
+    ] : []),
     {
       name: 'delete',
       text: t('Delete'),
@@ -665,6 +675,10 @@ function SelectedTransactionsFloatingActionBar({
                       message: t('Successfully merged transactions'),
                     }),
                   );
+                } else if (type === 'create-rule') {
+                  onCreateRule?.({
+                    ids: selectedTransactionsArray,
+                  });
                 }
                 setIsMoreOptionsMenuOpen(false);
               }}

@@ -13,6 +13,15 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 - **Rationale:** Provides high-level budget overview for mobile users; framework for future dashboard widgets
 - **Settings UI:** `packages/desktop-client/src/components/settings/Experimental.tsx`
 
+### mobileParity
+
+- **Type:** boolean (default: false)
+- **Location:** `packages/loot-core/src/types/prefs.ts`
+- **Default State:** `packages/desktop-client/src/hooks/useFeatureFlag.ts`
+- **Purpose:** Enable features in mobile web client that the desktop web client has
+- **Rationale:** Improves mobile feature parity with desktop; gates new transaction actions
+- **Settings UI:** `packages/desktop-client/src/components/settings/Experimental.tsx`
+
 ## Added Seams
 
 ### Mobile Navigation Extension Point
@@ -260,6 +269,34 @@ This document tracks custom modifications to Actual Budget for the mobile overvi
 10. `packages/desktop-client/src/components/mobile/overview/PinnedCategories.integration.test.tsx` - Integration tests
 11. `docs/plans/2025-12-31-mobile-overview-page-design.md` - Design document
 12. `docs/plans/2025-12-31-mobile-overview-page.md` - Implementation plan
+
+## Mobile Parity Features (mobileParity flag)
+
+**Purpose:** Enable features in mobile web client that the desktop web client has.
+
+**When added:** 2026-01-01
+
+**Features gated by this flag:**
+- Create rule action in mobile transaction menu (Phase 1)
+
+**Future features planned:**
+- Additional transaction actions
+- Other mobile parity features as identified
+
+**How to enable for testing:**
+1. Open Settings → Experimental Features
+2. Check "Mobile parity features"
+3. Return to mobile transaction list
+4. Select one or more transactions
+5. Tap "..." (More options) button
+6. "Create rule" should appear in menu (if not, flag may not be enabled)
+
+**Implementation notes:**
+- Flag is defined in `packages/loot-core/src/types/prefs.ts`
+- Default state set in `packages/desktop-client/src/hooks/useFeatureFlag.ts`
+- UI toggle in `packages/desktop-client/src/components/settings/Experimental.tsx`
+- Mobile menu conditional in `packages/desktop-client/src/components/mobile/transactions/TransactionList.tsx`
+- Reuses existing desktop rule creation logic (no new business logic)
 
 ## Future Considerations
 

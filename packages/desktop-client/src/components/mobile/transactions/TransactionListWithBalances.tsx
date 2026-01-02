@@ -94,6 +94,7 @@ type TransactionListWithBalancesProps = {
   onOpenTransaction: (transaction: TransactionEntity) => void;
   onRefresh?: () => void;
   showMakeTransfer?: boolean;
+  onCreateRule?: (params: { ids: string[] }) => void;
 };
 
 export function TransactionListWithBalances({
@@ -111,6 +112,7 @@ export function TransactionListWithBalances({
   onOpenTransaction,
   onRefresh,
   showMakeTransfer = false,
+  onCreateRule,
 }: TransactionListWithBalancesProps) {
   const selectedInst = useSelected('transactions', [...transactions], []);
 
@@ -157,6 +159,7 @@ export function TransactionListWithBalances({
             onLoadMore={onLoadMore}
             onOpenTransaction={onOpenTransaction}
             showMakeTransfer={showMakeTransfer}
+            onCreateRule={onCreateRule}
           />
         </PullToRefresh>
       </SelectedProvider>
