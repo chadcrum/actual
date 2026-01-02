@@ -15,6 +15,7 @@ import { CommandBar } from './CommandBar';
 import { GlobalKeys } from './GlobalKeys';
 import { MobileBankSyncAccountEditPage } from './mobile/banksync/MobileBankSyncAccountEditPage';
 import { MobileNavTabs } from './mobile/MobileNavTabs';
+import { OverviewPage } from './mobile/overview';
 import { TransactionEdit } from './mobile/transactions/TransactionEdit';
 import { Notifications } from './Notifications';
 import { Reports } from './reports';
@@ -31,6 +32,7 @@ import { getLatestAppVersion, sync } from '@desktop-client/app/appSlice';
 import { ProtectedRoute } from '@desktop-client/auth/ProtectedRoute';
 import { Permissions } from '@desktop-client/auth/types';
 import { useAccounts } from '@desktop-client/hooks/useAccounts';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useGlobalPref } from '@desktop-client/hooks/useGlobalPref';
 import { useLocalPref } from '@desktop-client/hooks/useLocalPref';
 import { useMetaThemeColor } from '@desktop-client/hooks/useMetaThemeColor';
@@ -86,6 +88,7 @@ export function FinancesApp() {
 
   const accounts = useAccounts();
   const isAccountsLoaded = useSelector(state => state.account.isAccountsLoaded);
+  const overviewEnabled = useFeatureFlag('enableOverviewPage');
 
   const versionInfo = useSelector(state => state.app.versionInfo);
   const [notifyWhenUpdateIsAvailable] = useGlobalPref(
@@ -237,7 +240,9 @@ export function FinancesApp() {
                   path="/"
                   element={
                     isAccountsLoaded ? (
-                      accounts.length > 0 ? (
+                      overviewEnabled && isNarrowWidth ? (
+                        <Navigate to="/overview" replace />
+                      ) : accounts.length > 0 ? (
                         <Navigate to="/budget" replace />
                       ) : (
                         // If there are no accounts, we want to redirect the user to
@@ -247,6 +252,15 @@ export function FinancesApp() {
                     ) : (
                       <LoadingIndicator />
                     )
+                  }
+                />
+
+                <Route
+                  path="/overview"
+                  element={
+                    <WideNotSupported>
+                      <OverviewPage />
+                    </WideNotSupported>
                   }
                 />
 
@@ -366,6 +380,7 @@ export function FinancesApp() {
             </View>
 
             <Routes>
+              <Route path="/overview" element={<MobileNavTabs />} />
               <Route path="/budget" element={<MobileNavTabs />} />
               <Route path="/accounts" element={<MobileNavTabs />} />
               <Route path="/settings" element={<MobileNavTabs />} />
