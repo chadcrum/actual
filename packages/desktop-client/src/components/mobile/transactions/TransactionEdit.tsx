@@ -56,7 +56,10 @@ import {
 import {
   type AccountEntity,
   type CategoryEntity,
+  type NewRuleEntity,
   type PayeeEntity,
+  type RuleActionEntity,
+  type RuleConditionEntity,
   type TransactionEntity,
 } from 'loot-core/types/models';
 
@@ -76,6 +79,7 @@ import { AmountInput } from '@desktop-client/components/util/AmountInput';
 import { useAccounts } from '@desktop-client/hooks/useAccounts';
 import { useCategories } from '@desktop-client/hooks/useCategories';
 import { useDateFormat } from '@desktop-client/hooks/useDateFormat';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useInitialMount } from '@desktop-client/hooks/useInitialMount';
 import { useLocalPref } from '@desktop-client/hooks/useLocalPref';
 import { useNavigate } from '@desktop-client/hooks/useNavigate';
@@ -582,6 +586,7 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
       [unserializedTransactions, dateFormat],
     );
     const { grouped: categoryGroups } = useCategories();
+    const mobileParity = useFeatureFlag('mobileParity');
 
     useEffect(() => {
       if (window.history.length === 1) {
@@ -966,6 +971,108 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
       ],
     );
 
+    const onCreateRuleInner = useCallback(
+      async () => {
+        try {
+          const [unserializedTransaction] = unserializedTransactions;
+
+          // Query for transaction with splits
+          const { data } = await aqlQuery(
+            q('transactions')
+              .filter({ id: unserializedTransaction.id })
+              .select('*')
+              .options({ splits: 'grouped' }),
+          );
+
+          const transactions = ungroupTransactions(data);
+          const ruleTransaction = transactions[0];
+          const childTransactions = transactions.filter(
+            t => t.parent_id === ruleTransaction.id,
+          );
+
+          // Build payee condition
+          const payeeCondition = ruleTransaction.imported_payee
+            ? ({
+                field: 'imported_payee',
+                op: 'is',
+                value: ruleTransaction.imported_payee,
+                type: 'string',
+              } satisfies RuleConditionEntity)
+            : ({
+                field: 'payee',
+                op: 'is',
+                value: ruleTransaction.payee!,
+                type: 'id',
+              } satisfies RuleConditionEntity);
+
+          // Build amount condition
+          const amountCondition = {
+            field: 'amount',
+            op: 'isapprox',
+            value: ruleTransaction.amount,
+            type: 'number',
+          } satisfies RuleConditionEntity;
+
+          // Build rule structure
+          const rule = {
+            stage: null,
+            conditionsOp: 'and',
+            conditions: [payeeCondition, amountCondition],
+            actions: [
+              ...(childTransactions.length === 0
+                ? [
+                    {
+                      op: 'set',
+                      field: 'category',
+                      value: ruleTransaction.category,
+                      type: 'id',
+                      options: {
+                        splitIndex: 0,
+                      },
+                    } satisfies RuleActionEntity,
+                  ]
+                : []),
+              ...childTransactions.flatMap((sub, index) => [
+                {
+                  op: 'set-split-amount',
+                  value: sub.amount,
+                  options: {
+                    splitIndex: index + 1,
+                    method: 'fixed-amount',
+                  },
+                } satisfies RuleActionEntity,
+                {
+                  op: 'set',
+                  field: 'category',
+                  value: sub.category,
+                  type: 'id',
+                  options: {
+                    splitIndex: index + 1,
+                  },
+                } satisfies RuleActionEntity,
+              ]),
+            ],
+          } satisfies NewRuleEntity;
+
+          // Open rule editor modal (stays on top of transaction edit)
+          dispatch(
+            pushModal({ modal: { name: 'edit-rule', options: { rule } } }),
+          );
+        } catch (error) {
+          console.error('Error creating rule:', error);
+          dispatch(
+            addNotification({
+              notification: {
+                type: 'error',
+                message: t('Failed to create rule'),
+              },
+            }),
+          );
+        }
+      },
+      [unserializedTransactions, dispatch, navigate, t],
+    );
+
     const scrollChildTransactionIntoView = useCallback(
       (id: TransactionEntity['id']) => {
         const childTransactionEditElement =
@@ -1233,6 +1340,38 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
               }
             />
           </View>
+
+          {!isAdding && mobileParity && (
+            <View style={{ alignItems: 'center' }}>
+              <Button
+                variant="bare"
+                onPress={onCreateRuleInner}
+                style={{
+                  height: 40,
+                  borderWidth: 0,
+                  marginLeft: styles.mobileEditingPadding,
+                  marginRight: styles.mobileEditingPadding,
+                  marginTop: 10,
+                  backgroundColor: 'transparent',
+                }}
+              >
+                <SvgPencilWriteAlternate
+                  width={17}
+                  height={17}
+                  style={{ color: theme.formLabelText }}
+                />
+                <Text
+                  style={{
+                    marginLeft: 5,
+                    userSelect: 'none',
+                    color: theme.formLabelText,
+                  }}
+                >
+                  <Trans>Create rule</Trans>
+                </Text>
+              </Button>
+            </View>
+          )}
 
           {!isAdding && (
             <View style={{ alignItems: 'center' }}>
