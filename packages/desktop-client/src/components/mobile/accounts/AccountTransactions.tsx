@@ -10,6 +10,10 @@ import {
   type TransactionEntity,
 } from 'loot-core/types/models';
 
+import { q } from 'loot-core/shared/query';
+import { type NewRuleEntity, type RuleConditionEntity } from 'loot-core/types/models';
+
+import { aqlQuery } from '@desktop-client/queries/aqlQuery';
 import { markAccountRead } from '@desktop-client/accounts/accountsSlice';
 import { syncAndDownload } from '@desktop-client/app/appSlice';
 import { TransactionListWithBalances } from '@desktop-client/components/mobile/transactions/TransactionListWithBalances';
@@ -199,6 +203,61 @@ function TransactionListWithPreviews({
     [dispatch, navigate],
   );
 
+  const onCreateRule = useCallback(
+    async (params: { ids: string[] }) => {
+      const { data } = await aqlQuery(
+        q('transactions')
+          .filter({ id: { $oneof: params.ids } })
+          .select('*')
+          .options({ splits: 'grouped' }),
+      );
+
+      const ruleTransaction = data[0];
+      if (!ruleTransaction) {
+        return;
+      }
+
+      const payeeCondition = ruleTransaction.imported_payee
+        ? ({
+            field: 'imported_payee',
+            op: 'is',
+            value: ruleTransaction.imported_payee,
+            type: 'string',
+          } satisfies RuleConditionEntity)
+        : ({
+            field: 'payee',
+            op: 'is',
+            value: ruleTransaction.payee,
+            type: 'id',
+          } satisfies RuleConditionEntity);
+
+      const amountCondition = {
+        field: 'amount',
+        op: 'isapprox',
+        value: ruleTransaction.amount,
+        type: 'number',
+      } satisfies RuleConditionEntity;
+
+      const newRule = {
+        conditionsOp: 'and',
+        conditions: [payeeCondition, amountCondition],
+        actions: [],
+      } as NewRuleEntity;
+
+      dispatch(
+        pushModal({
+          modal: {
+            name: 'edit-rule',
+            options: {
+              rule: newRule,
+            },
+          },
+        }),
+      );
+    },
+    [dispatch],
+  );
+
   const balanceBindings = useMemo(
     () => ({
       balance: bindings.accountBalance(account.id),
@@ -234,6 +293,7 @@ function TransactionListWithPreviews({
       onSearch={onSearch}
       onOpenTransaction={onOpenTransaction}
       onRefresh={onRefresh}
+      onCreateRule={onCreateRule}
     />
   );
 }
