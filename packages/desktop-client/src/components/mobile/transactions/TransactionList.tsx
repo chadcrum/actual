@@ -279,7 +279,7 @@ type SelectedTransactionsFloatingActionBarProps = {
   onCreateRule?: (params: { ids: string[] }) => void;
 };
 
-function SelectedTransactionsFloatingActionBar({
+export function SelectedTransactionsFloatingActionBar({
   transactions,
   style = {},
   showMakeTransfer,
