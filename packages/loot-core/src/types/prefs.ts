@@ -8,7 +8,8 @@ export type FeatureFlag =
   | 'plugins'
   | 'forceReload'
   | 'increaseMobileBudgetTableFontSize'
-  | 'enableOverviewPage';
+  | 'enableOverviewPage'
+  | 'mobileParity';
 
 /**
  * Cross-device preferences. These sync across devices when they are changed.

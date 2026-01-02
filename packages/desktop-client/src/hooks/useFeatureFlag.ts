@@ -13,6 +13,7 @@ const DEFAULT_FEATURE_FLAG_STATE: Record<FeatureFlag, boolean> = {
   forceReload: false,
   increaseMobileBudgetTableFontSize: false,
   enableOverviewPage: false,
+  mobileParity: false,
 };
 
 export function useFeatureFlag(name: FeatureFlag): boolean {
