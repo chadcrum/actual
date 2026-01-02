@@ -94,6 +94,7 @@ type TransactionListProps = {
   isLoadingMore: boolean;
   onLoadMore: () => void;
   showMakeTransfer?: boolean;
+  onCreateRule?: (params: { ids: string[] }) => void;
 };
 
 export function TransactionList({
@@ -105,6 +106,7 @@ export function TransactionList({
   isLoadingMore,
   onLoadMore,
   showMakeTransfer = false,
+  onCreateRule,
 }: TransactionListProps) {
   const locale = useLocale();
   const { t } = useTranslation();
@@ -263,6 +265,7 @@ export function TransactionList({
         <SelectedTransactionsFloatingActionBar
           transactions={transactions}
           showMakeTransfer={showMakeTransfer}
+          onCreateRule={onCreateRule}
         />
       )}
     </>
@@ -273,12 +276,14 @@ type SelectedTransactionsFloatingActionBarProps = {
   transactions: readonly TransactionEntity[];
   style?: CSSProperties;
   showMakeTransfer: boolean;
+  onCreateRule?: (params: { ids: string[] }) => void;
 };
 
 function SelectedTransactionsFloatingActionBar({
   transactions,
   style = {},
   showMakeTransfer,
+  onCreateRule,
 }: SelectedTransactionsFloatingActionBarProps) {
   const { t } = useTranslation();
   const mobileParity = useFeatureFlag('mobileParity');
@@ -670,6 +675,10 @@ function SelectedTransactionsFloatingActionBar({
                       message: t('Successfully merged transactions'),
                     }),
                   );
+                } else if (type === 'create-rule') {
+                  onCreateRule?.({
+                    ids: selectedTransactionsArray,
+                  });
                 }
                 setIsMoreOptionsMenuOpen(false);
               }}
