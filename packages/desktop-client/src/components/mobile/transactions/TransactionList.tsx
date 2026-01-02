@@ -46,6 +46,7 @@ import { ROW_HEIGHT, TransactionListItem } from './TransactionListItem';
 import { FloatingActionBar } from '@desktop-client/components/mobile/FloatingActionBar';
 import { useAccounts } from '@desktop-client/hooks/useAccounts';
 import { useCategories } from '@desktop-client/hooks/useCategories';
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useLocale } from '@desktop-client/hooks/useLocale';
 import { useNavigate } from '@desktop-client/hooks/useNavigate';
 import { usePayees } from '@desktop-client/hooks/usePayees';
@@ -280,6 +281,7 @@ function SelectedTransactionsFloatingActionBar({
   showMakeTransfer,
 }: SelectedTransactionsFloatingActionBarProps) {
   const { t } = useTranslation();
+  const mobileParity = useFeatureFlag('mobileParity');
   const editMenuTriggerRef = useRef(null);
   const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
   const moreOptionsMenuTriggerRef = useRef(null);
@@ -396,6 +398,9 @@ function SelectedTransactionsFloatingActionBar({
         ? t('Unlink schedule')
         : t('Link schedule'),
     },
+    ...(mobileParity ? [
+      { name: 'create-rule', text: t('Create rule') }
+    ] : []),
     {
       name: 'delete',
       text: t('Delete'),
