@@ -38,6 +38,7 @@ const categoryLongGoals = new Map([
 
 let lastCategoryIdUsed = '';
 let lastBindingType = '';
+let currentBudgetType = 'envelope';
 
 // Mock dependencies
 vi.mock('../../budget/hooks/usePinnedCategories');
@@ -58,7 +59,7 @@ vi.mock('@desktop-client/hooks/useFeatureFlag', () => ({
 vi.mock('@desktop-client/hooks/useSyncedPref', () => ({
   useSyncedPref: (key: string) => {
     if (key === 'budgetType') {
-      return ['envelope', vi.fn()];
+      return [currentBudgetType, vi.fn()];
     }
     return [undefined, vi.fn()];
   },
@@ -218,6 +219,7 @@ describe('Pinned Categories Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     pinnedCategoryIds = [];
+    currentBudgetType = 'envelope';
     setupMocks();
   });
 
@@ -678,6 +680,43 @@ describe('Pinned Categories Integration', () => {
       // Verify the category and balance are displayed
       expect(screen.getByText('Entertainment')).toBeInTheDocument();
       expect(screen.getByText('75.00')).toBeInTheDocument();
+    });
+  });
+
+  describe('Budget Type Switching', () => {
+    test('switches between envelope and tracking budget types correctly', () => {
+      const mockOnClick = vi.fn();
+
+      // Test with envelope budget (already set in global mock)
+      currentBudgetType = 'envelope';
+      pinnedCategoryIds = ['cat-1'];
+      setupMocks();
+
+      const { rerender } = render(
+        <PinnedCategoriesTable onCategoryClick={mockOnClick} />,
+      );
+
+      // Verify category is displayed with envelope budget
+      expect(screen.getByText('Groceries')).toBeInTheDocument();
+      expect(screen.getByText('150.50')).toBeInTheDocument();
+
+      // Switch to tracking budget
+      currentBudgetType = 'tracking';
+
+      rerender(<PinnedCategoriesTable onCategoryClick={mockOnClick} />);
+
+      // Verify category is still displayed (tracking budget supports same categories)
+      expect(screen.getByText('Groceries')).toBeInTheDocument();
+      expect(screen.getByText('150.50')).toBeInTheDocument();
+
+      // Switch back to envelope budget
+      currentBudgetType = 'envelope';
+
+      rerender(<PinnedCategoriesTable onCategoryClick={mockOnClick} />);
+
+      // Verify category is still displayed correctly
+      expect(screen.getByText('Groceries')).toBeInTheDocument();
+      expect(screen.getByText('150.50')).toBeInTheDocument();
     });
   });
 
