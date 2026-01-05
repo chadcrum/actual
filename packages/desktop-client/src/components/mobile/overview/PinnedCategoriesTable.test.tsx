@@ -76,6 +76,11 @@ vi.mock('@desktop-client/spreadsheet/bindings', () => ({
       lastBindingType = 'goal';
       return { categoryId, type: 'goal' };
     },
+    catLongGoal: (categoryId: string) => {
+      lastCategoryIdUsed = categoryId;
+      lastBindingType = 'longGoal';
+      return { categoryId, type: 'longGoal' };
+    },
   },
   trackingBudget: {
     catBalance: (categoryId: string) => {
@@ -93,6 +98,11 @@ vi.mock('@desktop-client/spreadsheet/bindings', () => ({
       lastBindingType = 'goal';
       return { categoryId, type: 'goal' };
     },
+    catLongGoal: (categoryId: string) => {
+      lastCategoryIdUsed = categoryId;
+      lastBindingType = 'longGoal';
+      return { categoryId, type: 'longGoal' };
+    },
   },
 }));
 
@@ -107,6 +117,10 @@ vi.mock('@desktop-client/hooks/useSheetValue', () => ({
       return categoryBudgeted.get(categoryId) ?? 0;
     } else if (bindingType === 'goal') {
       return categoryGoals.get(categoryId) ?? null;
+    } else if (bindingType === 'longGoal') {
+      // Return 0 for all categories (non-long goals)
+      // This means we should use budgetedValue in the formula
+      return 0;
     }
     return 0;
   },
