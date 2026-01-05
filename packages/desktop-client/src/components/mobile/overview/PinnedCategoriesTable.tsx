@@ -8,7 +8,7 @@ import { View } from '@actual-app/components/view';
 import { integerToCurrency } from 'loot-core/shared/util';
 
 import { usePinnedCategories } from '@desktop-client/components/budget/hooks/usePinnedCategories';
-import { makeAmountFullStyle } from '@desktop-client/components/budget/util';
+import { makeAmountFullStyle, makeBalanceAmountStyle } from '@desktop-client/components/budget/util';
 import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useSheetValue } from '@desktop-client/hooks/useSheetValue';
 import { useSyncedPref } from '@desktop-client/hooks/useSyncedPref';
