@@ -46,34 +46,34 @@ function PinnedCategoryRow({
     typeof balanceBinding
   >(balanceBinding);
 
-  // Add goal-related bindings for envelope budget
+  // Add goal-related bindings - both budget types support goals
   const goalBinding =
     budgetType === 'envelope'
       ? envelopeBudget.catGoal(categoryId)
-      : null;
+      : trackingBudget.catGoal(categoryId);
 
   const budgetedBinding =
     budgetType === 'envelope'
       ? envelopeBudget.catBudgeted(categoryId)
-      : null;
+      : trackingBudget.catBudgeted(categoryId);
 
   const longGoalBinding =
     budgetType === 'envelope'
       ? envelopeBudget.catLongGoal(categoryId)
-      : null;
+      : trackingBudget.catLongGoal(categoryId);
 
   const goalValue = useSheetValue<
-    'envelope-budget',
+    'envelope-budget' | 'tracking-budget',
     typeof goalBinding
   >(goalBinding);
 
   const budgetedValue = useSheetValue<
-    'envelope-budget',
+    'envelope-budget' | 'tracking-budget',
     typeof budgetedBinding
   >(budgetedBinding);
 
   const longGoalValue = useSheetValue<
-    'envelope-budget',
+    'envelope-budget' | 'tracking-budget',
     typeof longGoalBinding
   >(longGoalBinding);
 
