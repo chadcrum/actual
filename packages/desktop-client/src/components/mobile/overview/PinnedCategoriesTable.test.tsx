@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 
+import { theme } from '@actual-app/components/theme';
+
 import { PinnedCategoriesTable } from './PinnedCategoriesTable';
 
 import { usePinnedCategories } from '@desktop-client/components/budget/hooks/usePinnedCategories';
@@ -187,8 +189,8 @@ describe('PinnedCategoriesTable', () => {
       const row = container.querySelector(
         '[data-testid="category-row-cat-funded"]',
       );
-      const balanceText = row?.querySelectorAll('span')[1]; // Second span is the balance
-      expect(balanceText).toHaveStyle({ color: 'var(--color-noticeText)' }); // theme.noticeText
+      const balanceText = screen.getByText('100.00'); // Query by actual balance value
+      expect(balanceText).toHaveStyle({ color: theme.noticeText });
     });
 
     test('displays green when budgeted exceeds goal (overfunded)', () => {
@@ -208,8 +210,8 @@ describe('PinnedCategoriesTable', () => {
       const row = container.querySelector(
         '[data-testid="category-row-cat-overfunded"]',
       );
-      const balanceText = row?.querySelectorAll('span')[1]; // Second span is the balance
-      expect(balanceText).toHaveStyle({ color: 'var(--color-noticeText)' }); // theme.noticeText
+      const balanceText = screen.getByText('150.00'); // Query by actual balance value
+      expect(balanceText).toHaveStyle({ color: theme.noticeText });
     });
 
     test('displays yellow when budgeted is less than goal (underfunded)', () => {
@@ -233,8 +235,8 @@ describe('PinnedCategoriesTable', () => {
       const row = container.querySelector(
         '[data-testid="category-row-cat-underfunded"]',
       );
-      const balanceText = row?.querySelectorAll('span')[1]; // Second span is the balance
-      expect(balanceText).toHaveStyle({ color: 'var(--color-warningText)' }); // theme.warningText
+      const balanceText = screen.getByText('50.00'); // Query by actual balance value
+      expect(balanceText).toHaveStyle({ color: theme.warningText });
     });
 
     test('displays red when balance is negative regardless of goal', () => {
@@ -254,8 +256,8 @@ describe('PinnedCategoriesTable', () => {
       const row = container.querySelector(
         '[data-testid="category-row-cat-negative"]',
       );
-      const balanceText = row?.querySelectorAll('span')[1]; // Second span is the balance
-      expect(balanceText).toHaveStyle({ color: 'var(--color-errorText)' }); // theme.errorText
+      const balanceText = screen.getByText('-30.00'); // Query by actual balance value
+      expect(balanceText).toHaveStyle({ color: theme.errorText });
     });
 
     test('uses simple positive color when no goal is set', () => {
@@ -275,12 +277,10 @@ describe('PinnedCategoriesTable', () => {
       const row = container.querySelector(
         '[data-testid="category-row-cat-no-goal"]',
       );
-      const balanceText = row?.querySelectorAll('span')[1]; // Second span is the balance
+      const balanceText = screen.getByText('80.00'); // Query by actual balance value
       // When no goal is set, should use simple positive/negative coloring
       // Positive balance should show theme.noticeTextMenu (the simple positive color)
-      expect(balanceText).toHaveStyle({
-        color: 'var(--color-noticeTextMenu)',
-      }); // theme.noticeTextMenu
+      expect(balanceText).toHaveStyle({ color: theme.noticeTextMenu });
     });
   });
 
@@ -304,11 +304,9 @@ describe('PinnedCategoriesTable', () => {
       const row = container.querySelector(
         '[data-testid="category-row-cat-funded"]',
       );
-      const balanceText = row?.querySelectorAll('span')[1]; // Second span is the balance
+      const balanceText = screen.getByText('100.00'); // Query by actual balance value
       // Tracking budget should always use simple colors regardless of goals
-      expect(balanceText).toHaveStyle({
-        color: 'var(--color-noticeTextMenu)',
-      }); // theme.noticeTextMenu
+      expect(balanceText).toHaveStyle({ color: theme.noticeTextMenu });
     });
 
     test('uses red for negative balance in tracking budget', () => {
@@ -330,10 +328,8 @@ describe('PinnedCategoriesTable', () => {
       const row = container.querySelector(
         '[data-testid="category-row-cat-negative"]',
       );
-      const balanceText = row?.querySelectorAll('span')[1]; // Second span is the balance
-      expect(balanceText).toHaveStyle({
-        color: 'var(--color-errorTextMenu)',
-      }); // theme.errorTextMenu
+      const balanceText = screen.getByText('-30.00'); // Query by actual balance value
+      expect(balanceText).toHaveStyle({ color: theme.errorTextMenu });
     });
   });
 });
