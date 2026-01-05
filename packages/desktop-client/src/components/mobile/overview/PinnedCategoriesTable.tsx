@@ -46,6 +46,37 @@ function PinnedCategoryRow({
     typeof balanceBinding
   >(balanceBinding);
 
+  // Add goal-related bindings for envelope budget
+  const goalBinding =
+    budgetType === 'envelope'
+      ? envelopeBudget.catGoal(categoryId)
+      : null;
+
+  const budgetedBinding =
+    budgetType === 'envelope'
+      ? envelopeBudget.catBudgeted(categoryId)
+      : null;
+
+  const longGoalBinding =
+    budgetType === 'envelope'
+      ? envelopeBudget.catLongGoal(categoryId)
+      : null;
+
+  const goalValue = useSheetValue<
+    'envelope-budget',
+    typeof goalBinding
+  >(goalBinding);
+
+  const budgetedValue = useSheetValue<
+    'envelope-budget',
+    typeof budgetedBinding
+  >(budgetedBinding);
+
+  const longGoalValue = useSheetValue<
+    'envelope-budget',
+    typeof longGoalBinding
+  >(longGoalBinding);
+
   return (
     <View
       onClick={() => onCategoryClick(categoryId)}
