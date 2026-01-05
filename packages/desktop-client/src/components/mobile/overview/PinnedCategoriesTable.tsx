@@ -106,10 +106,16 @@ function PinnedCategoryRow({
           fontSize: 14,
           marginLeft: 12,
           flexShrink: 0,
-          ...makeAmountFullStyle(balance ?? 0, {
-            positiveColor: theme.noticeTextMenu,
-            negativeColor: theme.errorTextMenu,
-          }),
+          ...(budgetType === 'envelope' && goalValue != null
+            ? makeBalanceAmountStyle(
+                balance ?? 0,
+                goalValue,
+                longGoalValue === 1 ? balance : budgetedValue,
+              )
+            : makeAmountFullStyle(balance ?? 0, {
+                positiveColor: theme.noticeTextMenu,
+                negativeColor: theme.errorTextMenu,
+              })),
         }}
       >
         {balance != null ? integerToCurrency(balance) : '-'}
