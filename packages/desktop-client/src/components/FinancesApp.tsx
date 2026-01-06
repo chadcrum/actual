@@ -18,6 +18,7 @@ import { MobileNavTabs } from './mobile/MobileNavTabs';
 import { OverviewPage } from './mobile/overview';
 import { TransactionEdit } from './mobile/transactions/TransactionEdit';
 import { Notifications } from './Notifications';
+import { Planning } from './planning';
 import { Reports } from './reports';
 import { LoadingIndicator } from './reports/LoadingIndicator';
 import { NarrowAlternate, WideComponent } from './responsive';
@@ -89,6 +90,7 @@ export function FinancesApp() {
   const accounts = useAccounts();
   const isAccountsLoaded = useSelector(state => state.account.isAccountsLoaded);
   const overviewEnabled = useFeatureFlag('enableOverviewPage');
+  const planningEnabled = useFeatureFlag('enablePlanningPage');
 
   const versionInfo = useSelector(state => state.app.versionInfo);
   const [notifyWhenUpdateIsAvailable] = useGlobalPref(
@@ -270,6 +272,10 @@ export function FinancesApp() {
                   path="/budget"
                   element={<NarrowAlternate name="Budget" />}
                 />
+
+                {planningEnabled && (
+                  <Route path="/planning" element={<Planning />} />
+                )}
 
                 <Route
                   path="/schedules"
