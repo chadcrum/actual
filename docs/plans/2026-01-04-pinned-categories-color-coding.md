@@ -13,6 +13,7 @@
 ## Task 1: Update Tests to Expect Goal-Aware Colors
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/components/mobile/overview/PinnedCategoriesTable.test.tsx`
 
 **Step 1: Read the existing test file**
@@ -24,6 +25,7 @@ Purpose: Understand current test structure and what needs updating for goal-awar
 **Step 2: Add test cases for goal-based coloring**
 
 Add tests that verify:
+
 - Green color when budgeted >= goal (funded/overfunded)
 - Yellow color when budgeted < goal (underfunded)
 - Red color when balance is negative
@@ -48,6 +50,7 @@ git commit -m "test: add goal-aware color tests for pinned categories"
 ## Task 2: Import makeBalanceAmountStyle
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/components/mobile/overview/PinnedCategoriesTable.tsx:1-18`
 
 **Step 1: Add import for makeBalanceAmountStyle**
@@ -74,6 +77,7 @@ git commit -m "feat: import makeBalanceAmountStyle utility"
 ## Task 3: Add Spreadsheet Bindings for Goals
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/components/mobile/overview/PinnedCategoriesTable.tsx:31-48`
 
 **Step 1: Add goal-related useSheetValue hooks**
@@ -136,6 +140,7 @@ git commit -m "feat: add goal spreadsheet bindings to pinned categories"
 ## Task 4: Update Styling Logic for Goal-Aware Colors
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/components/mobile/overview/PinnedCategoriesTable.tsx:73-82`
 
 **Step 1: Replace makeAmountFullStyle with conditional logic**
@@ -203,6 +208,7 @@ Expected: Development server starts without errors.
 **Step 3: Test color coding scenarios**
 
 Create test categories with different states:
+
 1. **Green test:** Category with goal, budgeted >= goal → should show green
 2. **Yellow test:** Category with goal, budgeted < goal → should show yellow
 3. **Red test:** Category with negative balance → should show red
@@ -218,6 +224,7 @@ Take screenshots if colors don't match expectations, note any issues.
 ## Task 6: Update Integration Tests
 
 **Files:**
+
 - Modify: `packages/desktop-client/src/components/mobile/overview/PinnedCategories.integration.test.tsx`
 
 **Step 1: Review integration tests**
@@ -229,6 +236,7 @@ Purpose: Ensure integration tests cover goal-aware color scenarios.
 **Step 2: Add integration test scenarios**
 
 If not already covered, add tests for:
+
 - Pinned category with goal showing correct color based on funded status
 - Pinned category without goal showing simple colors
 - Switching between envelope and tracking budget types
@@ -273,6 +281,7 @@ Expected: No type errors.
 Run: `git diff integration..HEAD`
 
 Review changes to ensure:
+
 - Only PinnedCategoriesTable.tsx and related tests modified
 - No unintended changes
 - Code follows project style
@@ -305,6 +314,7 @@ git commit -m "chore: cleanup and final adjustments"
 ## Next Steps
 
 After completing this plan:
+
 1. Use @superpowers:verification-before-completion to verify all tests pass
 2. Use @superpowers:requesting-code-review for code review
 3. Use @superpowers:finishing-a-development-branch to create PR or merge
