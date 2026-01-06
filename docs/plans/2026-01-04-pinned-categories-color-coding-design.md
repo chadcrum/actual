@@ -3,6 +3,7 @@
 ## Problem Statement
 
 The pinned categories feature on the overview page currently uses simple positive/negative color coding for category balances. This is inconsistent with the budget page, which uses goal-aware color coding that helps users quickly identify:
+
 - Categories that are fully funded or overfunded (green)
 - Categories that are underfunded (yellow)
 - Categories with negative balances (red)
@@ -18,11 +19,13 @@ Update the pinned categories color coding to match the budget page's goal-aware 
 ### Color Logic (Envelope Budget)
 
 **With Goals Set:**
+
 - Negative balance → Red (`theme.errorText`)
 - Budgeted < Goal → Yellow (`theme.warningText`)
 - Budgeted ≥ Goal → Green (`theme.noticeText`)
 
 **Without Goals:**
+
 - Negative balance → Red
 - Zero balance → Grey (`theme.tableTextSubdued`)
 - Positive balance → Default text color
@@ -30,6 +33,7 @@ Update the pinned categories color coding to match the budget page's goal-aware 
 ### Color Logic (Tracking Budget)
 
 Continue using simple positive/negative coloring:
+
 - Positive balance → Green (`theme.noticeTextMenu`)
 - Negative balance → Red (`theme.errorTextMenu`)
 - Zero balance → Grey (`theme.tableTextSubdued`)
@@ -37,6 +41,7 @@ Continue using simple positive/negative coloring:
 ## Implementation Approach
 
 ### File to Modify
+
 `packages/desktop-client/src/components/mobile/overview/PinnedCategoriesTable.tsx`
 
 ### Changes to `PinnedCategoryRow` Component
