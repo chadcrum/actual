@@ -12,6 +12,7 @@ import { useSpring, animated, config } from 'react-spring';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import {
   SvgAdd,
+  SvgClipboard,
   SvgCog,
   SvgCreditCard,
   SvgHome,
@@ -45,6 +46,7 @@ export function MobileNavTabs() {
   const isTestEnv = useIsTestEnv();
   const isUsingServer = syncServerStatus !== 'no-server' || isTestEnv;
   const overviewEnabled = useFeatureFlag('enableOverviewPage');
+  const planningEnabled = useFeatureFlag('enablePlanningPage');
   const [navbarState, setNavbarState] = useState<'default' | 'open' | 'hidden'>(
     'default',
   );
@@ -120,6 +122,16 @@ export function MobileNavTabs() {
       style: navTabStyle,
       Icon: SvgWallet,
     },
+    ...(planningEnabled
+      ? [
+          {
+            name: t('Planning'),
+            path: '/planning',
+            style: navTabStyle,
+            Icon: SvgClipboard,
+          },
+        ]
+      : []),
     {
       name: t('Transaction'),
       path: '/transactions/new',
