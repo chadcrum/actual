@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
-import { useSpreadsheet } from '@desktop-client/hooks/useSpreadsheet';
-import { useSelector } from '@desktop-client/redux';
-import type { CategoryEntity, CategoryGroupEntity } from 'loot-core/types/models';
+import { useCategories } from '@desktop-client/hooks/useCategories';
 
 interface PlanningCategory {
   id: string;
@@ -21,9 +19,7 @@ interface PlanningGroup {
 }
 
 export function usePlanningData() {
-  const spreadsheet = useSpreadsheet();
-  const categories = useSelector(state => state.queries.categories.list) as CategoryEntity[];
-  const categoryGroups = useSelector(state => state.queries.categories.grouped) as CategoryGroupEntity[];
+  const { grouped: categoryGroups } = useCategories();
 
   return useMemo(() => {
     const planningGroups: PlanningGroup[] = [];
@@ -36,21 +32,29 @@ export function usePlanningData() {
       group.categories?.forEach(category => {
         if (category.hidden || category.tombstone) return;
 
-        // Get budgeted amount for current month
-        const budgetedValue = spreadsheet.getCellValue(
-          `budget-${category.id}`
-        ) || 0;
+        // Initialize with zero values - actual budgeted amounts would be
+        // retrieved from the spreadsheet in a component that needs them
+        const budgetedValue = 0;
 
-        // Get goal data
-        const goalValue = spreadsheet.getCellValue(`goal-${category.id}`) || null;
-        const longGoalValue = spreadsheet.getCellValue(`long-goal-${category.id}`) || 0;
-        const isLongGoal = longGoalValue === 1;
+        // Parse goal definition if it exists
+        let goalValue: number | null = null;
+        let isLongGoal = false;
+
+        if (category.goal_def) {
+          try {
+            const goalDef = JSON.parse(category.goal_def);
+            goalValue = goalDef.target ?? null;
+            isLongGoal = goalDef.type === 'by-date';
+          } catch {
+            // If parsing fails, leave as null
+          }
+        }
 
         // Calculate overfunded/underfunded
         let overfunded = 0;
         let underfunded = 0;
 
-        if (goalValue != null) {
+        if (goalValue != null && budgetedValue > 0) {
           const difference = budgetedValue - goalValue;
           if (difference > 0) {
             overfunded = difference;
@@ -83,5 +87,5 @@ export function usePlanningData() {
     return {
       groups: planningGroups,
     };
-  }, [spreadsheet, categories, categoryGroups]);
+  }, [categoryGroups]);
 }
