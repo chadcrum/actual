@@ -5,6 +5,7 @@ import { useLocation } from 'react-router';
 import {
   SvgCheveronDown,
   SvgCheveronRight,
+  SvgClipboard,
   SvgCog,
   SvgCreditCard,
   SvgReports,
@@ -19,6 +20,7 @@ import { View } from '@actual-app/components/view';
 import { Item } from './Item';
 import { SecondaryItem } from './SecondaryItem';
 
+import { useFeatureFlag } from '@desktop-client/hooks/useFeatureFlag';
 import { useIsTestEnv } from '@desktop-client/hooks/useIsTestEnv';
 import { useSyncServerStatus } from '@desktop-client/hooks/useSyncServerStatus';
 
@@ -31,6 +33,7 @@ export function PrimaryButtons() {
   const syncServerStatus = useSyncServerStatus();
   const isTestEnv = useIsTestEnv();
   const isUsingServer = syncServerStatus !== 'no-server' || isTestEnv;
+  const planningEnabled = useFeatureFlag('enablePlanningPage');
 
   const isActive = [
     '/payees',
@@ -49,6 +52,9 @@ export function PrimaryButtons() {
   return (
     <View style={{ flexShrink: 0 }}>
       <Item title={t('Budget')} Icon={SvgWallet} to="/budget" />
+      {planningEnabled && (
+        <Item title={t('Planning')} Icon={SvgClipboard} to="/planning" />
+      )}
       <Item title={t('Reports')} Icon={SvgReports} to="/reports" />
       <Item title={t('Schedules')} Icon={SvgCalendar3} to="/schedules" />
       <Item
