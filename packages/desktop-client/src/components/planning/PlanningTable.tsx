@@ -7,6 +7,8 @@ import { usePlanningData } from './usePlanningData';
 import { useCheckboxState } from './useCheckboxState';
 import { useSummaryCalculations } from './useSummaryCalculations';
 import { useFormat } from '@desktop-client/hooks/useFormat';
+import { GroupRow } from './GroupRow';
+import { CategoryRow } from './CategoryRow';
 
 export function PlanningTable() {
   const { groups } = usePlanningData();
@@ -32,6 +34,20 @@ export function PlanningTable() {
   }, [groups]);
 
   const totalSummary = useSummaryCalculations(allCategories, selectedCategories);
+
+  const [collapsedGroups, setCollapsedGroups] = React.useState<Set<string>>(new Set());
+
+  const toggleCollapse = (groupId: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  };
 
   return (
     <View
@@ -102,10 +118,37 @@ export function PlanningTable() {
         </View>
       </View>
 
-      {/* Groups and Categories will go here in next step */}
-      <View style={{ padding: 20, color: theme.pageTextSubdued, textAlign: 'center' }}>
-        Groups and categories will be rendered here
-      </View>
+      {/* Groups and Categories */}
+      {groups.map(group => {
+        const categoryIds = group.categories.map(c => c.id);
+        const groupCheckboxState = getGroupCheckboxState(categoryIds);
+        const isCollapsed = collapsedGroups.has(group.id);
+
+        return (
+          <React.Fragment key={group.id}>
+            <GroupRow
+              groupName={group.name}
+              categories={group.categories}
+              selectedCategories={selectedCategories}
+              checkboxState={groupCheckboxState}
+              onToggle={() => toggleGroup(categoryIds)}
+              isCollapsed={isCollapsed}
+              onToggleCollapse={() => toggleCollapse(group.id)}
+            />
+            {!isCollapsed && group.categories.map(category => (
+              <CategoryRow
+                key={category.id}
+                categoryName={category.name}
+                overfunded={category.overfunded}
+                underfunded={category.underfunded}
+                goalTarget={category.goalTarget}
+                isSelected={isSelected(category.id)}
+                onToggle={() => toggleCategory(category.id)}
+              />
+            ))}
+          </React.Fragment>
+        );
+      })}
     </View>
   );
 }
