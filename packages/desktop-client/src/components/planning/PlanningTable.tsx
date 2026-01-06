@@ -7,12 +7,18 @@ import { usePlanningData } from './usePlanningData';
 import { useCheckboxState } from './useCheckboxState';
 import { useSummaryCalculations } from './useSummaryCalculations';
 import { useFormat } from '@desktop-client/hooks/useFormat';
+import { useGlobalPref } from '@desktop-client/hooks/useGlobalPref';
 import { GroupRow } from './GroupRow';
 import { CategoryRow } from './CategoryRow';
 
 export function PlanningTable() {
   const { groups } = usePlanningData();
   const format = useFormat();
+  const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
+  const categoryExpandedState = categoryExpandedStatePref ?? 0;
+
+  // Calculate maxWidth: base (200) + category expansion + 3 data columns (360)
+  const maxWidth = 200 + 100 * categoryExpandedState + 360;
 
   // Get all category IDs for checkbox management
   const allCategoryIds = useMemo(() => {
@@ -56,6 +62,7 @@ export function PlanningTable() {
         borderRadius: 4,
         backgroundColor: theme.tableBackground,
         overflow: 'hidden',
+        maxWidth,
       }}
     >
       {/* Header Row */}

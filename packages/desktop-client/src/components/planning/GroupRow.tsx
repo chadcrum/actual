@@ -60,7 +60,7 @@ export function GroupRow({
           style={{ cursor: 'pointer' }}
         />
       </View>
-      <View style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+      <View style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <span>{isCollapsed ? '▶' : '▼'}</span>
         <span>{groupName}</span>
       </View>
