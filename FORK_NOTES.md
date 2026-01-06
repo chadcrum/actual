@@ -442,3 +442,143 @@ If any of these occur, re-evaluate approach:
 - Feature branch: `feature/mobile-overview-page`
 - Design document: `docs/plans/2025-12-31-mobile-overview-page-design.md`
 - Implementation plan: `docs/plans/2025-12-31-mobile-overview-page.md`
+
+## Planning Page Feature (enablePlanningPage)
+
+**Purpose:** Provides a goal-aware planning interface that allows users to review budget goals and toggle categories to see budget impact.
+
+**When added:** 2026-01-06
+
+**Feature Flag:** `enablePlanningPage`
+
+### Architecture
+
+**Location:**
+- Main component: `packages/desktop-client/src/components/planning/`
+- Components:
+  - `index.tsx` - Main Planning page component
+  - `PlanningTable.tsx` - Interactive table layout
+  - `CategoryRow.tsx` - Individual category rows
+  - `GroupRow.tsx` - Category group headers with collapse/expand
+- Hooks:
+  - `usePlanningData.ts` - Data loading and organization
+  - `useCheckboxState.ts` - Selection state management with localStorage persistence
+  - `useSummaryCalculations.ts` - Dynamic total calculations
+
+**Data Flow:**
+1. `usePlanningData()` retrieves categories via `useCategories()` hook
+2. Filters hidden/tombstone categories
+3. Parses goal information from category `goal_def` JSON field
+4. Organizes into groups and categories structure
+5. `PlanningTable` renders the organized data
+6. `useCheckboxState` manages selection state with localStorage
+7. `useSummaryCalculations` updates totals based on selected categories
+
+### Features
+
+- **Category Display:** Shows all categories organized by group
+- **Goal Information:** Displays goal targets parsed from category goal definitions
+- **Selection Toggles:**
+  - Individual category checkboxes
+  - Group checkboxes (toggle all in group)
+  - Master checkbox (toggle all categories)
+- **State Persistence:** Selection state saved to localStorage
+- **Dynamic Summaries:** Total overfunded/underfunded amounts update based on selection
+- **Collapsible Groups:** Click group header to collapse/expand categories
+- **Theme Integration:** Uses application theme colors for consistent styling
+
+### Implementation Details
+
+**Goal Parsing:**
+- Goals stored in category `goal_def` as JSON string
+- Format: `{ target: number, type: 'monthly' | 'by-date' }`
+- Safe parsing with fallback to null if invalid
+
+**Selection Management:**
+- State saved to localStorage under key `planning_selected_categories`
+- Defaults to all categories selected
+- Automatically adds new categories to selection
+- Handles indeterminate state for partial group selections
+
+**Styling:**
+- Uses theme colors: notice (overfunded), error (underfunded)
+- Responsive table layout with flexbox
+- Smooth opacity transitions for selected/deselected states
+- Mobile-friendly design
+
+### Integration Points
+
+1. **Settings:** Toggle in Experimental Features (`Experimental.tsx`)
+2. **Navigation:** Planning tab added to sidebar/mobile nav
+3. **Redux:** Reads categories from Redux state via `useCategories()` hook
+4. **Theme:** Uses theme system for colors and styling
+5. **Feature Flag:** Controlled by `enablePlanningPage` flag
+
+### Known Limitations
+
+1. **Budgeted Amounts:** Currently uses placeholder zero values. Future enhancement should integrate with spreadsheet for actual budgeted amounts.
+2. **Monthly Context:** Doesn't filter by specific month. Could be enhanced with month picker.
+3. **Goal Types:** All goal types displayed the same. Could add visual differentiation.
+
+### Files Changed
+
+**Modified:**
+- `packages/desktop-client/src/components/settings/Experimental.tsx` - Added feature toggle
+
+**Created:**
+- `packages/desktop-client/src/components/planning/index.tsx` - Main component
+- `packages/desktop-client/src/components/planning/PlanningTable.tsx` - Table layout
+- `packages/desktop-client/src/components/planning/CategoryRow.tsx` - Category rows
+- `packages/desktop-client/src/components/planning/GroupRow.tsx` - Group headers
+- `packages/desktop-client/src/components/planning/usePlanningData.ts` - Data hook
+- `packages/desktop-client/src/components/planning/useCheckboxState.ts` - Selection hook
+- `packages/desktop-client/src/components/planning/useSummaryCalculations.ts` - Calculation hook
+- `packages/desktop-client/src/components/planning/Planning.integration.test.tsx` - Tests
+- `packages/desktop-client/src/components/planning/README.md` - Documentation
+
+### Testing
+
+**Unit Tests:**
+- Planning component rendering
+- Header and description validation
+- PlanningTable component integration
+- All tests passing in `Planning.integration.test.tsx`
+
+**Manual Testing Checklist:**
+- [ ] Feature flag enables/disables Planning feature
+- [ ] Page loads without errors
+- [ ] Categories display with correct goal information
+- [ ] Checkbox toggles work properly
+- [ ] Selection state persists after refresh
+- [ ] Summary totals update dynamically
+- [ ] Groups collapse/expand correctly
+- [ ] Theme colors apply correctly
+- [ ] Responsive on mobile viewport
+
+### Future Enhancements
+
+1. **Spreadsheet Integration:** Load actual budgeted amounts
+2. **Month Selection:** Add month picker to filter data
+3. **Quick Edit:** Inline goal editing
+4. **Reporting:** Export planning data
+5. **Performance:** Virtualize for large category lists
+
+### Maintenance Notes
+
+- Planning Page components are isolated in `planning/` directory
+- Feature flag gates all rendering
+- localStorage persistence is handled at hook level
+- Tests cover core functionality
+- Documentation includes component architecture and data flow
+- No breaking changes to existing components
+- Integration with category data is read-only
+
+### For Future Integrators
+
+The Planning Page demonstrates a pattern for adding goal-aware features:
+1. Use feature flag to gate completely new features
+2. Isolate in separate directory with clear exports
+3. Use custom hooks for state management
+4. Leverage existing category data structures
+5. Include comprehensive tests and documentation
+6. Keep integration points minimal (settings toggle, route)
