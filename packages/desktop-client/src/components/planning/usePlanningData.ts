@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import { useCategories } from '@desktop-client/hooks/useCategories';
+import { useCategoryBudgetedValues } from './useCategoryBudgetedValues';
+import { useCategoryGoalValues } from './useCategoryGoalValues';
 
 interface PlanningCategory {
   id: string;
@@ -21,40 +23,47 @@ interface PlanningGroup {
 export function usePlanningData() {
   const { grouped: categoryGroups } = useCategories();
 
+  // Get all category IDs for fetching budgeted values (excluding income groups)
+  const allCategoryIds = useMemo(() => {
+    return categoryGroups
+      .filter(group => !group.hidden && !group.is_income)
+      .flatMap(group =>
+        group.categories
+          ?.filter(cat => !cat.hidden && !cat.tombstone)
+          .map(cat => cat.id) || []
+      );
+  }, [categoryGroups]);
+
+  const budgetedValues = useCategoryBudgetedValues(allCategoryIds);
+  const goalValues = useCategoryGoalValues(allCategoryIds);
+
   return useMemo(() => {
     const planningGroups: PlanningGroup[] = [];
 
     categoryGroups.forEach(group => {
-      if (group.hidden) return;
+      if (group.hidden || group.is_income) return;
 
       const planningCategories: PlanningCategory[] = [];
 
       group.categories?.forEach(category => {
         if (category.hidden || category.tombstone) return;
 
-        // Initialize with zero values - actual budgeted amounts would be
-        // retrieved from the spreadsheet in a component that needs them
-        const budgetedValue = 0;
+        // Get budgeted value from spreadsheet
+        const budgetedValue = budgetedValues[category.id] ?? 0;
 
-        // Parse goal definition if it exists
-        let goalValue: number | null = null;
-        let isLongGoal = false;
+        // Get goal values from spreadsheet (same as Budget page)
+        const categoryGoalData = goalValues[category.id];
+        const goalValue = categoryGoalData?.goal ?? null;
+        const isLongGoal = categoryGoalData?.longGoal === 1;
 
-        if (category.goal_def) {
-          try {
-            const goalDef = JSON.parse(category.goal_def);
-            goalValue = goalDef.target ?? null;
-            isLongGoal = goalDef.type === 'by-date';
-          } catch {
-            // If parsing fails, leave as null
-          }
-        }
-
-        // Calculate overfunded/underfunded
+        // Calculate overfunded/underfunded using same logic as BalanceWithCarryover
         let overfunded = 0;
         let underfunded = 0;
 
-        if (goalValue != null && budgetedValue > 0) {
+        if (goalValue != null) {
+          // For template goals (longGoal !== 1), use budgetedValue - goalValue
+          // For long goals (longGoal === 1), would use balanceValue - goalValue
+          // Planning page focuses on budgeted amounts, so we always use budgetedValue
           const difference = budgetedValue - goalValue;
           if (difference > 0) {
             overfunded = difference;
@@ -87,5 +96,5 @@ export function usePlanningData() {
     return {
       groups: planningGroups,
     };
-  }, [categoryGroups]);
+  }, [categoryGroups, budgetedValues, goalValues]);
 }
