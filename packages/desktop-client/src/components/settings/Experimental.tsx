@@ -241,6 +241,11 @@ export function ExperimentalFeatures() {
             <FeatureToggle flag="enableOverviewPage">
               <Trans>Mobile overview page</Trans>
             </FeatureToggle>
+            <FeatureToggle flag="enablePlanningPage">
+              <Trans>Planning Page</Trans> - shows goal targets with
+              overfunded/underfunded amounts. Toggle categories to see budget
+              impact.
+            </FeatureToggle>
             <FeatureToggle flag="mobileParity">
               <Trans>Mobile parity features</Trans>
             </FeatureToggle>
