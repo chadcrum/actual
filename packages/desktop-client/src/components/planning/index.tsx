@@ -1,22 +1,24 @@
 import React from 'react';
 import { View } from '@actual-app/components/view';
 import { theme } from '@actual-app/components/theme';
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 
 import { PlanningTable } from './PlanningTable';
 
 export function Planning() {
+  const { isNarrowWidth } = useResponsive();
+
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: theme.pageBackground,
         padding: 20,
-        overflow: 'auto',
+        // On mobile, let ScrollProvider handle scrolling; on desktop, scroll locally
+        overflow: isNarrowWidth ? 'visible' : 'auto',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        WebkitOverflowScrolling: 'touch',
-        touchAction: 'pan-y',
       }}
     >
       <View style={{ marginBottom: 40, width: '100%', maxWidth: 800 }}>
