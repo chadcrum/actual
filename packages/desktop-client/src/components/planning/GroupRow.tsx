@@ -74,10 +74,10 @@ export function GroupRow({
       </View>
       {!isMobile ? (
         <>
-          <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
+          <View style={{ width: 120, textAlign: 'right', color: summary.overfunded > 0 ? theme.warningText : theme.noticeText }}>
             {format(summary.overfunded, 'financial')}
           </View>
-          <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
+          <View style={{ width: 120, textAlign: 'right', color: summary.underfunded > 0 ? theme.warningText : theme.noticeText }}>
             {format(summary.underfunded, 'financial')}
           </View>
           <View style={{ width: 120, textAlign: 'right' }}>
@@ -90,9 +90,11 @@ export function GroupRow({
             width: 120,
             textAlign: 'right',
             color:
-              visibleColumn === 'overfunded' || visibleColumn === 'underfunded'
-                ? theme.noticeText
-                : theme.tableText,
+              visibleColumn === 'goalTarget'
+                ? theme.tableText
+                : visibleColumn === 'overfunded'
+                  ? summary.overfunded > 0 ? theme.warningText : theme.noticeText
+                  : summary.underfunded > 0 ? theme.warningText : theme.noticeText,
           }}
         >
           {visibleColumn === 'goalTarget' && format(summary.goalTarget, 'financial')}
