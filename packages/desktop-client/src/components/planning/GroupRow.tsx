@@ -17,6 +17,7 @@ interface GroupRowProps {
   onToggle: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  isNarrowWidth: boolean;
 }
 
 export function GroupRow({
@@ -27,6 +28,7 @@ export function GroupRow({
   onToggle,
   isCollapsed,
   onToggleCollapse,
+  isNarrowWidth,
 }: GroupRowProps) {
   const format = useFormat();
   const summary = useSummaryCalculations(categories, selectedCategories);
@@ -64,12 +66,16 @@ export function GroupRow({
         <span>{isCollapsed ? '▶' : '▼'}</span>
         <span>{groupName}</span>
       </View>
-      <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
-        {format(summary.overfunded, 'financial')}
-      </View>
-      <View style={{ width: 120, textAlign: 'right', color: theme.errorText }}>
-        {format(summary.underfunded, 'financial')}
-      </View>
+      {!isNarrowWidth && (
+        <>
+          <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
+            {format(summary.overfunded, 'financial')}
+          </View>
+          <View style={{ width: 120, textAlign: 'right', color: theme.errorText }}>
+            {format(summary.underfunded, 'financial')}
+          </View>
+        </>
+      )}
       <View style={{ width: 120, textAlign: 'right' }}>
         {format(summary.goalTarget, 'financial')}
       </View>

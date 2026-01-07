@@ -8,6 +8,7 @@ import { useCheckboxState } from './useCheckboxState';
 import { useSummaryCalculations } from './useSummaryCalculations';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useGlobalPref } from '@desktop-client/hooks/useGlobalPref';
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { GroupRow } from './GroupRow';
 import { CategoryRow } from './CategoryRow';
 
@@ -16,9 +17,13 @@ export function PlanningTable() {
   const format = useFormat();
   const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
   const categoryExpandedState = categoryExpandedStatePref ?? 0;
+  const { isNarrowWidth } = useResponsive();
 
-  // Calculate maxWidth: base (200) + category expansion + 3 data columns (360)
-  const maxWidth = 200 + 100 * categoryExpandedState + 360;
+  // Calculate maxWidth based on screen size
+  // Mobile (< 512px): base (200) + category expansion + 1 data column (120)
+  // Desktop (≥ 512px): base (200) + category expansion + 3 data columns (360)
+  const dataColumnsWidth = isNarrowWidth ? 120 : 360;
+  const maxWidth = 200 + 100 * categoryExpandedState + dataColumnsWidth;
 
   // Get all category IDs for checkbox management
   const allCategoryIds = useMemo(() => {
@@ -93,8 +98,12 @@ export function PlanningTable() {
           />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>Category</View>
-        <View style={{ width: 120, textAlign: 'right' }}>Overfunded</View>
-        <View style={{ width: 120, textAlign: 'right' }}>Underfunded</View>
+        {!isNarrowWidth && (
+          <>
+            <View style={{ width: 120, textAlign: 'right' }}>Overfunded</View>
+            <View style={{ width: 120, textAlign: 'right' }}>Underfunded</View>
+          </>
+        )}
         <View style={{ width: 120, textAlign: 'right' }}>Goal Target</View>
       </View>
 
@@ -114,12 +123,16 @@ export function PlanningTable() {
       >
         <View style={{ width: 40, flexShrink: 0 }} />
         <View style={{ flex: 1, minWidth: 0 }}>Total</View>
-        <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
-          {format(totalSummary.overfunded, 'financial')}
-        </View>
-        <View style={{ width: 120, textAlign: 'right', color: theme.errorText }}>
-          {format(totalSummary.underfunded, 'financial')}
-        </View>
+        {!isNarrowWidth && (
+          <>
+            <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
+              {format(totalSummary.overfunded, 'financial')}
+            </View>
+            <View style={{ width: 120, textAlign: 'right', color: theme.errorText }}>
+              {format(totalSummary.underfunded, 'financial')}
+            </View>
+          </>
+        )}
         <View style={{ width: 120, textAlign: 'right' }}>
           {format(totalSummary.goalTarget, 'financial')}
         </View>
@@ -141,6 +154,7 @@ export function PlanningTable() {
               onToggle={() => toggleGroup(categoryIds)}
               isCollapsed={isCollapsed}
               onToggleCollapse={() => toggleCollapse(group.id)}
+              isNarrowWidth={isNarrowWidth}
             />
             {!isCollapsed && group.categories.map(category => (
               <CategoryRow
@@ -151,6 +165,7 @@ export function PlanningTable() {
                 goalTarget={category.goalTarget}
                 isSelected={isSelected(category.id)}
                 onToggle={() => toggleCategory(category.id)}
+                isNarrowWidth={isNarrowWidth}
               />
             ))}
           </React.Fragment>

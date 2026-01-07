@@ -10,6 +10,7 @@ interface CategoryRowProps {
   goalTarget: number | null;
   isSelected: boolean;
   onToggle: () => void;
+  isNarrowWidth: boolean;
 }
 
 export function CategoryRow({
@@ -19,6 +20,7 @@ export function CategoryRow({
   goalTarget,
   isSelected,
   onToggle,
+  isNarrowWidth,
 }: CategoryRowProps) {
   const format = useFormat();
 
@@ -47,12 +49,16 @@ export function CategoryRow({
         />
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>{categoryName}</View>
-      <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
-        {overfunded > 0 ? format(overfunded, 'financial') : '—'}
-      </View>
-      <View style={{ width: 120, textAlign: 'right', color: theme.errorText }}>
-        {underfunded > 0 ? format(underfunded, 'financial') : '—'}
-      </View>
+      {!isNarrowWidth && (
+        <>
+          <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
+            {overfunded > 0 ? format(overfunded, 'financial') : '—'}
+          </View>
+          <View style={{ width: 120, textAlign: 'right', color: theme.errorText }}>
+            {underfunded > 0 ? format(underfunded, 'financial') : '—'}
+          </View>
+        </>
+      )}
       <View style={{ width: 120, textAlign: 'right' }}>
         {goalTarget != null ? format(goalTarget, 'financial') : '—'}
       </View>
