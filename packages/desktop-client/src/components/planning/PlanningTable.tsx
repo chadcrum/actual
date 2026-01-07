@@ -186,10 +186,10 @@ export function PlanningTable() {
         <View style={{ flex: 1, minWidth: 0 }}>Total</View>
         {!isMobile ? (
           <>
-            <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
+            <View style={{ width: 120, textAlign: 'right', color: totalSummary.overfunded > 0 ? theme.warningText : theme.noticeText }}>
               {format(totalSummary.overfunded, 'financial')}
             </View>
-            <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
+            <View style={{ width: 120, textAlign: 'right', color: totalSummary.underfunded > 0 ? theme.warningText : theme.noticeText }}>
               {format(totalSummary.underfunded, 'financial')}
             </View>
             <View style={{ width: 120, textAlign: 'right' }}>
@@ -202,9 +202,11 @@ export function PlanningTable() {
               width: 120,
               textAlign: 'right',
               color:
-                visibleColumn === 'overfunded' || visibleColumn === 'underfunded'
-                  ? theme.noticeText
-                  : theme.tableText,
+                visibleColumn === 'goalTarget'
+                  ? theme.tableText
+                  : visibleColumn === 'overfunded'
+                    ? totalSummary.overfunded > 0 ? theme.warningText : theme.noticeText
+                    : totalSummary.underfunded > 0 ? theme.warningText : theme.noticeText,
             }}
           >
             {visibleColumn === 'goalTarget' && format(totalSummary.goalTarget, 'financial')}

@@ -59,10 +59,10 @@ export function CategoryRow({
       </View>
       {!isMobile ? (
         <>
-          <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
+          <View style={{ width: 120, textAlign: 'right', color: overfunded > 0 ? theme.warningText : theme.noticeText }}>
             {overfunded > 0 ? format(overfunded, 'financial') : '—'}
           </View>
-          <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
+          <View style={{ width: 120, textAlign: 'right', color: underfunded > 0 ? theme.warningText : theme.noticeText }}>
             {underfunded > 0 ? format(underfunded, 'financial') : '—'}
           </View>
           <View style={{ width: 120, textAlign: 'right' }}>
@@ -75,9 +75,11 @@ export function CategoryRow({
             width: 120,
             textAlign: 'right',
             color:
-              visibleColumn === 'overfunded' || visibleColumn === 'underfunded'
-                ? theme.noticeText
-                : theme.tableText,
+              visibleColumn === 'goalTarget'
+                ? theme.tableText
+                : visibleColumn === 'overfunded'
+                  ? overfunded > 0 ? theme.warningText : theme.noticeText
+                  : underfunded > 0 ? theme.warningText : theme.noticeText,
           }}
         >
           {visibleColumn === 'goalTarget' && (goalTarget != null ? format(goalTarget, 'financial') : '—')}
