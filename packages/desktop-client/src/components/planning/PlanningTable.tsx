@@ -96,7 +96,8 @@ export function PlanningTable() {
         borderRadius: 4,
         backgroundColor: theme.tableBackground,
         overflow: 'visible',
-        maxWidth,
+        maxWidth: isMobile ? '100%' : maxWidth,
+        width: isMobile ? '100%' : 'auto',
       }}
     >
       {/* Header Row */}
@@ -145,9 +146,9 @@ export function PlanningTable() {
             aria-label="Cycle between Goal Target, Underfunded, and Overfunded columns"
             style={{
               width: 120,
-              textAlign: 'right',
               cursor: 'pointer',
               display: 'flex',
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'flex-end',
               gap: 4,
@@ -160,6 +161,7 @@ export function PlanningTable() {
                 width: 16,
                 height: 16,
                 color: theme.tableHeaderText,
+                flexShrink: 0,
               }}
             />
           </View>
