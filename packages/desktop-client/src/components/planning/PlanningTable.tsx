@@ -66,7 +66,7 @@ export function PlanningTable() {
         border: `1px solid ${theme.tableBorder}`,
         borderRadius: 4,
         backgroundColor: theme.tableBackground,
-        overflow: 'hidden',
+        overflow: 'visible',
         maxWidth,
       }}
     >
