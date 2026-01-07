@@ -128,7 +128,7 @@ export function PlanningTable() {
             <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
               {format(totalSummary.overfunded, 'financial')}
             </View>
-            <View style={{ width: 120, textAlign: 'right', color: theme.errorText }}>
+            <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
               {format(totalSummary.underfunded, 'financial')}
             </View>
           </>

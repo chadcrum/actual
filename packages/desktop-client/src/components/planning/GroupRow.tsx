@@ -71,7 +71,7 @@ export function GroupRow({
           <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
             {format(summary.overfunded, 'financial')}
           </View>
-          <View style={{ width: 120, textAlign: 'right', color: theme.errorText }}>
+          <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
             {format(summary.underfunded, 'financial')}
           </View>
         </>

@@ -54,7 +54,7 @@ export function CategoryRow({
           <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
             {overfunded > 0 ? format(overfunded, 'financial') : '—'}
           </View>
-          <View style={{ width: 120, textAlign: 'right', color: theme.errorText }}>
+          <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
             {underfunded > 0 ? format(underfunded, 'financial') : '—'}
           </View>
         </>
