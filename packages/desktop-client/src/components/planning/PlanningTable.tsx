@@ -1,11 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { View } from '@actual-app/components/view';
 import { theme } from '@actual-app/components/theme';
 import { styles } from '@actual-app/components/styles';
+import { SvgRefresh } from '@actual-app/components/icons/v1';
 
 import { usePlanningData } from './usePlanningData';
 import { useCheckboxState } from './useCheckboxState';
 import { useSummaryCalculations } from './useSummaryCalculations';
+import { useColumnCycling } from './useColumnCycling';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useGlobalPref } from '@desktop-client/hooks/useGlobalPref';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
@@ -18,6 +20,8 @@ export function PlanningTable() {
   const [categoryExpandedStatePref] = useGlobalPref('categoryExpandedState');
   const categoryExpandedState = categoryExpandedStatePref ?? 0;
   const { isNarrowWidth } = useResponsive();
+  const { visibleColumn, cycleColumn, isMobile } = useColumnCycling();
+  const [isFlashing, setIsFlashing] = useState(false);
 
   // Calculate maxWidth based on screen size
   // Mobile (< 512px): base (200) + category expansion + 1 data column (120)
@@ -60,6 +64,31 @@ export function PlanningTable() {
     });
   };
 
+  const handleCycleColumn = useCallback((e: React.MouseEvent | React.KeyboardEvent) => {
+    e.preventDefault();
+    cycleColumn();
+    setIsFlashing(true);
+    setTimeout(() => setIsFlashing(false), 200);
+  }, [cycleColumn]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      handleCycleColumn(e);
+    }
+  }, [handleCycleColumn]);
+
+  // Get column label for display
+  const getColumnLabel = (column: typeof visibleColumn) => {
+    switch (column) {
+      case 'goalTarget':
+        return 'Goal Target';
+      case 'underfunded':
+        return 'Underfunded';
+      case 'overfunded':
+        return 'Overfunded';
+    }
+  };
+
   return (
     <View
       style={{
@@ -77,11 +106,14 @@ export function PlanningTable() {
           flexDirection: 'row',
           alignItems: 'center',
           padding: '12px 16px',
-          backgroundColor: theme.tableHeaderBackground,
+          backgroundColor: isFlashing
+            ? theme.tableHeaderBackgroundHover
+            : theme.tableHeaderBackground,
           borderBottom: `1px solid ${theme.tableBorder}`,
           fontWeight: 600,
           fontSize: 13,
           color: theme.tableHeaderText,
+          transition: 'background-color 0.2s ease',
         }}
       >
         <View style={{ width: 40, flexShrink: 0 }}>
@@ -98,13 +130,40 @@ export function PlanningTable() {
           />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>Category</View>
-        {!isNarrowWidth && (
+        {!isMobile ? (
           <>
             <View style={{ width: 120, textAlign: 'right' }}>Overfunded</View>
             <View style={{ width: 120, textAlign: 'right' }}>Underfunded</View>
+            <View style={{ width: 120, textAlign: 'right' }}>Goal Target</View>
           </>
+        ) : (
+          <View
+            role="button"
+            tabIndex={0}
+            onClick={handleCycleColumn}
+            onKeyDown={handleKeyDown}
+            aria-label="Cycle between Goal Target, Underfunded, and Overfunded columns"
+            style={{
+              width: 120,
+              textAlign: 'right',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: 4,
+              minHeight: 44,
+            }}
+          >
+            <span>{getColumnLabel(visibleColumn)}</span>
+            <SvgRefresh
+              style={{
+                width: 16,
+                height: 16,
+                color: theme.tableHeaderText,
+              }}
+            />
+          </View>
         )}
-        <View style={{ width: 120, textAlign: 'right' }}>Goal Target</View>
       </View>
 
       {/* Summary Row */}
@@ -123,7 +182,7 @@ export function PlanningTable() {
       >
         <View style={{ width: 40, flexShrink: 0 }} />
         <View style={{ flex: 1, minWidth: 0 }}>Total</View>
-        {!isNarrowWidth && (
+        {!isMobile ? (
           <>
             <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
               {format(totalSummary.overfunded, 'financial')}
@@ -131,11 +190,26 @@ export function PlanningTable() {
             <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
               {format(totalSummary.underfunded, 'financial')}
             </View>
+            <View style={{ width: 120, textAlign: 'right' }}>
+              {format(totalSummary.goalTarget, 'financial')}
+            </View>
           </>
+        ) : (
+          <View
+            style={{
+              width: 120,
+              textAlign: 'right',
+              color:
+                visibleColumn === 'overfunded' || visibleColumn === 'underfunded'
+                  ? theme.noticeText
+                  : theme.tableText,
+            }}
+          >
+            {visibleColumn === 'goalTarget' && format(totalSummary.goalTarget, 'financial')}
+            {visibleColumn === 'underfunded' && format(totalSummary.underfunded, 'financial')}
+            {visibleColumn === 'overfunded' && format(totalSummary.overfunded, 'financial')}
+          </View>
         )}
-        <View style={{ width: 120, textAlign: 'right' }}>
-          {format(totalSummary.goalTarget, 'financial')}
-        </View>
       </View>
 
       {/* Groups and Categories */}
@@ -155,6 +229,8 @@ export function PlanningTable() {
               isCollapsed={isCollapsed}
               onToggleCollapse={() => toggleCollapse(group.id)}
               isNarrowWidth={isNarrowWidth}
+              visibleColumn={visibleColumn}
+              isMobile={isMobile}
             />
             {!isCollapsed && group.categories.map(category => (
               <CategoryRow
@@ -166,6 +242,8 @@ export function PlanningTable() {
                 isSelected={isSelected(category.id)}
                 onToggle={() => toggleCategory(category.id)}
                 isNarrowWidth={isNarrowWidth}
+                visibleColumn={visibleColumn}
+                isMobile={isMobile}
               />
             ))}
           </React.Fragment>

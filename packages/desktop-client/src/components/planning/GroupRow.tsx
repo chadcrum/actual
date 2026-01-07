@@ -3,6 +3,7 @@ import { View } from '@actual-app/components/view';
 import { theme } from '@actual-app/components/theme';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useSummaryCalculations } from './useSummaryCalculations';
+import type { VisibleColumn } from './useColumnCycling';
 
 interface GroupRowProps {
   groupName: string;
@@ -18,6 +19,8 @@ interface GroupRowProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   isNarrowWidth: boolean;
+  visibleColumn: VisibleColumn;
+  isMobile: boolean;
 }
 
 export function GroupRow({
@@ -29,6 +32,8 @@ export function GroupRow({
   isCollapsed,
   onToggleCollapse,
   isNarrowWidth,
+  visibleColumn,
+  isMobile,
 }: GroupRowProps) {
   const format = useFormat();
   const summary = useSummaryCalculations(categories, selectedCategories);
@@ -67,7 +72,7 @@ export function GroupRow({
         <span style={{ flexShrink: 0 }}>{isCollapsed ? '▶' : '▼'}</span>
         <span style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{groupName}</span>
       </View>
-      {!isNarrowWidth && (
+      {!isMobile ? (
         <>
           <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
             {format(summary.overfunded, 'financial')}
@@ -75,11 +80,26 @@ export function GroupRow({
           <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
             {format(summary.underfunded, 'financial')}
           </View>
+          <View style={{ width: 120, textAlign: 'right' }}>
+            {format(summary.goalTarget, 'financial')}
+          </View>
         </>
+      ) : (
+        <View
+          style={{
+            width: 120,
+            textAlign: 'right',
+            color:
+              visibleColumn === 'overfunded' || visibleColumn === 'underfunded'
+                ? theme.noticeText
+                : theme.tableText,
+          }}
+        >
+          {visibleColumn === 'goalTarget' && format(summary.goalTarget, 'financial')}
+          {visibleColumn === 'underfunded' && format(summary.underfunded, 'financial')}
+          {visibleColumn === 'overfunded' && format(summary.overfunded, 'financial')}
+        </View>
       )}
-      <View style={{ width: 120, textAlign: 'right' }}>
-        {format(summary.goalTarget, 'financial')}
-      </View>
     </View>
   );
 }

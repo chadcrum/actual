@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from '@actual-app/components/view';
 import { theme } from '@actual-app/components/theme';
 import { useFormat } from '@desktop-client/hooks/useFormat';
+import type { VisibleColumn } from './useColumnCycling';
 
 interface CategoryRowProps {
   categoryName: string;
@@ -11,6 +12,8 @@ interface CategoryRowProps {
   isSelected: boolean;
   onToggle: () => void;
   isNarrowWidth: boolean;
+  visibleColumn: VisibleColumn;
+  isMobile: boolean;
 }
 
 export function CategoryRow({
@@ -21,6 +24,8 @@ export function CategoryRow({
   isSelected,
   onToggle,
   isNarrowWidth,
+  visibleColumn,
+  isMobile,
 }: CategoryRowProps) {
   const format = useFormat();
 
@@ -52,7 +57,7 @@ export function CategoryRow({
       <View style={{ flex: 1, minWidth: 0, whiteSpace: 'normal', wordBreak: 'break-word' }}>
         {categoryName}
       </View>
-      {!isNarrowWidth && (
+      {!isMobile ? (
         <>
           <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
             {overfunded > 0 ? format(overfunded, 'financial') : '—'}
@@ -60,11 +65,26 @@ export function CategoryRow({
           <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>
             {underfunded > 0 ? format(underfunded, 'financial') : '—'}
           </View>
+          <View style={{ width: 120, textAlign: 'right' }}>
+            {goalTarget != null ? format(goalTarget, 'financial') : '—'}
+          </View>
         </>
+      ) : (
+        <View
+          style={{
+            width: 120,
+            textAlign: 'right',
+            color:
+              visibleColumn === 'overfunded' || visibleColumn === 'underfunded'
+                ? theme.noticeText
+                : theme.tableText,
+          }}
+        >
+          {visibleColumn === 'goalTarget' && (goalTarget != null ? format(goalTarget, 'financial') : '—')}
+          {visibleColumn === 'underfunded' && (underfunded > 0 ? format(underfunded, 'financial') : '—')}
+          {visibleColumn === 'overfunded' && (overfunded > 0 ? format(overfunded, 'financial') : '—')}
+        </View>
       )}
-      <View style={{ width: 120, textAlign: 'right' }}>
-        {goalTarget != null ? format(goalTarget, 'financial') : '—'}
-      </View>
     </View>
   );
 }

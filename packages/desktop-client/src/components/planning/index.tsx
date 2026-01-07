@@ -13,15 +13,24 @@ export function Planning() {
       style={{
         flex: 1,
         backgroundColor: theme.pageBackground,
-        padding: 20,
+        padding: isNarrowWidth ? '20px 16px' : 20,
         // On mobile, let ScrollProvider handle scrolling; on desktop, scroll locally
         overflow: isNarrowWidth ? 'visible' : 'auto',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
+        alignItems: isNarrowWidth ? 'stretch' : 'center',
+        maxWidth: isNarrowWidth ? 'none' : '1200px',
+        margin: isNarrowWidth ? 0 : '0 auto',
+        width: '100%',
       }}
     >
-      <View style={{ marginBottom: 40, width: '100%', maxWidth: 800 }}>
+      <View
+        style={{
+          marginBottom: 40,
+          width: '100%',
+          maxWidth: isNarrowWidth ? 'none' : 800,
+        }}
+      >
         <h1 style={{ margin: 0, fontSize: 24, color: theme.pageText }}>
           Budget Planning
         </h1>
