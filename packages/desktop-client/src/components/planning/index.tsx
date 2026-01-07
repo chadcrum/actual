@@ -15,6 +15,8 @@ export function Planning() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        WebkitOverflowScrolling: 'touch',
+        touchAction: 'pan-y',
       }}
     >
       <View style={{ marginBottom: 40, width: '100%', maxWidth: 800 }}>
