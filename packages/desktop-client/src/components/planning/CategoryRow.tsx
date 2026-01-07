@@ -31,7 +31,7 @@ export function CategoryRow({
         flexDirection: 'row',
         alignItems: 'center',
         padding: '8px 16px',
-        paddingLeft: 56, // Indent for category rows
+        paddingLeft: 36, // Indent for category rows (creates 20px visual indent after checkbox)
         backgroundColor: theme.tableBackground,
         borderBottom: `1px solid ${theme.tableBorder}`,
         fontSize: 13,
@@ -40,7 +40,7 @@ export function CategoryRow({
         transition: 'opacity 0.2s ease',
       }}
     >
-      <View style={{ width: 40, flexShrink: 0, marginLeft: -40 }}>
+      <View style={{ width: 40, flexShrink: 0 }}>
         <input
           type="checkbox"
           checked={isSelected}
