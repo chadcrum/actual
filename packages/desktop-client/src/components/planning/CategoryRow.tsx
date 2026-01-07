@@ -29,8 +29,9 @@ export function CategoryRow({
       style={{
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'center',
-        padding: '8px 16px',
+        alignItems: 'flex-start',
+        flexShrink: 0,
+        padding: '12px 16px',
         paddingLeft: 36, // Indent for category rows (creates 20px visual indent after checkbox)
         backgroundColor: theme.tableBackground,
         borderBottom: `1px solid ${theme.tableBorder}`,
@@ -48,7 +49,9 @@ export function CategoryRow({
           style={{ cursor: 'pointer' }}
         />
       </View>
-      <View style={{ flex: 1, minWidth: 0 }}>{categoryName}</View>
+      <View style={{ flex: 1, minWidth: 0, whiteSpace: 'normal', wordBreak: 'break-word' }}>
+        {categoryName}
+      </View>
       {!isNarrowWidth && (
         <>
           <View style={{ width: 120, textAlign: 'right', color: theme.noticeText }}>

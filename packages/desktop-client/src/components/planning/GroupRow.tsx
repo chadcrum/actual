@@ -38,8 +38,9 @@ export function GroupRow({
       style={{
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'center',
-        padding: '10px 16px',
+        alignItems: 'flex-start',
+        flexShrink: 0,
+        padding: '12px 16px',
         backgroundColor: theme.tableRowHeaderBackground,
         borderBottom: `1px solid ${theme.tableBorder}`,
         fontWeight: 600,
@@ -63,8 +64,8 @@ export function GroupRow({
         />
       </View>
       <View style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <span>{isCollapsed ? '▶' : '▼'}</span>
-        <span>{groupName}</span>
+        <span style={{ flexShrink: 0 }}>{isCollapsed ? '▶' : '▼'}</span>
+        <span style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{groupName}</span>
       </View>
       {!isNarrowWidth && (
         <>
