@@ -12,9 +12,12 @@ export function Planning() {
         backgroundColor: theme.pageBackground,
         padding: 20,
         overflow: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
       }}
     >
-      <View style={{ marginBottom: 20 }}>
+      <View style={{ marginBottom: 20, width: '100%', maxWidth: 800 }}>
         <h1 style={{ margin: 0, fontSize: 24, color: theme.pageText }}>
           Budget Planning
         </h1>
