@@ -229,8 +229,17 @@ export function PlanningTable() {
       </View>
       </View>
 
-      {/* Groups and Categories */}
-      {groups.map(group => {
+      {/* Scrollable Content Section */}
+      <View
+        style={{
+          overflowY: 'scroll',
+          overflowAnchor: 'none',
+          flex: 1,
+          paddingRight: 5 + getScrollbarWidth(),
+        }}
+      >
+        {/* Groups and Categories */}
+        {groups.map(group => {
         const categoryIds = group.categories.map(c => c.id);
         const groupCheckboxState = getGroupCheckboxState(categoryIds);
         const isCollapsed = collapsedGroups.has(group.id);
@@ -266,6 +275,7 @@ export function PlanningTable() {
           </React.Fragment>
         );
       })}
+      </View>
     </View>
   );
 }
