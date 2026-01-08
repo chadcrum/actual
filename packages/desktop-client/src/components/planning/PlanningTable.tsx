@@ -96,9 +96,12 @@ export function PlanningTable() {
         border: `1px solid ${theme.tableBorder}`,
         borderRadius: 4,
         backgroundColor: theme.tableBackground,
-        overflow: 'visible',
+        overflow: 'hidden',
         maxWidth: isMobile ? '100%' : maxWidth,
         width: isMobile ? '100%' : 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
       }}
     >
       {/* Header Row */}
