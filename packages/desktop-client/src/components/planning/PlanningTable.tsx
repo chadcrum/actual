@@ -11,6 +11,7 @@ import { useColumnCycling } from './useColumnCycling';
 import { useFormat } from '@desktop-client/hooks/useFormat';
 import { useGlobalPref } from '@desktop-client/hooks/useGlobalPref';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
+import { getScrollbarWidth } from '@desktop-client/components/budget/util';
 import { GroupRow } from './GroupRow';
 import { CategoryRow } from './CategoryRow';
 
