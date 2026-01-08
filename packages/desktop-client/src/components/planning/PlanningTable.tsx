@@ -104,8 +104,15 @@ export function PlanningTable() {
         flex: 1,
       }}
     >
-      {/* Header Row */}
+      {/* Fixed Header Section */}
       <View
+        style={{
+          overflow: 'hidden',
+          flexShrink: 0,
+        }}
+      >
+        {/* Header Row */}
+        <View
         style={{
           display: 'flex',
           flexDirection: 'row',
@@ -184,6 +191,7 @@ export function PlanningTable() {
           fontWeight: 600,
           fontSize: 14,
           color: theme.tableText,
+          marginRight: 5 + getScrollbarWidth(),
         }}
       >
         <View style={{ width: 40, flexShrink: 0 }} />
@@ -218,6 +226,7 @@ export function PlanningTable() {
             {visibleColumn === 'overfunded' && format(totalSummary.overfunded, 'financial')}
           </View>
         )}
+      </View>
       </View>
 
       {/* Groups and Categories */}
