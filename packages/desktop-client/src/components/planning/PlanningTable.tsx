@@ -118,9 +118,7 @@ export function PlanningTable() {
             flexDirection: 'row',
             alignItems: 'center',
             padding: '12px 16px',
-            backgroundColor: isFlashing
-              ? theme.tableHeaderBackgroundHover
-              : theme.tableHeaderBackground,
+            backgroundColor: theme.tableHeaderBackground,
             borderBottom: `1px solid ${theme.tableBorder}`,
             fontWeight: 600,
             fontSize: 13,
