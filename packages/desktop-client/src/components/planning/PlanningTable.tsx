@@ -113,20 +113,20 @@ export function PlanningTable() {
       >
         {/* Header Row */}
         <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: '12px 16px',
-          backgroundColor: isFlashing
-            ? theme.tableHeaderBackgroundHover
-            : theme.tableHeaderBackground,
-          borderBottom: `1px solid ${theme.tableBorder}`,
-          fontWeight: 600,
-          fontSize: 13,
-          color: theme.tableHeaderText,
-          transition: 'background-color 0.2s ease',
-        }}
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: '12px 16px',
+            backgroundColor: isFlashing
+              ? theme.tableHeaderBackgroundHover
+              : theme.tableHeaderBackground,
+            borderBottom: `1px solid ${theme.tableBorder}`,
+            fontWeight: 600,
+            fontSize: 13,
+            color: theme.tableHeaderText,
+            transition: 'background-color 0.2s ease',
+          }}
       >
         <View style={{ width: 40, flexShrink: 0 }}>
           <input
