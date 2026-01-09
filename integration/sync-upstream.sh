@@ -24,9 +24,13 @@ if ! git remote get-url upstream &>/dev/null; then
   exit 1
 fi
 
-# Fetch latest changes from upstream
-echo "📥 Fetching latest changes from upstream/master..."
-git fetch upstream master
+# Fetch all remotes
+echo "📥 Fetching from all remotes..."
+git fetch --all
+
+# Ensure we have the latest upstream master
+echo "📥 Pulling latest changes from upstream/master..."
+git pull upstream master
 
 # Check if there are any changes to merge
 LOCAL=$(git rev-parse HEAD)
